@@ -6,9 +6,9 @@
   "--color-button": "#263244",
   "--color-button-hover": "#334155",
   "--color-accent": "#3b82f6",
-  "--color-accent-strong": "#1d4ed8",
-  "--border-subtle": "#334155",
-  "--border-strong": "#3b82f6",
+  "--color-accent-strong": "#2563eb",
+  "--border-subtle": "rgba(51, 65, 85, 0.78)",
+  "--border-strong": "#2f6ede",
   "--panel-bg": "linear-gradient(170deg, var(--color-surface), var(--color-bg-alt))",
-  "--button-primary-bg": "linear-gradient(160deg, var(--color-accent), var(--color-accent-strong))"
+  "--button-primary-bg": "linear-gradient(160deg, #3476e8, #2563eb)"
 }

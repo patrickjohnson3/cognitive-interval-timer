@@ -20,6 +20,10 @@
   --font-size-overline: 0.82rem;
   --font-size-body-small: 0.9rem;
   --font-size-hint: 1.03rem;
+  --glow-soft: var(--color-accent-glow);
+  --glow-strong: var(--color-accent-glow);
+  --long-hint-border-width: 1px;
+  --sidebar-label-color: var(--text-secondary, var(--color-muted));
 }
 
 :root[data-density="compact"] {
@@ -122,6 +126,7 @@ h1 {
   margin: 0 0 var(--space-2);
   font-size: clamp(2.5rem, 8vw, 4.6rem);
   line-height: 1;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--text-primary, var(--color-text));
   text-shadow: 0 0 12px var(--color-accent-glow);
@@ -150,7 +155,7 @@ h1 {
   font-weight: 550;
   min-height: 2.6em;
   padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--long-hint-border);
+  border: var(--long-hint-border-width) solid var(--long-hint-border);
   border-radius: 12px;
   background: var(--long-hint-bg);
   box-shadow: var(--elevation-2);
@@ -182,18 +187,19 @@ button {
 button:hover {
   transform: translateY(-1px);
   background: var(--color-button-hover);
-  box-shadow: 0 4px 10px var(--color-accent-glow);
+  box-shadow: 0 4px 10px var(--glow-soft);
 }
 
 button.primary {
   background: var(--button-primary-bg);
   color: var(--color-primary-text);
   border-color: var(--border-strong, var(--color-accent-strong));
-  box-shadow: 0 5px 12px var(--color-accent-glow);
+  box-shadow: none;
 }
 
 button.primary:hover {
   background: var(--button-primary-hover-bg);
+  box-shadow: 0 5px 12px var(--glow-strong);
 }
 
 button:focus-visible,
@@ -253,7 +259,7 @@ kbd {
   font-size: var(--font-size-overline);
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--text-secondary, var(--color-muted));
+  color: var(--sidebar-label-color);
 }
 
 .break-layout {
@@ -282,7 +288,7 @@ kbd {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  color: var(--text-secondary, var(--color-muted));
+  color: var(--sidebar-label-color);
   font-size: var(--font-size-label-strong);
 }
 
@@ -301,7 +307,7 @@ label {
   display: grid;
   gap: var(--space-1);
   font-size: var(--font-size-label);
-  color: var(--text-secondary, var(--color-muted));
+  color: var(--sidebar-label-color);
 }
 
 input[type="number"],
@@ -361,7 +367,7 @@ select {
   border: 1px solid var(--border-subtle, var(--color-border));
   border-radius: 12px;
   background: var(--theme-row-bg);
-  box-shadow: 0 4px 12px var(--color-accent-glow);
+  box-shadow: 0 4px 12px var(--glow-soft);
 }
 
 .sr-only {
