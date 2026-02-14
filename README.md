@@ -10,6 +10,10 @@ A browser-based interval timer inspired by Pomodoro, designed around cognitive p
 
 The app is client-side only (no backend) and includes light/dark grayscale themes, keyboard shortcuts, audio phase-change cues, and persistent settings/stats via local storage.
 
+## Live Site
+
+https://patrickjohnson3.github.io/cognitive-interval-timer/
+
 ## Features
 
 - Multi-phase workflow with configurable durations
