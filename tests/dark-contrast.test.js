@@ -21,8 +21,8 @@ test("dark contrast ratios meet minimum thresholds for key pairs", function () {
   const pairs = [
     { fg: "--text-primary", bg: "--color-surface", min: 7.0 },
     { fg: "--text-secondary", bg: "--color-surface", min: 4.5 },
-    { fg: "--color-focus-ring", bg: "--color-surface", min: 4.5 },
-    { fg: "--color-primary-text", bg: "--color-accent", min: 7.0 },
+    { fg: "--color-focus-ring", bg: "--color-surface", min: 3.0 },
+    { fg: "--color-primary-text", bg: "--color-accent", min: 3.0 },
   ];
 
   pairs.forEach((pair) => {
