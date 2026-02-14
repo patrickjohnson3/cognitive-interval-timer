@@ -9,6 +9,6 @@
   "--color-accent-strong": "#a4a4a4",
   "--border-subtle": "rgba(212, 212, 212, 0.16)",
   "--border-strong": "#d0d0d0",
-  "--panel-bg": "linear-gradient(165deg, var(--color-surface), var(--color-bg-alt))",
+  "--panel-bg": "linear-gradient(170deg, var(--color-surface), var(--color-bg-alt))",
   "--button-primary-bg": "linear-gradient(160deg, var(--color-accent), var(--color-accent-strong))"
 }

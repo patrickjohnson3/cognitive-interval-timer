@@ -20,6 +20,17 @@ function read(file) {
   return fs.readFileSync(path.join(__dirname, "..", file), "utf8");
 }
 
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function readSelectorBlock(css, selector) {
+  const re = new RegExp("(?:^|\\n)\\s*" + escapeRegExp(selector) + "\\s*\\{([\\s\\S]*?)\\}");
+  const match = css.match(re);
+  if (!match) return null;
+  return match[0];
+}
+
 test("key UI blocks are token driven for light-theme safety", function () {
   const css = read("styles.css");
 
@@ -32,9 +43,8 @@ test("key UI blocks are token driven for light-theme safety", function () {
   ];
 
   checks.forEach((check) => {
-    const idx = css.indexOf(check.sel);
-    assert(idx !== -1, `missing selector ${check.sel}`);
-    const block = css.slice(idx, css.indexOf("}", idx) + 1);
+    const block = readSelectorBlock(css, check.sel);
+    assert(block, `missing selector ${check.sel}`);
     check.must.forEach((needle) => {
       assert(block.includes(needle), `${check.sel} missing ${needle}`);
     });
