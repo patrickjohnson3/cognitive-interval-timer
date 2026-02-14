@@ -218,9 +218,58 @@ kbd {
   gap: var(--space-1);
 }
 
-.settings h2 {
-  margin: 0 0 12px;
-  font-size: 1rem;
+.settings-group {
+  border: 1px solid var(--border-subtle, var(--color-border));
+  border-radius: 12px;
+  background: var(--theme-row-bg);
+  padding: var(--space-4);
+}
+
+.settings-group + .settings-group {
+  margin-top: var(--space-3);
+}
+
+.settings-group h3 {
+  margin: 0 0 var(--space-3);
+  font-size: 0.92rem;
+  letter-spacing: 0.02em;
+  color: var(--text-primary, var(--color-text));
+}
+
+.phase-subgroup + .phase-subgroup {
+  margin-top: var(--space-3);
+}
+
+.phase-subgroup h4 {
+  margin: 0 0 var(--space-2);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary, var(--color-muted));
+}
+
+.break-layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.break-short {
+  grid-column: 1 / 2;
+}
+
+.settings-theme {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-secondary, var(--color-muted));
+  font-size: 0.9rem;
+}
+
+.settings-theme select {
+  width: auto;
+  min-width: 110px;
 }
 
 .grid {
@@ -286,12 +335,9 @@ select {
   font-weight: 700;
 }
 
-.theme-row {
+.cycle-wrap {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  color: var(--color-text);
-  font-size: 0.86rem;
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--border-subtle, var(--color-border));
   border-radius: 12px;
@@ -318,5 +364,9 @@ select {
 
   .header {
     padding: var(--space-6);
+  }
+
+  .break-layout {
+    grid-template-columns: 1fr;
   }
 }

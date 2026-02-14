@@ -82,7 +82,7 @@
   }
 
   function applyStaticCopy() {
-    dom.copy.settingsHeading.textContent = Content.UI_COPY.settingsHeading;
+    dom.copy.phaseSettingsHeading.textContent = Content.UI_COPY.phaseSettingsHeading;
     dom.copy.blocks.textContent = Content.UI_COPY.blocksBeforeLongBreak;
     dom.copy.primeEnabled.textContent = Content.UI_COPY.startWithPrep;
     dom.copy.autoStart.textContent = Content.UI_COPY.autoStartNext;
@@ -509,7 +509,7 @@
         sound_enabled: byId("sound_enabled"),
       },
       copy: {
-        settingsHeading: byId("label-settings-heading"),
+        phaseSettingsHeading: byId("label-phase-settings-heading"),
         blocks: byId("label-blocks"),
         primeEnabled: byId("label-prime-enabled"),
         autoStart: byId("label-auto-start"),

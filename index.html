@@ -18,12 +18,7 @@
         <h1>Cognitive Interval Timer</h1>
         <p class="subtitle" id="tagline"></p>
       </div>
-      <div class="theme-row">
-        <label for="theme">Theme</label>
-        <select id="theme" aria-label="Theme selector">
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-        </select>
+      <div class="cycle-wrap">
         <span class="badge" id="cycle-badge">Cycle 0</span>
       </div>
     </header>
@@ -52,21 +47,40 @@
       </article>
 
       <aside class="panel settings" aria-label="Settings panel">
-        <h2 id="label-settings-heading">Phase Settings (Minutes)</h2>
-        <div class="grid">
-          <label><span id="label-prime">Prep</span><input id="prime" type="number" min="0" max="60" /></label>
-          <label><span id="label-focus">Focus</span><input id="focus" type="number" min="1" max="180" /></label>
-          <label><span id="label-recall">Recall</span><input id="recall" type="number" min="0" max="30" /></label>
-          <label><span id="label-break">Short Break</span><input id="break" type="number" min="1" max="60" /></label>
-          <label><span id="label-long_break">Long Break</span><input id="long_break" type="number" min="1" max="90" /></label>
-          <label><span id="label-blocks">Focus Blocks Before Long Break</span><input id="blocks_per_ultradian" type="number" min="1" max="8" /></label>
-        </div>
+        <section class="settings-group" aria-label="General controls">
+          <div class="settings-theme">
+            <label for="theme">Theme</label>
+            <select id="theme" aria-label="Theme selector">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+          <div class="checks">
+            <label><input id="prime_enabled" type="checkbox" /> <span id="label-prime-enabled">Start With Prep Phase</span></label>
+            <label><input id="auto_start" type="checkbox" /> <span id="label-auto-start">Auto-Start Next Phase</span></label>
+            <label><input id="sound_enabled" type="checkbox" /> <span id="label-sound-enabled">Play Sound On Phase Change</span></label>
+          </div>
+        </section>
 
-        <div class="checks">
-          <label><input id="prime_enabled" type="checkbox" /> <span id="label-prime-enabled">Start With Prep Phase</span></label>
-          <label><input id="auto_start" type="checkbox" /> <span id="label-auto-start">Auto-Start Next Phase</span></label>
-          <label><input id="sound_enabled" type="checkbox" /> <span id="label-sound-enabled">Play Sound On Phase Change</span></label>
-        </div>
+        <section class="settings-group" aria-labelledby="label-phase-settings-heading">
+          <h3 id="label-phase-settings-heading">Phase (minutes)</h3>
+          <div class="phase-subgroup">
+            <h4>Work</h4>
+            <div class="grid">
+              <label><span id="label-prime">Prep</span><input id="prime" type="number" min="0" max="60" /></label>
+              <label><span id="label-focus">Focus</span><input id="focus" type="number" min="1" max="180" /></label>
+              <label><span id="label-recall">Recall</span><input id="recall" type="number" min="0" max="30" /></label>
+            </div>
+          </div>
+          <div class="phase-subgroup">
+            <h4>Break</h4>
+            <div class="break-layout">
+              <label class="break-short"><span id="label-break">Short Break</span><input id="break" type="number" min="1" max="60" /></label>
+              <label><span id="label-long_break">Long Break</span><input id="long_break" type="number" min="1" max="90" /></label>
+              <label><span id="label-blocks">Focus Blocks Before Long Break</span><input id="blocks_per_ultradian" type="number" min="1" max="8" /></label>
+            </div>
+          </div>
+        </section>
 
         <div class="actions">
           <button id="save" type="button" class="primary">Save settings</button>
