@@ -13,6 +13,7 @@
       phase: "focus",
       remainingSec: 0,
       lastTickMs: null,
+      hasStartedOnce: false,
     },
   };
 
@@ -244,6 +245,17 @@
 
     function start() {
       state.stats = Core.rolloverStats(state.stats, Core.dateKey());
+
+      if (!state.timer.hasStartedOnce) {
+        hooks.onPhaseChange({
+          from: null,
+          to: state.timer.phase,
+          label: Core.stateLabel(state.timer.phase),
+          reason: "initial_start",
+        });
+        state.timer.hasStartedOnce = true;
+      }
+
       state.timer.running = true;
       state.timer.lastTickMs = Date.now();
       hooks.onStateChange();
