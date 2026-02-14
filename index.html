@@ -61,7 +61,7 @@
       font-family: "Space Grotesk", sans-serif;
       background: radial-gradient(circle at 10% 20%, var(--bg-alt), transparent 45%),
         radial-gradient(circle at 18% 78%, var(--accent-glow), transparent 40%),
-        radial-gradient(circle at 85% 80%, color-mix(in srgb, var(--bg-alt), transparent 35%), transparent 50%),
+        radial-gradient(circle at 85% 80%, var(--bg-alt), transparent 50%),
         linear-gradient(140deg, var(--bg), var(--bg-alt));
       color: var(--ink);
       display: grid;
@@ -71,12 +71,17 @@
 
     .app {
       width: min(760px, 100%);
-      background: color-mix(in srgb, var(--surface), transparent calc((1 - var(--surface-alpha)) * 100%));
-      backdrop-filter: blur(6px);
+      background: var(--surface);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       border: 1px solid var(--border);
       overflow: hidden;
+    }
+
+    @supports (backdrop-filter: blur(6px)) {
+      .app {
+        backdrop-filter: blur(6px);
+      }
     }
 
     .header {
@@ -105,7 +110,7 @@
       background: var(--accent-soft);
       color: var(--accent);
       font-weight: 700;
-      border: 1px solid color-mix(in srgb, var(--accent), transparent 60%);
+      border: 1px solid var(--border);
       border-radius: 999px;
       padding: 8px 12px;
       font-size: 0.8rem;
@@ -121,11 +126,7 @@
     }
 
     .panel {
-      background: linear-gradient(
-        165deg,
-        color-mix(in srgb, var(--surface), #fff 8%),
-        color-mix(in srgb, var(--surface), #000 4%)
-      );
+      background: linear-gradient(165deg, var(--surface), var(--bg-alt));
       border-radius: 16px;
       border: 1px solid var(--border);
       padding: 18px;
@@ -145,8 +146,8 @@
       font-size: clamp(2.5rem, 8vw, 4.6rem);
       line-height: 1;
       font-variant-numeric: tabular-nums;
-      color: color-mix(in srgb, var(--ink), var(--accent) 20%);
-      text-shadow: 0 0 12px color-mix(in srgb, var(--accent-glow), transparent 50%);
+      color: var(--ink);
+      text-shadow: 0 0 12px var(--accent-glow);
     }
 
     .hint {
@@ -162,7 +163,7 @@
     }
 
     button {
-      border: 1px solid color-mix(in srgb, var(--border), transparent 20%);
+      border: 1px solid var(--border);
       border-radius: 11px;
       padding: 10px 12px;
       font: inherit;
@@ -176,18 +177,18 @@
     button:hover {
       transform: translateY(-1px);
       background: var(--button-bg-hover);
-      box-shadow: 0 4px 10px color-mix(in srgb, var(--accent-glow), transparent 55%);
+      box-shadow: 0 4px 10px var(--accent-glow);
     }
 
     button.primary {
       background: linear-gradient(160deg, var(--accent), var(--accent-strong));
       color: var(--primary-text);
-      border-color: color-mix(in srgb, var(--accent), #000 18%);
-      box-shadow: 0 5px 12px color-mix(in srgb, var(--accent-glow), transparent 45%);
+      border-color: var(--accent-strong);
+      box-shadow: 0 5px 12px var(--accent-glow);
     }
 
     button.primary:hover {
-      background: linear-gradient(160deg, color-mix(in srgb, var(--accent), #fff 8%), var(--accent-strong));
+      background: linear-gradient(160deg, var(--accent-strong), var(--accent));
     }
 
     .stats {
@@ -453,7 +454,15 @@
       lastTickMs = now;
 
       // Consume elapsed time accurately so throttled tabs stay in sync.
-      for (let i = 0; i < 10 && elapsedSec > 0; i += 1) {
+      let transitionGuard = 0;
+      while (elapsedSec > 0) {
+        transitionGuard += 1;
+        if (transitionGuard > 1000) {
+          timer.running = false;
+          lastTickMs = null;
+          break;
+        }
+
         if (timer.remainingSec > elapsedSec) {
           timer.remainingSec -= elapsedSec;
           elapsedSec = 0;
@@ -539,10 +548,7 @@
         const raw = localStorage.getItem(STORAGE.settings);
         if (!raw) return { ...DEFAULTS };
         const parsed = JSON.parse(raw);
-        return {
-          ...DEFAULTS,
-          ...parsed
-        };
+        return normalizeSettings(parsed);
       } catch {
         return { ...DEFAULTS };
       }
@@ -576,12 +582,12 @@
     }
 
     function saveSettings() {
-      localStorage.setItem(STORAGE.settings, JSON.stringify(settings));
+      safeSetLocalStorage(STORAGE.settings, JSON.stringify(settings));
     }
 
     function saveStats() {
       stats.dateKey = new Date().toDateString();
-      localStorage.setItem(STORAGE.stats, JSON.stringify(stats));
+      safeSetLocalStorage(STORAGE.stats, JSON.stringify(stats));
     }
 
     function rolloverStatsIfNeeded() {
@@ -593,7 +599,7 @@
     }
 
     function loadTheme() {
-      const stored = localStorage.getItem(STORAGE.theme);
+      const stored = safeGetLocalStorage(STORAGE.theme);
       return stored === "dark" ? "dark" : "light";
     }
 
@@ -601,13 +607,45 @@
       theme = nextTheme === "dark" ? "dark" : "light";
       document.documentElement.setAttribute("data-theme", theme);
       dom.theme.value = theme;
-      localStorage.setItem(STORAGE.theme, theme);
+      safeSetLocalStorage(STORAGE.theme, theme);
+    }
+
+    function safeGetLocalStorage(key) {
+      try {
+        return localStorage.getItem(key);
+      } catch {
+        return null;
+      }
+    }
+
+    function safeSetLocalStorage(key, value) {
+      try {
+        localStorage.setItem(key, value);
+        return true;
+      } catch {
+        return false;
+      }
     }
 
     function validateMinutes(raw, fallback, min = 0, max = 300) {
       const num = Number(raw);
       if (!Number.isFinite(num)) return fallback;
       return Math.max(min, Math.min(max, Math.round(num)));
+    }
+
+    function normalizeSettings(source) {
+      const merged = { ...DEFAULTS, ...source };
+      return {
+        prime: validateMinutes(merged.prime, DEFAULTS.prime, 0, 60),
+        focus: validateMinutes(merged.focus, DEFAULTS.focus, 1, 180),
+        recall: validateMinutes(merged.recall, DEFAULTS.recall, 0, 30),
+        break: validateMinutes(merged.break, DEFAULTS.break, 1, 60),
+        long_break: validateMinutes(merged.long_break, DEFAULTS.long_break, 1, 90),
+        blocks_per_ultradian: validateMinutes(merged.blocks_per_ultradian, DEFAULTS.blocks_per_ultradian, 1, 8),
+        prime_enabled: typeof merged.prime_enabled === "boolean" ? merged.prime_enabled : DEFAULTS.prime_enabled,
+        auto_start: typeof merged.auto_start === "boolean" ? merged.auto_start : DEFAULTS.auto_start,
+        sound_enabled: typeof merged.sound_enabled === "boolean" ? merged.sound_enabled : DEFAULTS.sound_enabled
+      };
     }
 
     function hydrateForm() {
@@ -687,6 +725,7 @@
 
       document.getElementById("save").addEventListener("click", () => {
         readFormIntoSettings();
+        settings = normalizeSettings(settings);
         saveSettings();
 
         if (!timer.running) {
@@ -704,7 +743,7 @@
       });
 
       document.getElementById("defaults").addEventListener("click", () => {
-        settings = { ...DEFAULTS };
+        settings = normalizeSettings(DEFAULTS);
         saveSettings();
         hydrateForm();
         timer.state = settings.prime_enabled ? "prime" : "focus";
