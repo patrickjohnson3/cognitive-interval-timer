@@ -113,6 +113,7 @@
   }
 
   function stateLabel(phase) {
+    if (phase === "prime") return "Prep";
     if (phase === "long_break") return "Long Break";
     if (phase === "break") return "Short Break";
     return phase.charAt(0).toUpperCase() + phase.slice(1);
