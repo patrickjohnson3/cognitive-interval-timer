@@ -16,6 +16,11 @@
       hasStartedOnce: false,
     },
   };
+  const TAGLINES = [
+    "deep work. real breaks. repeat.",
+    "intensity. recovery. repeat.",
+    "work. recover. repeat.",
+  ];
 
   const storage = createStorageAdapter();
   const audio = createAudioEngine();
@@ -29,6 +34,7 @@
 
   function initialize() {
     hydrateFromStorage();
+    ui.setTagline(TAGLINES[Math.floor(Math.random() * TAGLINES.length)]);
     ui.hydrateSettingsForm(appState.settings);
     ui.hydrateTheme(appState.theme);
     ui.bindControls({
@@ -400,6 +406,7 @@
       saveMsg: byId("save-msg"),
       theme: byId("theme"),
       live: byId("live-announcer"),
+      tagline: byId("tagline"),
       controls: {
         start: byId("start"),
         pause: byId("pause"),
@@ -499,6 +506,10 @@
       }, 1800);
     }
 
+    function setTagline(text) {
+      dom.tagline.textContent = text;
+    }
+
     function announce(text) {
       dom.live.textContent = "";
       setTimeout(function writeAnnouncement() {
@@ -526,6 +537,7 @@
       hydrateSettingsForm,
       hydrateTheme,
       flashMessage,
+      setTagline,
       announce,
       render,
     };

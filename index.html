@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Better Pomodoro</title>
+  <title>Cognitive Interval Timer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -13,8 +13,8 @@
   <main class="app" aria-label="Pomodoro timer app">
     <header class="header">
       <div>
-        <h1>Better Pomodoro</h1>
-        <p class="subtitle">Focus with rhythm: prime, work, reflect, recover.</p>
+        <h1>Cognitive Interval Timer</h1>
+        <p class="subtitle" id="tagline"></p>
       </div>
       <div class="theme-row">
         <label for="theme">Theme</label>
@@ -50,7 +50,7 @@
       </article>
 
       <aside class="panel settings" aria-label="Settings panel">
-        <h2>Session Settings (minutes)</h2>
+        <h2>Phase Settings (minutes)</h2>
         <div class="grid">
           <label>Prime<input id="prime" type="number" min="0" max="60" /></label>
           <label>Focus<input id="focus" type="number" min="1" max="180" /></label>
