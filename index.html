@@ -310,7 +310,6 @@
           <button id="pause">Pause</button>
           <button id="skip">Skip</button>
           <button id="reset">Reset</button>
-          <button id="notify">Enable notifications</button>
         </div>
 
         <div class="stats">
@@ -334,6 +333,7 @@
         <div class="checks">
           <label><input id="prime_enabled" type="checkbox" /> Start with prime phase</label>
           <label><input id="auto_start" type="checkbox" /> Auto-start next phase</label>
+          <label><input id="sound_enabled" type="checkbox" /> Play sound on phase change</label>
         </div>
 
         <div class="actions">
@@ -354,7 +354,8 @@
       long_break: 25,
       blocks_per_ultradian: 2,
       prime_enabled: true,
-      auto_start: true
+      auto_start: true,
+      sound_enabled: true
     };
 
     const STORAGE = {
@@ -389,6 +390,7 @@
     let stats = loadStats();
     let theme = loadTheme();
     let intervalId = null;
+    let audioCtx = null;
 
     let timer = {
       running: false,
@@ -430,7 +432,7 @@
       }
 
       timer.running = autoStart;
-      notify(`Entering ${stateLabel(state)}`, stateHints[state]);
+      playPhaseChime();
       render();
     }
 
@@ -471,11 +473,46 @@
       return `${mm}:${ss}`;
     }
 
-    function notify(title, body) {
-      if (!("Notification" in window)) return;
-      if (Notification.permission === "granted") {
-        new Notification(title, { body });
+    function ensureAudioContext() {
+      if (audioCtx) {
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        return audioCtx;
       }
+
+      const AudioCtor = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtor) return null;
+      audioCtx = new AudioCtor();
+      if (audioCtx.state === "suspended") audioCtx.resume();
+      return audioCtx;
+    }
+
+    function playPhaseChime() {
+      if (!settings.sound_enabled) return;
+      const ctx = ensureAudioContext();
+      if (!ctx) return;
+
+      const start = ctx.currentTime + 0.01;
+      const notes = [523.25, 659.25, 783.99];
+
+      notes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = "sine";
+        osc.frequency.value = freq;
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        const t0 = start + idx * 0.09;
+        const t1 = t0 + 0.12;
+
+        gain.gain.setValueAtTime(0, t0);
+        gain.gain.linearRampToValueAtTime(0.07, t0 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t1);
+
+        osc.start(t0);
+        osc.stop(t1);
+      });
     }
 
     function loadSettings() {
@@ -555,6 +592,7 @@
       document.getElementById("blocks_per_ultradian").value = settings.blocks_per_ultradian;
       document.getElementById("prime_enabled").checked = settings.prime_enabled;
       document.getElementById("auto_start").checked = settings.auto_start;
+      document.getElementById("sound_enabled").checked = settings.sound_enabled;
     }
 
     function readFormIntoSettings() {
@@ -571,6 +609,7 @@
       );
       settings.prime_enabled = document.getElementById("prime_enabled").checked;
       settings.auto_start = document.getElementById("auto_start").checked;
+      settings.sound_enabled = document.getElementById("sound_enabled").checked;
     }
 
     function flashSaved(message) {
@@ -582,6 +621,14 @@
 
     function setupControls() {
       hydrateForm();
+
+      const unlockAudio = () => {
+        ensureAudioContext();
+        window.removeEventListener("pointerdown", unlockAudio);
+        window.removeEventListener("keydown", unlockAudio);
+      };
+      window.addEventListener("pointerdown", unlockAudio);
+      window.addEventListener("keydown", unlockAudio);
 
       document.getElementById("start").addEventListener("click", () => {
         timer.running = true;
@@ -602,15 +649,6 @@
         timer.state = settings.prime_enabled ? "prime" : "focus";
         timer.remainingSec = durationSec(timer.state);
         render();
-      });
-
-      document.getElementById("notify").addEventListener("click", async () => {
-        if (!("Notification" in window)) {
-          alert("This browser does not support notifications.");
-          return;
-        }
-        const p = await Notification.requestPermission();
-        alert(`Notification permission: ${p}`);
       });
 
       document.getElementById("save").addEventListener("click", () => {
