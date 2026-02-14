@@ -1,45 +1,48 @@
 :root[data-theme="light"] {
-  --color-bg: #d4d4d4;
-  --color-bg-alt: #bfbfbf;
-  --color-surface: #cecece;
-  --color-text: #1e1e1e;
-  --color-muted: #4a4a4a;
-  --color-accent: #4f4f4f;
-  --color-accent-strong: #3d3d3d;
-  --color-accent-soft: #bdbdbd;
-  --color-accent-glow: rgba(79, 79, 79, 0.16);
-  --color-success: #4a4a4a;
-  --color-border: rgba(30, 30, 30, 0.14);
-  --color-shadow: rgba(30, 30, 30, 0.13);
-  --color-button: #cfcfcf;
-  --color-button-hover: #b5b5b5;
-  --color-input: #c4c4c4;
-  --color-primary-text: #d4d4d4;
-  --color-focus-ring: #1e1e1e;
-  --color-input-edge: rgba(30, 30, 30, 0.12);
-  --border-subtle: rgba(30, 30, 30, 0.14);
-  --border-strong: #3d3d3d;
+  --color-bg: #f5f7f9;
+  --color-bg-alt: #eef2f6;
+  --color-surface: #ffffff;
+  --color-text: #1f2933;
+  --color-muted: #52606d;
+  --color-accent: #2563eb;
+  --color-accent-strong: #1d4ed8;
+  --color-accent-soft: #dbeafe;
+  --color-accent-glow: rgba(37, 99, 235, 0.2);
+  --color-break-accent: #16a34a;
+  --color-recall-accent: #7c3aed;
+  --color-success: #16a34a;
+  --color-border: #e4e7eb;
+  --color-shadow: rgba(31, 41, 51, 0.12);
+  --color-button: #f8fafc;
+  --color-button-hover: #eef2f7;
+  --color-input: #ffffff;
+  --color-primary-text: #ffffff;
+  --color-focus-ring: #2563eb;
+  --color-input-edge: rgba(31, 41, 51, 0.08);
+  --border-subtle: #e4e7eb;
+  --border-strong: #2563eb;
 
-  --text-primary: #1e1e1e;
-  --text-secondary: #4a4a4a;
-  --text-tertiary: #5b5b5b;
+  --text-primary: #1f2933;
+  --text-secondary: #52606d;
+  --text-tertiary: #616e7c;
 
-  --elevation-1: 0 4px 12px rgba(30, 30, 30, 0.12);
-  --elevation-2: 0 7px 18px rgba(30, 30, 30, 0.14);
-  --elevation-3: 0 12px 24px rgba(30, 30, 30, 0.13);
+  --elevation-1: 0 2px 8px rgba(31, 41, 51, 0.07);
+  --elevation-2: 0 8px 20px rgba(31, 41, 51, 0.1);
+  --elevation-3: 0 14px 34px rgba(31, 41, 51, 0.12);
 
-  --hint-bg: linear-gradient(160deg, var(--color-surface), var(--color-bg-alt));
+  --hint-bg: linear-gradient(160deg, #eff6ff, #ffffff);
   --hint-border: var(--color-accent);
-  --long-hint-bg: var(--color-surface);
-  --long-hint-border: var(--color-accent);
-  --badge-bg: linear-gradient(150deg, var(--color-surface), var(--color-bg-alt));
-  --badge-border: var(--color-accent);
-  --badge-text: var(--color-accent-strong);
+  --long-hint-bg: linear-gradient(165deg, #f5f3ff, #ffffff);
+  --long-hint-border: var(--color-recall-accent);
+  --badge-bg: linear-gradient(150deg, #f3f4f6, #ffffff);
+  --badge-border: var(--color-border);
+  --badge-text: var(--color-break-accent);
   --button-primary-bg: linear-gradient(160deg, var(--color-accent), var(--color-accent-strong));
-  --button-primary-hover-bg: linear-gradient(160deg, var(--color-accent-strong), var(--color-accent));
-  --theme-row-bg: var(--color-surface);
-  --panel-bg: linear-gradient(170deg, var(--color-surface), var(--color-bg-alt));
+  --button-primary-hover-bg: linear-gradient(160deg, var(--color-accent-strong), #1e40af);
+  --theme-row-bg: #fcfdff;
+  --panel-bg: linear-gradient(170deg, var(--color-surface), #f8fafc);
   --card-bg: var(--color-surface);
-  --bg-gradient: radial-gradient(circle at 15% 22%, var(--color-bg-alt), transparent 42%),
+  --bg-gradient: radial-gradient(circle at 14% 18%, #e8eef5, transparent 42%),
+    radial-gradient(circle at 86% 82%, #edf4ff, transparent 44%),
     linear-gradient(140deg, var(--color-bg), var(--color-bg-alt));
 }
