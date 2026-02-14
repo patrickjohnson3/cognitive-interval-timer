@@ -43,10 +43,17 @@
 
       Object.keys(dom.fields).forEach(function watchField(key) {
         const field = dom.fields[key];
+        const tag = field.tagName;
+        const type = field.type;
+
+        if (type === "checkbox" || tag === "SELECT") {
+          field.addEventListener("change", function onChange() {
+            handlers.onSettingsInput(readSettingsForm());
+          });
+          return;
+        }
+
         field.addEventListener("input", function onInput() {
-          handlers.onSettingsInput(readSettingsForm());
-        });
-        field.addEventListener("change", function onChange() {
           handlers.onSettingsInput(readSettingsForm());
         });
       });

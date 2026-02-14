@@ -50,6 +50,7 @@
   };
 
   window.AppController = AppController;
+  let lastSavedStats = null;
 
   initialize();
 
@@ -104,6 +105,7 @@
       focusBlocksSinceLong: 0,
     });
     appState.stats = Core.normalizeStats(storedStats, Core.dateKey());
+    lastSavedStats = cloneStats(appState.stats);
 
     const storedTheme = storage.getText(Core.STORAGE_KEYS.theme, "light");
     appState.theme = storedTheme === "dark" ? "dark" : "light";
@@ -133,6 +135,9 @@
   }
 
   function saveSettings(rawSettings) {
+    const previousSettings = appState.settings;
+    const oldPhaseDuration = Core.phaseDurationSec(appState.timer.phase, previousSettings);
+    const elapsedInPhase = Math.max(0, oldPhaseDuration - appState.timer.remainingSec);
     const next = Core.normalizeSettings(rawSettings);
 
     if (next.auto_start !== appState.settings.auto_start) {
@@ -146,10 +151,8 @@
     storage.setJSON(Core.STORAGE_KEYS.settings, appState.settings);
 
     if (!appState.timer.running) {
-      appState.timer.remainingSec = Math.min(
-        appState.timer.remainingSec,
-        Core.phaseDurationSec(appState.timer.phase, appState.settings)
-      );
+      const nextPhaseDuration = Core.phaseDurationSec(appState.timer.phase, appState.settings);
+      appState.timer.remainingSec = Math.max(0, nextPhaseDuration - elapsedInPhase);
     }
 
     if (!appState.settings.prime_enabled && appState.timer.phase === "prime") {
@@ -202,8 +205,31 @@
 
   function onStateChange() {
     appState.stats = Core.rolloverStats(appState.stats, Core.dateKey());
-    storage.setJSON(Core.STORAGE_KEYS.stats, appState.stats);
+    persistStatsIfChanged();
     render.render(appState);
+  }
+
+  function sameStats(a, b) {
+    if (!a || !b) return false;
+    return (
+      a.dateKey === b.dateKey &&
+      a.focusBlocksToday === b.focusBlocksToday &&
+      a.focusBlocksSinceLong === b.focusBlocksSinceLong
+    );
+  }
+
+  function cloneStats(stats) {
+    return {
+      dateKey: stats.dateKey,
+      focusBlocksToday: stats.focusBlocksToday,
+      focusBlocksSinceLong: stats.focusBlocksSinceLong,
+    };
+  }
+
+  function persistStatsIfChanged() {
+    if (sameStats(lastSavedStats, appState.stats)) return;
+    storage.setJSON(Core.STORAGE_KEYS.stats, appState.stats);
+    lastSavedStats = cloneStats(appState.stats);
   }
 
   function createStorageAdapter() {
