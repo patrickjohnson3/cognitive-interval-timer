@@ -17,9 +17,9 @@
     },
   };
   const TAGLINES = [
-    "deep work. real breaks. repeat.",
-    "intensity. recovery. repeat.",
-    "work. recover. repeat.",
+    "Deep Work. Real Breaks. Repeat.",
+    "Intensity. Recovery. Repeat.",
+    "Work. Recover. Repeat.",
   ];
 
   const storage = createStorageAdapter();

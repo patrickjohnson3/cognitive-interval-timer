@@ -29,11 +29,11 @@
   const MAX_PHASE_TRANSITIONS_PER_TICK = 1000;
 
   const STATE_HINTS = {
-    prime: "Prepare your mind. Define one clear output.",
-    focus: "Single task only. Messages and feeds stay closed.",
-    recall: "Log: done, learned, next step.",
-    break: "Move your body and look away from screens.",
-    long_break: "Deep reset: walk, snack, sunlight, breathe.",
+    prime: "Prepare Your Mind. Choose One Clear Goal.",
+    focus: "One Task. Everything Else Closed.",
+    recall: "Lock It In.",
+    break: "Step Away. No Screens. Move. Reset.",
+    long_break: "Deep Reset: Eat, Move, Go Outside",
   };
 
   const STATE_LONG_HINTS = {
