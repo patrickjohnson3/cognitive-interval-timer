@@ -57,7 +57,7 @@
   ];
 
   const UI_COPY = {
-    settingsHeading: "Phase Settings (Minutes)",
+    settingsHeading: "Phase Settings (minutes)",
     blocksBeforeLongBreak: "Focus Blocks Before Long Break",
     startWithPrep: "Start With Prep Phase",
     autoStartNext: "Auto-Start Next Phase",
