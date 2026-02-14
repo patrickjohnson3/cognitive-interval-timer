@@ -155,13 +155,15 @@
       appState.timer.remainingSec = Math.max(0, nextPhaseDuration - elapsedInPhase);
     }
 
-    if (!appState.settings.prime_enabled && appState.timer.phase === "prime") {
-      timer.resetToPhase("focus");
-    }
-
     appState.ui.settingsDirty = false;
     render.hydrateSettingsForm(appState.settings);
     announce.flashMessage("Settings Saved.");
+
+    if (!appState.settings.prime_enabled && appState.timer.phase === "prime") {
+      timer.resetToPhase("focus");
+      return;
+    }
+
     onStateChange();
   }
 
@@ -176,7 +178,6 @@
     render.hydrateSettingsForm(appState.settings);
     timer.reset();
     announce.flashMessage("Defaults Restored.");
-    onStateChange();
   }
 
   function setTheme(nextTheme) {
@@ -290,16 +291,27 @@
   function createAudioEngine() {
     let audioCtx = null;
 
+    function tryResume(ctx) {
+      try {
+        const result = ctx.resume();
+        if (result && typeof result.catch === "function") {
+          result.catch(function ignoreResumeError() {});
+        }
+      } catch {
+        // Ignore resume failures; browsers may gate this behind user interaction.
+      }
+    }
+
     function ensureAudioContext() {
       if (audioCtx) {
-        if (audioCtx.state === "suspended") audioCtx.resume();
+        if (audioCtx.state === "suspended") tryResume(audioCtx);
         return audioCtx;
       }
 
       const AudioCtor = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtor) return null;
       audioCtx = new AudioCtor();
-      if (audioCtx.state === "suspended") audioCtx.resume();
+      if (audioCtx.state === "suspended") tryResume(audioCtx);
       return audioCtx;
     }
 
@@ -475,6 +487,14 @@
         state.timer.lastTickMs = null;
       }
       state.stats = consumed.stats;
+
+      if (consumed.transitionLimitHit) {
+        state.timer.running = false;
+        state.timer.lastTickMs = null;
+        state.timer.remainingSec = Core.phaseDurationSec(state.timer.phase, state.settings);
+        hooks.onStateChange();
+        return;
+      }
 
       consumed.events.forEach(function emit(event) {
         hooks.onPhaseChange({
