@@ -43,8 +43,6 @@
       dom.status.textContent = "Status: " + (state.timer.running ? "Running" : "Paused") + storageSuffix;
 
       dom.cycleBadge.textContent = "Cycle " + state.stats.focusBlocksToday;
-      dom.controls.start.setAttribute("aria-pressed", state.timer.running ? "true" : "false");
-      dom.controls.pause.setAttribute("aria-pressed", state.timer.running ? "false" : "true");
 
       if (state.ui.settingsDirty) {
         dom.dirtyIndicator.textContent = "Unsaved Changes";
