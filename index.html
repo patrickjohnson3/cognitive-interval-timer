@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Better Pomodoro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-a: #ffe8c9;
+      --bg-b: #f7c9a9;
+      --surface: #fff8f0;
+      --ink: #312218;
+      --muted: #6f5a4a;
+      --accent: #c44f2c;
+      --accent-soft: #f6d3c0;
+      --success: #2e7d57;
+      --radius: 20px;
+      --shadow: 0 20px 50px rgba(70, 32, 12, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Space Grotesk", sans-serif;
+      background: radial-gradient(circle at 10% 20%, #fff7ec, transparent 40%),
+        radial-gradient(circle at 85% 80%, #f8b997, transparent 45%),
+        linear-gradient(140deg, var(--bg-a), var(--bg-b));
+      color: var(--ink);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .app {
+      width: min(760px, 100%);
+      background: rgba(255, 248, 240, 0.88);
+      backdrop-filter: blur(6px);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      overflow: hidden;
+    }
+
+    .header {
+      padding: 22px 24px;
+      border-bottom: 1px solid rgba(49, 34, 24, 0.1);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.3rem, 2.2vw, 1.65rem);
+      letter-spacing: 0.01em;
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    .badge {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 16px;
+      padding: 18px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border-radius: 16px;
+      border: 1px solid rgba(49, 34, 24, 0.08);
+      padding: 18px;
+    }
+
+    .state {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .time {
+      margin: 6px 0 8px;
+      font-size: clamp(2.5rem, 8vw, 4.6rem);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hint {
+      margin: 0 0 14px;
+      color: var(--muted);
+      min-height: 1.4em;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 11px;
+      padding: 10px 12px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--ink);
+      background: #f8ede3;
+      transition: transform 120ms ease, background 160ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      background: #f4dfcf;
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    button.primary:hover {
+      background: #ae4526;
+    }
+
+    .stats {
+      margin-top: 14px;
+      font-size: 0.92rem;
+      color: var(--muted);
+      display: grid;
+      gap: 6px;
+    }
+
+    .settings h2 {
+      margin: 0 0 12px;
+      font-size: 1rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    input[type="number"] {
+      width: 100%;
+      border: 1px solid rgba(49, 34, 24, 0.18);
+      background: #fffdf9;
+      border-radius: 10px;
+      padding: 9px 10px;
+      font: inherit;
+      color: var(--ink);
+    }
+
+    .checks {
+      margin-top: 10px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .checks label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--ink);
+      font-size: 0.9rem;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .ok {
+      margin-top: 9px;
+      min-height: 1.3em;
+      font-size: 0.84rem;
+      color: var(--success);
+    }
+
+    @media (max-width: 760px) {
+      .main {
+        grid-template-columns: 1fr;
+      }
+
+      .header {
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <div>
+        <h1>Better Pomodoro</h1>
+        <p class="subtitle">Focus with rhythm: prime, work, reflect, recover.</p>
+      </div>
+      <span class="badge" id="cycle-badge">Cycle 0</span>
+    </header>
+
+    <section class="main">
+      <article class="panel">
+        <p class="state" id="state">State</p>
+        <p class="time" id="time">00:00</p>
+        <p class="hint" id="hint"></p>
+
+        <div class="controls">
+          <button id="start" class="primary">Start</button>
+          <button id="pause">Pause</button>
+          <button id="skip">Skip</button>
+          <button id="reset">Reset</button>
+          <button id="notify">Enable notifications</button>
+        </div>
+
+        <div class="stats">
+          <div id="today">Focus blocks today: 0</div>
+          <div id="long">Since long break: 0/0</div>
+          <div id="status">Status: idle</div>
+        </div>
+      </article>
+
+      <aside class="panel settings">
+        <h2>Session Settings (minutes)</h2>
+        <div class="grid">
+          <label>Prime<input id="prime" type="number" min="0" max="60" /></label>
+          <label>Focus<input id="focus" type="number" min="1" max="180" /></label>
+          <label>Recall<input id="recall" type="number" min="0" max="30" /></label>
+          <label>Short break<input id="break" type="number" min="1" max="60" /></label>
+          <label>Long break<input id="long_break" type="number" min="1" max="90" /></label>
+          <label>Focus blocks before long break<input id="blocks_per_ultradian" type="number" min="1" max="8" /></label>
+        </div>
+
+        <div class="checks">
+          <label><input id="prime_enabled" type="checkbox" /> Start with prime phase</label>
+          <label><input id="auto_start" type="checkbox" /> Auto-start next phase</label>
+        </div>
+
+        <div class="actions">
+          <button id="save" class="primary">Save settings</button>
+          <button id="defaults">Restore defaults</button>
+        </div>
+        <div class="ok" id="save-msg"></div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const DEFAULTS = {
+      prime: 2,
+      focus: 45,
+      recall: 3,
+      break: 15,
+      long_break: 25,
+      blocks_per_ultradian: 2,
+      prime_enabled: true,
+      auto_start: true
+    };
+
+    const STORAGE = {
+      settings: "better_pomodoro_settings_v1",
+      stats: "better_pomodoro_stats_v1"
+    };
+
+    const stateHints = {
+      prime: "Prepare your mind. Define one clear output.",
+      focus: "Single task only. Messages and feeds stay closed.",
+      recall: "Log: done, learned, next step.",
+      break: "Move your body and look away from screens.",
+      long_break: "Deep reset: walk, snack, sunlight, breathe."
+    };
+
+    const phaseOrder = ["prime", "focus", "recall", "break", "long_break"];
+
+    const dom = {
+      state: document.getElementById("state"),
+      time: document.getElementById("time"),
+      hint: document.getElementById("hint"),
+      cycleBadge: document.getElementById("cycle-badge"),
+      today: document.getElementById("today"),
+      long: document.getElementById("long"),
+      status: document.getElementById("status"),
+      saveMsg: document.getElementById("save-msg")
+    };
+
+    let settings = loadSettings();
+    let stats = loadStats();
+    let intervalId = null;
+
+    let timer = {
+      running: false,
+      state: settings.prime_enabled ? "prime" : "focus",
+      remainingSec: durationSec(settings.prime_enabled ? "prime" : "focus")
+    };
+
+    setupControls();
+    render();
+    startTicker();
+
+    function durationSec(state) {
+      return Math.max(0, Number(settings[state] || 0) * 60);
+    }
+
+    function nextState(current) {
+      if (current === "prime") return "focus";
+      if (current === "focus") return "recall";
+      if (current === "recall") {
+        return stats.focusBlocksSinceLong >= settings.blocks_per_ultradian ? "long_break" : "break";
+      }
+      return "focus";
+    }
+
+    function enterState(state, { autoStart = settings.auto_start } = {}) {
+      timer.state = state;
+      timer.remainingSec = durationSec(state);
+
+      if (state === "recall") {
+        stats.focusBlocksToday += 1;
+        stats.focusBlocksSinceLong += 1;
+        saveStats();
+      }
+
+      if (state === "long_break") {
+        stats.focusBlocksSinceLong = 0;
+        saveStats();
+      }
+
+      timer.running = autoStart;
+      notify(`Entering ${stateLabel(state)}`, stateHints[state]);
+      render();
+    }
+
+    function tick() {
+      if (!timer.running) return;
+
+      if (timer.remainingSec <= 0) {
+        enterState(nextState(timer.state));
+        return;
+      }
+
+      timer.remainingSec -= 0.25;
+
+      if (timer.remainingSec <= 0) {
+        timer.remainingSec = 0;
+        render();
+        enterState(nextState(timer.state));
+        return;
+      }
+
+      render();
+    }
+
+    function startTicker() {
+      if (intervalId) clearInterval(intervalId);
+      intervalId = setInterval(tick, 250);
+    }
+
+    function stateLabel(state) {
+      if (state === "long_break") return "Long Break";
+      return state.charAt(0).toUpperCase() + state.slice(1);
+    }
+
+    function formatTime(seconds) {
+      const s = Math.max(0, Math.floor(seconds));
+      const mm = String(Math.floor(s / 60)).padStart(2, "0");
+      const ss = String(s % 60).padStart(2, "0");
+      return `${mm}:${ss}`;
+    }
+
+    function notify(title, body) {
+      if (!("Notification" in window)) return;
+      if (Notification.permission === "granted") {
+        new Notification(title, { body });
+      }
+    }
+
+    function loadSettings() {
+      try {
+        const raw = localStorage.getItem(STORAGE.settings);
+        if (!raw) return { ...DEFAULTS };
+        const parsed = JSON.parse(raw);
+        return {
+          ...DEFAULTS,
+          ...parsed
+        };
+      } catch {
+        return { ...DEFAULTS };
+      }
+    }
+
+    function loadStats() {
+      const today = new Date().toDateString();
+      try {
+        const raw = localStorage.getItem(STORAGE.stats);
+        if (!raw) {
+          return { dateKey: today, focusBlocksToday: 0, focusBlocksSinceLong: 0 };
+        }
+
+        const parsed = JSON.parse(raw);
+        if (parsed.dateKey !== today) {
+          return {
+            dateKey: today,
+            focusBlocksToday: 0,
+            focusBlocksSinceLong: parsed.focusBlocksSinceLong || 0
+          };
+        }
+
+        return {
+          dateKey: today,
+          focusBlocksToday: Number(parsed.focusBlocksToday || 0),
+          focusBlocksSinceLong: Number(parsed.focusBlocksSinceLong || 0)
+        };
+      } catch {
+        return { dateKey: today, focusBlocksToday: 0, focusBlocksSinceLong: 0 };
+      }
+    }
+
+    function saveSettings() {
+      localStorage.setItem(STORAGE.settings, JSON.stringify(settings));
+    }
+
+    function saveStats() {
+      stats.dateKey = new Date().toDateString();
+      localStorage.setItem(STORAGE.stats, JSON.stringify(stats));
+    }
+
+    function validateMinutes(raw, fallback, min = 0, max = 300) {
+      const num = Number(raw);
+      if (!Number.isFinite(num)) return fallback;
+      return Math.max(min, Math.min(max, Math.round(num)));
+    }
+
+    function hydrateForm() {
+      phaseOrder.forEach((key) => {
+        if (document.getElementById(key)) {
+          document.getElementById(key).value = settings[key];
+        }
+      });
+      document.getElementById("blocks_per_ultradian").value = settings.blocks_per_ultradian;
+      document.getElementById("prime_enabled").checked = settings.prime_enabled;
+      document.getElementById("auto_start").checked = settings.auto_start;
+    }
+
+    function readFormIntoSettings() {
+      settings.prime = validateMinutes(document.getElementById("prime").value, DEFAULTS.prime, 0, 60);
+      settings.focus = validateMinutes(document.getElementById("focus").value, DEFAULTS.focus, 1, 180);
+      settings.recall = validateMinutes(document.getElementById("recall").value, DEFAULTS.recall, 0, 30);
+      settings.break = validateMinutes(document.getElementById("break").value, DEFAULTS.break, 1, 60);
+      settings.long_break = validateMinutes(document.getElementById("long_break").value, DEFAULTS.long_break, 1, 90);
+      settings.blocks_per_ultradian = validateMinutes(
+        document.getElementById("blocks_per_ultradian").value,
+        DEFAULTS.blocks_per_ultradian,
+        1,
+        8
+      );
+      settings.prime_enabled = document.getElementById("prime_enabled").checked;
+      settings.auto_start = document.getElementById("auto_start").checked;
+    }
+
+    function flashSaved(message) {
+      dom.saveMsg.textContent = message;
+      setTimeout(() => {
+        if (dom.saveMsg.textContent === message) dom.saveMsg.textContent = "";
+      }, 1800);
+    }
+
+    function setupControls() {
+      hydrateForm();
+
+      document.getElementById("start").addEventListener("click", () => {
+        timer.running = true;
+        render();
+      });
+
+      document.getElementById("pause").addEventListener("click", () => {
+        timer.running = false;
+        render();
+      });
+
+      document.getElementById("skip").addEventListener("click", () => {
+        enterState(nextState(timer.state));
+      });
+
+      document.getElementById("reset").addEventListener("click", () => {
+        timer.running = false;
+        timer.state = settings.prime_enabled ? "prime" : "focus";
+        timer.remainingSec = durationSec(timer.state);
+        render();
+      });
+
+      document.getElementById("notify").addEventListener("click", async () => {
+        if (!("Notification" in window)) {
+          alert("This browser does not support notifications.");
+          return;
+        }
+        const p = await Notification.requestPermission();
+        alert(`Notification permission: ${p}`);
+      });
+
+      document.getElementById("save").addEventListener("click", () => {
+        readFormIntoSettings();
+        saveSettings();
+
+        if (!timer.running) {
+          timer.remainingSec = Math.min(timer.remainingSec, durationSec(timer.state));
+        }
+
+        if (!settings.prime_enabled && timer.state === "prime") {
+          timer.state = "focus";
+          timer.remainingSec = durationSec("focus");
+        }
+
+        hydrateForm();
+        render();
+        flashSaved("Settings saved.");
+      });
+
+      document.getElementById("defaults").addEventListener("click", () => {
+        settings = { ...DEFAULTS };
+        saveSettings();
+        hydrateForm();
+        timer.state = settings.prime_enabled ? "prime" : "focus";
+        timer.remainingSec = durationSec(timer.state);
+        timer.running = false;
+        render();
+        flashSaved("Defaults restored.");
+      });
+    }
+
+    function render() {
+      dom.state.textContent = stateLabel(timer.state);
+      dom.time.textContent = formatTime(timer.remainingSec);
+      dom.hint.textContent = stateHints[timer.state] || "";
+      dom.today.textContent = `Focus blocks today: ${stats.focusBlocksToday}`;
+      dom.long.textContent = `Since long break: ${stats.focusBlocksSinceLong}/${settings.blocks_per_ultradian}`;
+      dom.status.textContent = `Status: ${timer.running ? "running" : "paused"}`;
+      dom.cycleBadge.textContent = `Cycle ${stats.focusBlocksToday}`;
+      document.title = `${formatTime(timer.remainingSec)} - ${stateLabel(timer.state)}`;
+    }
+  </script>
+</body>
+</html>
