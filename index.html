@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,16 +9,40 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg-a: #ffe8c9;
-      --bg-b: #f7c9a9;
-      --surface: #fff8f0;
-      --ink: #312218;
-      --muted: #6f5a4a;
-      --accent: #c44f2c;
-      --accent-soft: #f6d3c0;
-      --success: #2e7d57;
       --radius: 20px;
-      --shadow: 0 20px 50px rgba(70, 32, 12, 0.18);
+      --surface-alpha: 0.88;
+    }
+
+    :root[data-theme="light"] {
+      --bg: #d4d4d4;
+      --bg-alt: #e1e1e1;
+      --surface: #ececec;
+      --ink: #1e1e1e;
+      --muted: #3e3e3e;
+      --accent: #2f2f2f;
+      --accent-soft: #c4c4c4;
+      --success: #1f6f47;
+      --border: rgba(30, 30, 30, 0.14);
+      --shadow: 0 16px 35px rgba(30, 30, 30, 0.16);
+      --button-bg: #dedede;
+      --button-bg-hover: #d1d1d1;
+      --input-bg: #f1f1f1;
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #1e1e1e;
+      --bg-alt: #2a2a2a;
+      --surface: #282828;
+      --ink: #d4d4d4;
+      --muted: #b5b5b5;
+      --accent: #f0f0f0;
+      --accent-soft: #383838;
+      --success: #73d2a6;
+      --border: rgba(212, 212, 212, 0.16);
+      --shadow: 0 16px 35px rgba(0, 0, 0, 0.45);
+      --button-bg: #333333;
+      --button-bg-hover: #3d3d3d;
+      --input-bg: #1f1f1f;
     }
 
     * {
@@ -29,9 +53,9 @@
       margin: 0;
       min-height: 100vh;
       font-family: "Space Grotesk", sans-serif;
-      background: radial-gradient(circle at 10% 20%, #fff7ec, transparent 40%),
-        radial-gradient(circle at 85% 80%, #f8b997, transparent 45%),
-        linear-gradient(140deg, var(--bg-a), var(--bg-b));
+      background: radial-gradient(circle at 10% 20%, var(--bg-alt), transparent 45%),
+        radial-gradient(circle at 85% 80%, color-mix(in srgb, var(--bg-alt), transparent 35%), transparent 50%),
+        linear-gradient(140deg, var(--bg), var(--bg-alt));
       color: var(--ink);
       display: grid;
       place-items: center;
@@ -40,17 +64,17 @@
 
     .app {
       width: min(760px, 100%);
-      background: rgba(255, 248, 240, 0.88);
+      background: color-mix(in srgb, var(--surface), transparent calc((1 - var(--surface-alpha)) * 100%));
       backdrop-filter: blur(6px);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      border: 1px solid rgba(255, 255, 255, 0.65);
+      border: 1px solid var(--border);
       overflow: hidden;
     }
 
     .header {
       padding: 22px 24px;
-      border-bottom: 1px solid rgba(49, 34, 24, 0.1);
+      border-bottom: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
       gap: 12px;
@@ -91,7 +115,7 @@
     .panel {
       background: var(--surface);
       border-radius: 16px;
-      border: 1px solid rgba(49, 34, 24, 0.08);
+      border: 1px solid var(--border);
       padding: 18px;
     }
 
@@ -131,22 +155,22 @@
       font-weight: 600;
       cursor: pointer;
       color: var(--ink);
-      background: #f8ede3;
+      background: var(--button-bg);
       transition: transform 120ms ease, background 160ms ease;
     }
 
     button:hover {
       transform: translateY(-1px);
-      background: #f4dfcf;
+      background: var(--button-bg-hover);
     }
 
     button.primary {
       background: var(--accent);
-      color: #fff;
+      color: var(--bg);
     }
 
     button.primary:hover {
-      background: #ae4526;
+      background: color-mix(in srgb, var(--accent), #000 12%);
     }
 
     .stats {
@@ -177,8 +201,8 @@
 
     input[type="number"] {
       width: 100%;
-      border: 1px solid rgba(49, 34, 24, 0.18);
-      background: #fffdf9;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
       border-radius: 10px;
       padding: 9px 10px;
       font: inherit;
@@ -213,6 +237,23 @@
       color: var(--success);
     }
 
+    .theme-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    select {
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--ink);
+      border-radius: 10px;
+      font: inherit;
+      padding: 7px 10px;
+    }
+
     @media (max-width: 760px) {
       .main {
         grid-template-columns: 1fr;
@@ -231,7 +272,14 @@
         <h1>Better Pomodoro</h1>
         <p class="subtitle">Focus with rhythm: prime, work, reflect, recover.</p>
       </div>
-      <span class="badge" id="cycle-badge">Cycle 0</span>
+      <div class="theme-row">
+        <label for="theme">Theme</label>
+        <select id="theme">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+        <span class="badge" id="cycle-badge">Cycle 0</span>
+      </div>
     </header>
 
     <section class="main">
@@ -294,7 +342,8 @@
 
     const STORAGE = {
       settings: "better_pomodoro_settings_v1",
-      stats: "better_pomodoro_stats_v1"
+      stats: "better_pomodoro_stats_v1",
+      theme: "better_pomodoro_theme_v1"
     };
 
     const stateHints = {
@@ -315,11 +364,13 @@
       today: document.getElementById("today"),
       long: document.getElementById("long"),
       status: document.getElementById("status"),
-      saveMsg: document.getElementById("save-msg")
+      saveMsg: document.getElementById("save-msg"),
+      theme: document.getElementById("theme")
     };
 
     let settings = loadSettings();
     let stats = loadStats();
+    let theme = loadTheme();
     let intervalId = null;
 
     let timer = {
@@ -329,6 +380,7 @@
     };
 
     setupControls();
+    applyTheme(theme);
     render();
     startTicker();
 
@@ -459,6 +511,18 @@
       localStorage.setItem(STORAGE.stats, JSON.stringify(stats));
     }
 
+    function loadTheme() {
+      const stored = localStorage.getItem(STORAGE.theme);
+      return stored === "dark" ? "dark" : "light";
+    }
+
+    function applyTheme(nextTheme) {
+      theme = nextTheme === "dark" ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", theme);
+      dom.theme.value = theme;
+      localStorage.setItem(STORAGE.theme, theme);
+    }
+
     function validateMinutes(raw, fallback, min = 0, max = 300) {
       const num = Number(raw);
       if (!Number.isFinite(num)) return fallback;
@@ -559,6 +623,10 @@
         timer.running = false;
         render();
         flashSaved("Defaults restored.");
+      });
+
+      dom.theme.addEventListener("change", (event) => {
+        applyTheme(event.target.value);
       });
     }
 
