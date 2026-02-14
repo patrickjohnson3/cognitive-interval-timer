@@ -391,6 +391,7 @@
     let theme = loadTheme();
     let intervalId = null;
     let audioCtx = null;
+    let lastTickMs = null;
 
     let timer = {
       running: false,
@@ -416,11 +417,12 @@
       return "focus";
     }
 
-    function enterState(state, { autoStart = settings.auto_start } = {}) {
+    function enterState(state, { autoStart = settings.auto_start, creditFocus = false } = {}) {
+      rolloverStatsIfNeeded();
       timer.state = state;
       timer.remainingSec = durationSec(state);
 
-      if (state === "recall") {
+      if (state === "recall" && creditFocus) {
         stats.focusBlocksToday += 1;
         stats.focusBlocksSinceLong += 1;
         saveStats();
@@ -432,25 +434,42 @@
       }
 
       timer.running = autoStart;
+      lastTickMs = timer.running ? Date.now() : null;
       playPhaseChime();
       render();
     }
 
     function tick() {
       if (!timer.running) return;
+      rolloverStatsIfNeeded();
 
-      if (timer.remainingSec <= 0) {
-        enterState(nextState(timer.state));
+      const now = Date.now();
+      if (lastTickMs === null) {
+        lastTickMs = now;
         return;
       }
+      let elapsedSec = (now - lastTickMs) / 1000;
+      if (elapsedSec <= 0) return;
+      lastTickMs = now;
 
-      timer.remainingSec -= 0.25;
+      // Consume elapsed time accurately so throttled tabs stay in sync.
+      for (let i = 0; i < 10 && elapsedSec > 0; i += 1) {
+        if (timer.remainingSec > elapsedSec) {
+          timer.remainingSec -= elapsedSec;
+          elapsedSec = 0;
+          break;
+        }
 
-      if (timer.remainingSec <= 0) {
+        elapsedSec -= timer.remainingSec;
         timer.remainingSec = 0;
-        render();
-        enterState(nextState(timer.state));
-        return;
+        const current = timer.state;
+        const ns = nextState(current);
+        const creditFocus = current === "focus" && ns === "recall";
+        enterState(ns, { autoStart: settings.auto_start, creditFocus });
+        if (!timer.running) {
+          elapsedSec = 0;
+          break;
+        }
       }
 
       render();
@@ -565,6 +584,14 @@
       localStorage.setItem(STORAGE.stats, JSON.stringify(stats));
     }
 
+    function rolloverStatsIfNeeded() {
+      const today = new Date().toDateString();
+      if (stats.dateKey === today) return;
+      stats.dateKey = today;
+      stats.focusBlocksToday = 0;
+      saveStats();
+    }
+
     function loadTheme() {
       const stored = localStorage.getItem(STORAGE.theme);
       return stored === "dark" ? "dark" : "light";
@@ -631,21 +658,28 @@
       window.addEventListener("keydown", unlockAudio);
 
       document.getElementById("start").addEventListener("click", () => {
+        rolloverStatsIfNeeded();
         timer.running = true;
+        lastTickMs = Date.now();
         render();
       });
 
       document.getElementById("pause").addEventListener("click", () => {
         timer.running = false;
+        lastTickMs = null;
         render();
       });
 
       document.getElementById("skip").addEventListener("click", () => {
-        enterState(nextState(timer.state));
+        const current = timer.state;
+        const ns = nextState(current);
+        enterState(ns, { creditFocus: false });
       });
 
       document.getElementById("reset").addEventListener("click", () => {
+        rolloverStatsIfNeeded();
         timer.running = false;
+        lastTickMs = null;
         timer.state = settings.prime_enabled ? "prime" : "focus";
         timer.remainingSec = durationSec(timer.state);
         render();
@@ -676,6 +710,7 @@
         timer.state = settings.prime_enabled ? "prime" : "focus";
         timer.remainingSec = durationSec(timer.state);
         timer.running = false;
+        lastTickMs = null;
         render();
         flashSaved("Defaults restored.");
       });
@@ -686,6 +721,7 @@
     }
 
     function render() {
+      rolloverStatsIfNeeded();
       dom.state.textContent = stateLabel(timer.state);
       dom.time.textContent = formatTime(timer.remainingSec);
       dom.hint.textContent = stateHints[timer.state] || "";
