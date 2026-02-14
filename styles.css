@@ -14,38 +14,12 @@
   --font-main: "Space Grotesk", sans-serif;
 }
 
-:root[data-theme="dark"] {
-  --color-bg: #1e1e1e;
-  --color-bg-alt: #2a2a2a;
-  --color-surface: #282828;
-  --color-text: #d4d4d4;
-  --color-muted: #b5b5b5;
-  --color-accent: #d0d0d0;
-  --color-accent-strong: #a4a4a4;
-  --color-accent-soft: #333333;
-  --color-accent-glow: rgba(212, 212, 212, 0.16);
-  --color-success: #c3c3c3;
-  --color-border: rgba(212, 212, 212, 0.16);
-  --color-shadow: rgba(0, 0, 0, 0.36);
-  --color-button: #333333;
-  --color-button-hover: #4a4a4a;
-  --color-input: #1f1f1f;
-  --color-primary-text: #1e1e1e;
-  --color-focus-ring: #d4d4d4;
-  --color-input-edge: rgba(212, 212, 212, 0.14);
-  --text-primary: #d4d4d4;
-  --text-secondary: #b5b5b5;
-  --text-tertiary: #a4a4a4;
-  --elevation-1: 0 4px 12px rgba(0, 0, 0, 0.28);
-  --elevation-2: 0 7px 18px rgba(0, 0, 0, 0.34);
-  --elevation-3: 0 12px 24px rgba(0, 0, 0, 0.36);
-  --hint-bg: linear-gradient(160deg, var(--color-accent-soft), var(--color-surface));
-  --hint-border: var(--color-accent);
-  --long-hint-bg: linear-gradient(165deg, var(--color-surface), var(--color-bg-alt));
-  --long-hint-border: var(--color-accent);
-  --badge-bg: linear-gradient(150deg, var(--color-accent-soft), var(--color-bg-alt));
-  --badge-border: var(--color-accent);
-  --badge-text: var(--color-accent-strong);
+:root[data-density="compact"] {
+  --density-scale: 0.9;
+}
+
+:root[data-density="comfortable"] {
+  --density-scale: 1;
 }
 
 * {
@@ -56,10 +30,7 @@ body {
   margin: 0;
   min-height: 100vh;
   font-family: var(--font-main);
-  background: radial-gradient(circle at 10% 20%, var(--color-bg-alt), transparent 45%),
-    radial-gradient(circle at 18% 78%, var(--color-accent-glow), transparent 40%),
-    radial-gradient(circle at 85% 80%, var(--color-bg-alt), transparent 50%),
-    linear-gradient(140deg, var(--color-bg), var(--color-bg-alt));
+  background: var(--bg-gradient);
   color: var(--text-primary, var(--color-text));
   display: grid;
   place-items: center;
@@ -71,7 +42,7 @@ body {
   background: var(--color-surface);
   border-radius: var(--radius-lg);
   box-shadow: var(--elevation-3);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--border-subtle, var(--color-border));
   overflow: hidden;
 }
 
@@ -83,7 +54,7 @@ body {
 
 .header {
   padding: 22px var(--space-8);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--border-subtle, var(--color-border));
   display: flex;
   justify-content: space-between;
   gap: var(--space-4);
@@ -124,9 +95,9 @@ h1 {
 }
 
 .panel {
-  background: linear-gradient(165deg, var(--color-surface), var(--color-bg-alt));
+  background: var(--panel-bg);
   border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--border-subtle, var(--color-border));
   padding: var(--space-6);
 }
 
@@ -156,7 +127,7 @@ h1 {
   font-size: 1.03rem;
   line-height: 1.35;
   padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--border-subtle, var(--color-border));
   border-left: 5px solid var(--hint-border);
   background: var(--hint-bg);
   border-radius: 10px;
@@ -190,7 +161,7 @@ select {
 }
 
 button {
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--border-subtle, var(--color-border));
   border-radius: var(--radius-sm);
   padding: var(--space-3) var(--space-4);
   font-weight: 600;
@@ -207,14 +178,14 @@ button:hover {
 }
 
 button.primary {
-  background: linear-gradient(160deg, var(--color-accent), var(--color-accent-strong));
+  background: var(--button-primary-bg);
   color: var(--color-primary-text);
-  border-color: var(--color-accent-strong);
+  border-color: var(--border-strong, var(--color-accent-strong));
   box-shadow: 0 5px 12px var(--color-accent-glow);
 }
 
 button.primary:hover {
-  background: linear-gradient(160deg, var(--color-accent-strong), var(--color-accent));
+  background: var(--button-primary-hover-bg);
 }
 
 button.ghost {
@@ -234,7 +205,7 @@ select:focus-visible,
 }
 
 kbd {
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--border-subtle, var(--color-border));
   border-radius: 4px;
   padding: 1px 4px;
   background: var(--color-input);
@@ -285,7 +256,7 @@ label {
 input[type="number"],
 select {
   width: 100%;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--border-subtle, var(--color-border));
   background: var(--color-input);
   border-radius: 10px;
   padding: 9px 10px;
@@ -339,9 +310,9 @@ select {
   color: var(--color-text);
   font-size: 0.86rem;
   padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--border-subtle, var(--color-border));
   border-radius: 12px;
-  background: linear-gradient(160deg, var(--color-surface), var(--color-bg-alt));
+  background: var(--theme-row-bg);
   box-shadow: 0 4px 12px var(--color-accent-glow);
 }
 
@@ -372,9 +343,9 @@ select {
 
 .shortcuts-card {
   width: min(420px, 100%);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--border-subtle, var(--color-border));
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--card-bg, var(--color-surface));
   box-shadow: 0 16px 30px var(--color-shadow);
   padding: var(--space-6);
 }

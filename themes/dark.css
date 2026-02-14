@@ -1,0 +1,60 @@
+:root[data-theme="dark"] {
+  --color-bg: #1e1e1e;
+  --color-bg-alt: #2a2a2a;
+  --color-surface: #282828;
+  --color-text: #d4d4d4;
+  --color-muted: #b5b5b5;
+  --color-accent: #d0d0d0;
+  --color-accent-strong: #a4a4a4;
+  --color-accent-soft: #333333;
+  --color-accent-glow: rgba(212, 212, 212, 0.16);
+  --color-success: #c3c3c3;
+  --color-border: rgba(212, 212, 212, 0.16);
+  --color-shadow: rgba(0, 0, 0, 0.36);
+  --color-button: #333333;
+  --color-button-hover: #4a4a4a;
+  --color-input: #1f1f1f;
+  --color-primary-text: #1e1e1e;
+  --color-focus-ring: #d4d4d4;
+  --color-input-edge: rgba(212, 212, 212, 0.14);
+
+  --border-subtle: rgba(212, 212, 212, 0.16);
+  --border-strong: #d0d0d0;
+
+  --text-primary: #d4d4d4;
+  --text-secondary: #b5b5b5;
+  --text-tertiary: #a4a4a4;
+
+  --elevation-1: 0 4px 12px rgba(0, 0, 0, 0.28);
+  --elevation-2: 0 7px 18px rgba(0, 0, 0, 0.34);
+  --elevation-3: 0 12px 24px rgba(0, 0, 0, 0.36);
+
+  --hint-bg: linear-gradient(160deg, var(--color-accent-soft), var(--color-surface));
+  --hint-border: var(--color-accent);
+  --long-hint-bg: linear-gradient(165deg, var(--color-surface), var(--color-bg-alt));
+  --long-hint-border: var(--color-accent);
+  --badge-bg: linear-gradient(150deg, var(--color-accent-soft), var(--color-bg-alt));
+  --badge-border: var(--color-accent);
+  --badge-text: var(--color-accent-strong);
+  --button-primary-bg: linear-gradient(160deg, var(--color-accent), var(--color-accent-strong));
+  --button-primary-hover-bg: linear-gradient(160deg, var(--color-accent-strong), var(--color-accent));
+  --theme-row-bg: linear-gradient(160deg, var(--color-surface), var(--color-bg-alt));
+  --panel-bg: linear-gradient(165deg, var(--color-surface), var(--color-bg-alt));
+  --card-bg: var(--color-surface);
+  --bg-gradient: radial-gradient(circle at 10% 20%, var(--color-bg-alt), transparent 45%),
+    radial-gradient(circle at 18% 78%, var(--color-accent-glow), transparent 40%),
+    radial-gradient(circle at 85% 80%, var(--color-bg-alt), transparent 50%),
+    linear-gradient(140deg, var(--color-bg), var(--color-bg-alt));
+}
+
+:root[data-theme="dark"][data-contrast="high"] {
+  --text-primary: #d4d4d4;
+  --text-secondary: #c8c8c8;
+  --text-tertiary: #bdbdbd;
+  --color-focus-ring: #d4d4d4;
+  --border-subtle: rgba(212, 212, 212, 0.28);
+  --border-strong: #d4d4d4;
+  --elevation-1: 0 0 0 rgba(0, 0, 0, 0), 0 0 0 1px rgba(212, 212, 212, 0.16);
+  --elevation-2: 0 0 0 rgba(0, 0, 0, 0), 0 0 0 1px rgba(212, 212, 212, 0.22);
+  --elevation-3: 0 0 0 rgba(0, 0, 0, 0), 0 0 0 1px rgba(212, 212, 212, 0.28);
+}

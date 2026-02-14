@@ -1,0 +1,14 @@
+{
+  "--color-bg": "#1e1e1e",
+  "--color-text": "#d4d4d4",
+  "--text-primary": "#d4d4d4",
+  "--text-secondary": "#b5b5b5",
+  "--color-button": "#333333",
+  "--color-button-hover": "#4a4a4a",
+  "--color-accent": "#d0d0d0",
+  "--color-accent-strong": "#a4a4a4",
+  "--border-subtle": "rgba(212, 212, 212, 0.16)",
+  "--border-strong": "#d0d0d0",
+  "--panel-bg": "linear-gradient(165deg, var(--color-surface), var(--color-bg-alt))",
+  "--button-primary-bg": "linear-gradient(160deg, var(--color-accent), var(--color-accent-strong))"
+}

@@ -4,7 +4,8 @@ const path = require("path");
 function readStyles() {
   const shared = fs.readFileSync(path.join(__dirname, "..", "styles.css"), "utf8");
   const light = fs.readFileSync(path.join(__dirname, "..", "themes", "light.css"), "utf8");
-  return light + "\n" + shared;
+  const dark = fs.readFileSync(path.join(__dirname, "..", "themes", "dark.css"), "utf8");
+  return light + "\n" + dark + "\n" + shared;
 }
 
 function extractThemeBlock(css, theme) {
@@ -60,7 +61,40 @@ function parseColorChannels(value) {
   return null;
 }
 
+function parseHex(value) {
+  const hex = value.match(/^#([0-9a-fA-F]{6})$/);
+  if (!hex) return null;
+  const raw = hex[1];
+  return [
+    parseInt(raw.slice(0, 2), 16),
+    parseInt(raw.slice(2, 4), 16),
+    parseInt(raw.slice(4, 6), 16),
+  ];
+}
+
+function relativeLuminance(rgb) {
+  const convert = (n) => {
+    const v = n / 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  };
+  const [r, g, b] = rgb.map(convert);
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+function contrastRatio(hexA, hexB) {
+  const a = parseHex(hexA);
+  const b = parseHex(hexB);
+  if (!a || !b) return null;
+  const l1 = relativeLuminance(a);
+  const l2 = relativeLuminance(b);
+  const lighter = Math.max(l1, l2);
+  const darker = Math.min(l1, l2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
 module.exports = {
   parseThemeTokens,
   parseColorChannels,
+  parseHex,
+  contrastRatio,
 };
