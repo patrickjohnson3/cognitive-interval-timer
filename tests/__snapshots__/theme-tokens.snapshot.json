@@ -1,0 +1,42 @@
+{
+  "light": {
+    "--color-bg": "#d4d4d4",
+    "--color-bg-alt": "#c9c9c9",
+    "--color-surface": "#d0d0d0",
+    "--color-text": "#1e1e1e",
+    "--color-muted": "#4a4a4a",
+    "--color-accent": "#4f4f4f",
+    "--color-accent-strong": "#3d3d3d",
+    "--color-accent-soft": "#bdbdbd",
+    "--color-accent-glow": "rgba(79, 79, 79, 0.16)",
+    "--color-success": "#4a4a4a",
+    "--color-border": "rgba(30, 30, 30, 0.14)",
+    "--color-shadow": "rgba(30, 30, 30, 0.13)",
+    "--color-button": "#cfcfcf",
+    "--color-button-hover": "#b5b5b5",
+    "--color-input": "#c4c4c4",
+    "--color-primary-text": "#d4d4d4",
+    "--color-focus-ring": "#1e1e1e",
+    "--color-input-edge": "rgba(30, 30, 30, 0.12)"
+  },
+  "dark": {
+    "--color-bg": "#1e1e1e",
+    "--color-bg-alt": "#2a2a2a",
+    "--color-surface": "#282828",
+    "--color-text": "#d4d4d4",
+    "--color-muted": "#b5b5b5",
+    "--color-accent": "#d0d0d0",
+    "--color-accent-strong": "#a4a4a4",
+    "--color-accent-soft": "#333333",
+    "--color-accent-glow": "rgba(212, 212, 212, 0.16)",
+    "--color-success": "#c3c3c3",
+    "--color-border": "rgba(212, 212, 212, 0.16)",
+    "--color-shadow": "rgba(0, 0, 0, 0.36)",
+    "--color-button": "#333333",
+    "--color-button-hover": "#4a4a4a",
+    "--color-input": "#1f1f1f",
+    "--color-primary-text": "#1e1e1e",
+    "--color-focus-ring": "#d4d4d4",
+    "--color-input-edge": "rgba(212, 212, 212, 0.14)"
+  }
+}

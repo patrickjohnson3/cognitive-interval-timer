@@ -61,6 +61,23 @@ test("consumeElapsed handles large elapsed time without dropping transitions", f
   assert(out.remainingElapsed === 0, "elapsed time should be fully consumed");
 });
 
+test("stateLabel maps all phases to configured display names", function () {
+  Core.PHASES.forEach(function eachPhase(phase) {
+    const expected = Core.PHASE_CONFIG[phase].displayName;
+    const actual = Core.stateLabel(phase);
+    assert(actual === expected, "expected " + phase + " label " + expected + ", got " + actual);
+  });
+});
+
+test("all phases have short and long guidance text", function () {
+  Core.PHASES.forEach(function eachPhase(phase) {
+    const shortHint = Core.STATE_HINTS[phase];
+    const longHint = Core.STATE_LONG_HINTS[phase];
+    assert(typeof shortHint === "string" && shortHint.trim().length > 0, "missing short hint for " + phase);
+    assert(typeof longHint === "string" && longHint.trim().length > 0, "missing long hint for " + phase);
+  });
+});
+
 if (!process.exitCode) {
   console.log("All tests passed.");
 }

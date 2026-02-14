@@ -1,7 +1,12 @@
 (function bootstrapApp() {
   const Core = window.PomodoroCore;
-  if (!Core) {
-    throw new Error("PomodoroCore missing. Load core.js before app.js");
+  const Content = window.PomodoroContent;
+  const UIAnnounce = window.PomodoroUIAnnounce;
+  const UIRender = window.PomodoroUIRender;
+  const UIControls = window.PomodoroUIControls;
+
+  if (!Core || !Content || !UIAnnounce || !UIRender || !UIControls) {
+    throw new Error("Missing required modules. Ensure content/core/ui scripts load before app.js");
   }
 
   const appState = {
@@ -15,40 +20,78 @@
       lastTickMs: null,
       hasStartedOnce: false,
     },
+    ui: {
+      settingsDirty: false,
+      sessionFlags: {
+        changedAutoStart: false,
+        changedSound: false,
+      },
+    },
   };
-  const TAGLINES = [
-    "Deep Work. Real Breaks. Repeat.",
-    "Intensity. Recovery. Repeat.",
-    "Work. Recover. Repeat.",
-  ];
 
   const storage = createStorageAdapter();
   const audio = createAudioEngine();
-  const ui = createUI();
+  const dom = createDOM();
+  const announce = UIAnnounce.create(dom);
+  const render = UIRender.create({ dom: dom, Core: Core, storage: storage });
+  const controls = UIControls.create(dom);
   const timer = createTimerEngine(appState, {
     onPhaseChange: onPhaseChange,
     onStateChange: onStateChange,
   });
 
+  const AppController = {
+    start: timer.start,
+    pause: timer.pause,
+    skip: timer.skip,
+    reset: timer.reset,
+    setTheme: setTheme,
+    saveSettings: saveSettings,
+  };
+
+  window.AppController = AppController;
+
   initialize();
 
   function initialize() {
     hydrateFromStorage();
-    ui.setTagline(TAGLINES[Math.floor(Math.random() * TAGLINES.length)]);
-    ui.hydrateSettingsForm(appState.settings);
-    ui.hydrateTheme(appState.theme);
-    ui.bindControls({
-      onStart: timer.start,
-      onPause: timer.pause,
-      onSkip: timer.skip,
-      onReset: timer.reset,
-      onSaveSettings: saveSettings,
+    applyStaticCopy();
+    render.setTagline(randomFrom(Content.SITE_TAGLINES));
+    render.hydrateSettingsForm(appState.settings);
+    render.hydrateTheme(appState.theme);
+
+    controls.bindControls({
+      onStart: AppController.start,
+      onPause: AppController.pause,
+      onSkip: AppController.skip,
+      onReset: AppController.reset,
+      onSaveSettings: AppController.saveSettings,
       onRestoreDefaults: restoreDefaults,
-      onThemeChange: setTheme,
+      onThemeChange: AppController.setTheme,
       onShortcut: handleShortcut,
+      onSettingsInput: onSettingsInput,
     });
+
     timer.startTicker();
     onStateChange();
+  }
+
+  function randomFrom(values) {
+    if (!Array.isArray(values) || values.length === 0) return "";
+    return values[Math.floor(Math.random() * values.length)];
+  }
+
+  function applyStaticCopy() {
+    dom.copy.settingsHeading.textContent = Content.UI_COPY.settingsHeading;
+    dom.copy.blocks.textContent = Content.UI_COPY.blocksBeforeLongBreak;
+    dom.copy.primeEnabled.textContent = Content.UI_COPY.startWithPrep;
+    dom.copy.autoStart.textContent = Content.UI_COPY.autoStartNext;
+    dom.copy.soundEnabled.textContent = Content.UI_COPY.soundOnPhaseChange;
+
+    Core.PHASES.forEach(function eachPhase(phase) {
+      if (!dom.copy.phaseLabels[phase]) return;
+      dom.copy.phaseLabels[phase].textContent = Core.stateLabel(phase);
+    });
   }
 
   function hydrateFromStorage() {
@@ -69,8 +112,37 @@
     appState.timer.remainingSec = Core.phaseDurationSec(appState.timer.phase, appState.settings);
   }
 
+  function onSettingsInput(rawSettings) {
+    const normalized = Core.normalizeSettings(rawSettings);
+    appState.ui.settingsDirty = !sameSettings(normalized, appState.settings);
+    onStateChange();
+  }
+
+  function sameSettings(a, b) {
+    return (
+      a.prime === b.prime &&
+      a.focus === b.focus &&
+      a.recall === b.recall &&
+      a.break === b.break &&
+      a.long_break === b.long_break &&
+      a.blocks_per_ultradian === b.blocks_per_ultradian &&
+      a.prime_enabled === b.prime_enabled &&
+      a.auto_start === b.auto_start &&
+      a.sound_enabled === b.sound_enabled
+    );
+  }
+
   function saveSettings(rawSettings) {
-    appState.settings = Core.normalizeSettings(rawSettings);
+    const next = Core.normalizeSettings(rawSettings);
+
+    if (next.auto_start !== appState.settings.auto_start) {
+      appState.ui.sessionFlags.changedAutoStart = true;
+    }
+    if (next.sound_enabled !== appState.settings.sound_enabled) {
+      appState.ui.sessionFlags.changedSound = true;
+    }
+
+    appState.settings = next;
     storage.setJSON(Core.STORAGE_KEYS.settings, appState.settings);
 
     if (!appState.timer.running) {
@@ -84,24 +156,30 @@
       timer.resetToPhase("focus");
     }
 
-    ui.hydrateSettingsForm(appState.settings);
-    ui.flashMessage("Settings saved.");
+    appState.ui.settingsDirty = false;
+    render.hydrateSettingsForm(appState.settings);
+    announce.flashMessage("Settings Saved.");
     onStateChange();
   }
 
   function restoreDefaults() {
     appState.settings = Core.normalizeSettings(Core.DEFAULT_SETTINGS);
     storage.setJSON(Core.STORAGE_KEYS.settings, appState.settings);
-    ui.hydrateSettingsForm(appState.settings);
+
+    appState.ui.settingsDirty = false;
+    appState.ui.sessionFlags.changedAutoStart = false;
+    appState.ui.sessionFlags.changedSound = false;
+
+    render.hydrateSettingsForm(appState.settings);
     timer.reset();
-    ui.flashMessage("Defaults restored.");
+    announce.flashMessage("Defaults Restored.");
     onStateChange();
   }
 
   function setTheme(nextTheme) {
     appState.theme = nextTheme === "dark" ? "dark" : "light";
     storage.setText(Core.STORAGE_KEYS.theme, appState.theme);
-    ui.hydrateTheme(appState.theme);
+    render.hydrateTheme(appState.theme);
     onStateChange();
   }
 
@@ -119,13 +197,13 @@
     if (appState.settings.sound_enabled) {
       audio.playPhaseChime();
     }
-    ui.announce(payload.label + " started");
+    announce.announce(payload.label + " Started");
   }
 
   function onStateChange() {
     appState.stats = Core.rolloverStats(appState.stats, Core.dateKey());
     storage.setJSON(Core.STORAGE_KEYS.stats, appState.stats);
-    ui.render(appState);
+    render.render(appState);
   }
 
   function createStorageAdapter() {
@@ -298,11 +376,14 @@
     }
 
     function enterPhase(phase, options) {
-      const config = Object.assign({
-        reason: "transition",
-        autoStart: state.settings.auto_start,
-        creditFocus: false,
-      }, options || {});
+      const config = Object.assign(
+        {
+          reason: "transition",
+          autoStart: state.settings.auto_start,
+          creditFocus: false,
+        },
+        options || {}
+      );
 
       const from = state.timer.phase;
       const isResetLike = config.reason === "reset" || config.reason === "init";
@@ -351,7 +432,6 @@
           running: state.timer.running,
           phase: state.timer.phase,
           remainingSec: state.timer.remainingSec,
-          lastTickMs: state.timer.lastTickMs,
         },
         elapsedSec,
         state.settings,
@@ -393,7 +473,7 @@
     };
   }
 
-  function createUI() {
+  function createDOM() {
     const dom = {
       state: byId("state"),
       time: byId("time"),
@@ -404,9 +484,14 @@
       long: byId("long"),
       status: byId("status"),
       saveMsg: byId("save-msg"),
+      dirtyIndicator: byId("dirty-indicator"),
+      sessionNote: byId("session-note"),
       theme: byId("theme"),
       live: byId("live-announcer"),
       tagline: byId("tagline"),
+      shortcutsHelp: byId("shortcuts-help"),
+      shortcutsModal: byId("shortcuts-modal"),
+      shortcutsClose: byId("shortcuts-close"),
       controls: {
         start: byId("start"),
         pause: byId("pause"),
@@ -426,120 +511,30 @@
         auto_start: byId("auto_start"),
         sound_enabled: byId("sound_enabled"),
       },
+      copy: {
+        settingsHeading: byId("label-settings-heading"),
+        blocks: byId("label-blocks"),
+        primeEnabled: byId("label-prime-enabled"),
+        autoStart: byId("label-auto-start"),
+        soundEnabled: byId("label-sound-enabled"),
+        phaseLabels: {
+          prime: byId("label-prime"),
+          focus: byId("label-focus"),
+          recall: byId("label-recall"),
+          break: byId("label-break"),
+          long_break: byId("label-long_break"),
+        },
+      },
     };
 
-    function byId(id) {
-      const node = document.getElementById(id);
-      if (!node) throw new Error("Missing DOM node #" + id);
-      return node;
+    return dom;
+  }
+
+  function byId(id) {
+    const node = document.getElementById(id);
+    if (!node) {
+      throw new Error("Missing DOM node #" + id);
     }
-
-    function bindControls(handlers) {
-      dom.controls.start.addEventListener("click", handlers.onStart);
-      dom.controls.pause.addEventListener("click", handlers.onPause);
-      dom.controls.skip.addEventListener("click", handlers.onSkip);
-      dom.controls.reset.addEventListener("click", handlers.onReset);
-
-      dom.controls.save.addEventListener("click", function saveClick() {
-        handlers.onSaveSettings(readSettingsForm());
-      });
-
-      dom.controls.defaults.addEventListener("click", handlers.onRestoreDefaults);
-      dom.theme.addEventListener("change", function themeChange(event) {
-        handlers.onThemeChange(event.target.value);
-      });
-
-      window.addEventListener("keydown", function onKeydown(event) {
-        if (isFormTarget(event.target)) return;
-        const key = event.key.toLowerCase();
-        if (key === " ") {
-          event.preventDefault();
-          handlers.onShortcut("toggle");
-          return;
-        }
-        if (key === "s") handlers.onShortcut("skip");
-        if (key === "r") handlers.onShortcut("reset");
-      });
-    }
-
-    function isFormTarget(target) {
-      if (!target) return false;
-      const tag = target.tagName;
-      return tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA" || target.isContentEditable;
-    }
-
-    function readSettingsForm() {
-      return {
-        prime: dom.fields.prime.value,
-        focus: dom.fields.focus.value,
-        recall: dom.fields.recall.value,
-        break: dom.fields.break.value,
-        long_break: dom.fields.long_break.value,
-        blocks_per_ultradian: dom.fields.blocks_per_ultradian.value,
-        prime_enabled: dom.fields.prime_enabled.checked,
-        auto_start: dom.fields.auto_start.checked,
-        sound_enabled: dom.fields.sound_enabled.checked,
-      };
-    }
-
-    function hydrateSettingsForm(settings) {
-      dom.fields.prime.value = settings.prime;
-      dom.fields.focus.value = settings.focus;
-      dom.fields.recall.value = settings.recall;
-      dom.fields.break.value = settings.break;
-      dom.fields.long_break.value = settings.long_break;
-      dom.fields.blocks_per_ultradian.value = settings.blocks_per_ultradian;
-      dom.fields.prime_enabled.checked = settings.prime_enabled;
-      dom.fields.auto_start.checked = settings.auto_start;
-      dom.fields.sound_enabled.checked = settings.sound_enabled;
-    }
-
-    function hydrateTheme(theme) {
-      document.documentElement.setAttribute("data-theme", theme);
-      dom.theme.value = theme;
-    }
-
-    function flashMessage(message) {
-      dom.saveMsg.textContent = message;
-      setTimeout(function clearMessage() {
-        if (dom.saveMsg.textContent === message) dom.saveMsg.textContent = "";
-      }, 1800);
-    }
-
-    function setTagline(text) {
-      dom.tagline.textContent = text;
-    }
-
-    function announce(text) {
-      dom.live.textContent = "";
-      setTimeout(function writeAnnouncement() {
-        dom.live.textContent = text;
-      }, 10);
-    }
-
-    function render(state) {
-      dom.state.textContent = Core.stateLabel(state.timer.phase);
-      dom.time.textContent = Core.formatTime(state.timer.remainingSec);
-      dom.hint.textContent = Core.STATE_HINTS[state.timer.phase] || "";
-      dom.longHint.textContent = Core.STATE_LONG_HINTS[state.timer.phase] || "";
-      dom.today.textContent = "Focus blocks today: " + state.stats.focusBlocksToday;
-      dom.long.textContent = "Since long break: " + state.stats.focusBlocksSinceLong + "/" + state.settings.blocks_per_ultradian;
-
-      const storageSuffix = storage.mode() === "memory" ? " (volatile storage)" : "";
-      dom.status.textContent = "Status: " + (state.timer.running ? "running" : "paused") + storageSuffix;
-
-      dom.cycleBadge.textContent = "Cycle " + state.stats.focusBlocksToday;
-      document.title = Core.formatTime(state.timer.remainingSec) + " - " + Core.stateLabel(state.timer.phase);
-    }
-
-    return {
-      bindControls,
-      hydrateSettingsForm,
-      hydrateTheme,
-      flashMessage,
-      setTagline,
-      announce,
-      render,
-    };
+    return node;
   }
 })();

@@ -34,13 +34,16 @@
         <p class="long-hint" id="long-hint"></p>
 
         <div class="controls" aria-label="Timer controls">
-          <button id="start" type="button" class="primary">Start</button>
-          <button id="pause" type="button">Pause</button>
+          <button id="start" type="button" class="primary" aria-pressed="false">Start</button>
+          <button id="pause" type="button" aria-pressed="true">Pause</button>
           <button id="skip" type="button">Skip</button>
           <button id="reset" type="button">Reset</button>
         </div>
 
-        <p class="shortcut-hint">Shortcuts: <kbd>Space</kbd> start/pause, <kbd>S</kbd> skip, <kbd>R</kbd> reset.</p>
+        <div class="shortcut-row">
+          <p class="shortcut-hint">Shortcuts: <kbd>Space</kbd> Start/Pause, <kbd>S</kbd> Skip, <kbd>R</kbd> Reset.</p>
+          <button id="shortcuts-help" type="button" class="ghost">Shortcut Help</button>
+        </div>
 
         <div class="stats" aria-label="Stats">
           <div id="today">Focus blocks today: 0</div>
@@ -50,34 +53,50 @@
       </article>
 
       <aside class="panel settings" aria-label="Settings panel">
-        <h2>Phase Settings (Minutes)</h2>
+        <h2 id="label-settings-heading">Phase Settings (Minutes)</h2>
         <div class="grid">
-          <label>Prep<input id="prime" type="number" min="0" max="60" /></label>
-          <label>Focus<input id="focus" type="number" min="1" max="180" /></label>
-          <label>Recall<input id="recall" type="number" min="0" max="30" /></label>
-          <label>Short Break<input id="break" type="number" min="1" max="60" /></label>
-          <label>Long Break<input id="long_break" type="number" min="1" max="90" /></label>
-          <label>Focus Blocks Before Long Break<input id="blocks_per_ultradian" type="number" min="1" max="8" /></label>
+          <label><span id="label-prime">Prep</span><input id="prime" type="number" min="0" max="60" /></label>
+          <label><span id="label-focus">Focus</span><input id="focus" type="number" min="1" max="180" /></label>
+          <label><span id="label-recall">Recall</span><input id="recall" type="number" min="0" max="30" /></label>
+          <label><span id="label-break">Short Break</span><input id="break" type="number" min="1" max="60" /></label>
+          <label><span id="label-long_break">Long Break</span><input id="long_break" type="number" min="1" max="90" /></label>
+          <label><span id="label-blocks">Focus Blocks Before Long Break</span><input id="blocks_per_ultradian" type="number" min="1" max="8" /></label>
         </div>
 
         <div class="checks">
-          <label><input id="prime_enabled" type="checkbox" /> Start With Prep Phase</label>
-          <label><input id="auto_start" type="checkbox" /> Auto-Start Next Phase</label>
-          <label><input id="sound_enabled" type="checkbox" /> Play Sound On Phase Change</label>
+          <label><input id="prime_enabled" type="checkbox" /> <span id="label-prime-enabled">Start With Prep Phase</span></label>
+          <label><input id="auto_start" type="checkbox" /> <span id="label-auto-start">Auto-Start Next Phase</span></label>
+          <label><input id="sound_enabled" type="checkbox" /> <span id="label-sound-enabled">Play Sound On Phase Change</span></label>
         </div>
 
         <div class="actions">
           <button id="save" type="button" class="primary">Save settings</button>
           <button id="defaults" type="button">Restore defaults</button>
         </div>
+        <div class="settings-state" id="dirty-indicator" aria-live="polite"></div>
+        <div class="session-note" id="session-note" aria-live="polite"></div>
         <div class="ok" id="save-msg" aria-live="polite"></div>
       </aside>
     </section>
   </main>
 
+  <section id="shortcuts-modal" class="shortcuts-modal" role="dialog" aria-modal="true" aria-labelledby="shortcuts-title" hidden>
+    <div class="shortcuts-card">
+      <h2 id="shortcuts-title">Keyboard Shortcuts</h2>
+      <p><kbd>Space</kbd> Start/Pause</p>
+      <p><kbd>S</kbd> Skip</p>
+      <p><kbd>R</kbd> Reset</p>
+      <button id="shortcuts-close" type="button">Close</button>
+    </div>
+  </section>
+
   <div id="live-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
+  <script src="content.js"></script>
   <script src="core.js"></script>
+  <script src="ui-announce.js"></script>
+  <script src="ui-render.js"></script>
+  <script src="ui-controls.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

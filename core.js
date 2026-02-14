@@ -1,11 +1,25 @@
 (function initCore(root, factory) {
   if (typeof module === "object" && module.exports) {
-    module.exports = factory();
+    module.exports = factory(require("./content.js"));
   } else {
-    root.PomodoroCore = factory();
+    root.PomodoroCore = factory(root.PomodoroContent || {});
   }
-})(typeof self !== "undefined" ? self : this, function makeCore() {
-  const PHASES = ["prime", "focus", "recall", "break", "long_break"];
+})(typeof self !== "undefined" ? self : this, function makeCore(Content) {
+  const phaseOrder = Array.isArray(Content.PHASE_ORDER) && Content.PHASE_ORDER.length > 0
+    ? Content.PHASE_ORDER.slice()
+    : ["prime", "focus", "recall", "break", "long_break"];
+
+  const PHASE_CONFIG = Content.PHASE_CONFIG || {
+    prime: { displayName: "Prep", shortHint: "Prepare", longHint: "", durationKey: "prime" },
+    focus: { displayName: "Focus", shortHint: "Focus", longHint: "", durationKey: "focus" },
+    recall: { displayName: "Recall", shortHint: "Recall", longHint: "", durationKey: "recall" },
+    break: { displayName: "Short Break", shortHint: "Break", longHint: "", durationKey: "break" },
+    long_break: { displayName: "Long Break", shortHint: "Long Break", longHint: "", durationKey: "long_break" },
+  };
+
+  const PHASES = phaseOrder.filter(function keepPhase(key) {
+    return Boolean(PHASE_CONFIG[key]);
+  });
 
   const DEFAULT_SETTINGS = {
     prime: 2,
@@ -28,21 +42,17 @@
   const TICK_INTERVAL_MS = 250;
   const MAX_PHASE_TRANSITIONS_PER_TICK = 1000;
 
-  const STATE_HINTS = {
-    prime: "Prepare Your Mind. Choose One Clear Goal.",
-    focus: "One Task. Everything Else Closed.",
-    recall: "Lock It In.",
-    break: "Step Away. No Screens. Move. Reset.",
-    long_break: "Deep Reset: Eat, Move, Go Outside",
-  };
+  const STATE_HINTS = toPhaseMap("shortHint");
+  const STATE_LONG_HINTS = toPhaseMap("longHint");
 
-  const STATE_LONG_HINTS = {
-    prime: "Stand up, take a few slow breaths, and clearly state the one specific thing you’re about to do. This helps your brain switch from wandering mode to focused mode so you start the work clean and intentional.",
-    focus: "Work on one clearly defined task with notifications off and no multitasking. Stay slightly challenged, don’t switch tabs, and keep going until the timer ends — depth over busyness.",
-    recall: "Stop working and briefly write what you accomplished, what you learned, and the exact next step. This locks in memory and makes the next focus block easier to start.",
-    break: "Step away from the screen and move — walk, stretch, hydrate, breathe. No scrolling. Let your brain reset so the next focus block starts sharp instead of foggy.",
-    long_break: "Take a real reset — eat, go outside, move your body, or fully relax away from screens. This lets your brain recover deeply so the next cycle starts strong instead of depleted.",
-  };
+  function toPhaseMap(prop) {
+    const out = {};
+    PHASES.forEach(function eachPhase(phase) {
+      const cfg = PHASE_CONFIG[phase] || {};
+      out[phase] = cfg[prop] || "";
+    });
+    return out;
+  }
 
   function clampInt(value, fallback, min, max) {
     const num = Number(value);
@@ -94,7 +104,8 @@
   }
 
   function phaseDurationSec(phase, settings) {
-    const minutes = Number(settings[phase] || 0);
+    const key = (PHASE_CONFIG[phase] && PHASE_CONFIG[phase].durationKey) || phase;
+    const minutes = Number(settings[key] || 0);
     return Math.max(0, minutes * 60);
   }
 
@@ -113,10 +124,8 @@
   }
 
   function stateLabel(phase) {
-    if (phase === "prime") return "Prep";
-    if (phase === "long_break") return "Long Break";
-    if (phase === "break") return "Short Break";
-    return phase.charAt(0).toUpperCase() + phase.slice(1);
+    const cfg = PHASE_CONFIG[phase];
+    return cfg && cfg.displayName ? cfg.displayName : phase.charAt(0).toUpperCase() + phase.slice(1);
   }
 
   function formatTime(seconds) {
@@ -127,10 +136,13 @@
   }
 
   function consumeElapsed(timer, elapsedSec, settings, stats, options) {
-    const config = Object.assign({
-      autoStart: settings.auto_start,
-      maxTransitions: MAX_PHASE_TRANSITIONS_PER_TICK,
-    }, options || {});
+    const config = Object.assign(
+      {
+        autoStart: settings.auto_start,
+        maxTransitions: MAX_PHASE_TRANSITIONS_PER_TICK,
+      },
+      options || {}
+    );
 
     const outTimer = Object.assign({}, timer);
     const outStats = normalizeStats(stats);
@@ -185,6 +197,7 @@
 
   return {
     PHASES,
+    PHASE_CONFIG,
     DEFAULT_SETTINGS,
     STORAGE_KEYS,
     TICK_INTERVAL_MS,
