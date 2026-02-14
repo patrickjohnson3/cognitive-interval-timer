@@ -24,6 +24,10 @@
   --glow-strong: var(--color-accent-glow);
   --long-hint-border-width: 1px;
   --sidebar-label-color: var(--text-secondary, var(--color-muted));
+  --settings-group-padding: var(--space-3);
+  --timer-text-color: var(--text-primary, var(--color-text));
+  --tagline-pill-bg: transparent;
+  --tagline-pill-border: transparent;
 }
 
 :root[data-density="compact"] {
@@ -84,6 +88,11 @@ h1 {
   margin: var(--space-nudge) 0 0;
   font-size: var(--font-size-body-small);
   color: var(--text-secondary, var(--color-muted));
+  display: inline-block;
+  padding: var(--space-1) var(--space-2);
+  border-radius: 999px;
+  background: var(--tagline-pill-bg);
+  border: 1px solid var(--tagline-pill-border);
 }
 
 .badge {
@@ -128,7 +137,7 @@ h1 {
   line-height: 1;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: var(--text-primary, var(--color-text));
+  color: var(--timer-text-color);
   text-shadow: 0 0 12px var(--color-accent-glow);
 }
 
@@ -236,7 +245,7 @@ kbd {
   border: 1px solid var(--border-subtle, var(--color-border));
   border-radius: 12px;
   background: var(--theme-row-bg);
-  padding: var(--space-3);
+  padding: var(--settings-group-padding);
 }
 
 .settings-group + .settings-group {
