@@ -1,0 +1,36 @@
+:root[data-theme="light"] {
+  --color-bg: #d4d4d4;
+  --color-bg-alt: #c9c9c9;
+  --color-surface: #d0d0d0;
+  --color-text: #1e1e1e;
+  --color-muted: #4a4a4a;
+  --color-accent: #4f4f4f;
+  --color-accent-strong: #3d3d3d;
+  --color-accent-soft: #bdbdbd;
+  --color-accent-glow: rgba(79, 79, 79, 0.16);
+  --color-success: #4a4a4a;
+  --color-border: rgba(30, 30, 30, 0.14);
+  --color-shadow: rgba(30, 30, 30, 0.13);
+  --color-button: #cfcfcf;
+  --color-button-hover: #b5b5b5;
+  --color-input: #c4c4c4;
+  --color-primary-text: #d4d4d4;
+  --color-focus-ring: #1e1e1e;
+  --color-input-edge: rgba(30, 30, 30, 0.12);
+
+  --text-primary: #1e1e1e;
+  --text-secondary: #4a4a4a;
+  --text-tertiary: #5b5b5b;
+
+  --elevation-1: 0 4px 12px rgba(30, 30, 30, 0.12);
+  --elevation-2: 0 7px 18px rgba(30, 30, 30, 0.14);
+  --elevation-3: 0 12px 24px rgba(30, 30, 30, 0.13);
+
+  --hint-bg: linear-gradient(160deg, var(--color-accent-soft), var(--color-surface));
+  --hint-border: var(--color-accent);
+  --long-hint-bg: linear-gradient(165deg, var(--color-surface), var(--color-bg-alt));
+  --long-hint-border: var(--color-accent);
+  --badge-bg: linear-gradient(150deg, var(--color-accent-soft), var(--color-bg-alt));
+  --badge-border: var(--color-accent);
+  --badge-text: var(--color-accent-strong);
+}

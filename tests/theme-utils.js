@@ -2,7 +2,9 @@ const fs = require("fs");
 const path = require("path");
 
 function readStyles() {
-  return fs.readFileSync(path.join(__dirname, "..", "styles.css"), "utf8");
+  const shared = fs.readFileSync(path.join(__dirname, "..", "styles.css"), "utf8");
+  const light = fs.readFileSync(path.join(__dirname, "..", "themes", "light.css"), "utf8");
+  return light + "\n" + shared;
 }
 
 function extractThemeBlock(css, theme) {
