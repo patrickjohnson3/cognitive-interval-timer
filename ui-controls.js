@@ -51,19 +51,7 @@
         });
       });
 
-      dom.shortcutsHelp.addEventListener("click", function openModal() {
-        dom.shortcutsModal.hidden = false;
-      });
-      dom.shortcutsClose.addEventListener("click", function closeModal() {
-        dom.shortcutsModal.hidden = true;
-      });
-
       window.addEventListener("keydown", function onKeydown(event) {
-        if (event.key === "Escape" && !dom.shortcutsModal.hidden) {
-          dom.shortcutsModal.hidden = true;
-          return;
-        }
-
         if (isFormTarget(event.target)) return;
         const key = event.key.toLowerCase();
         if (key === " ") {

@@ -489,9 +489,6 @@
       theme: byId("theme"),
       live: byId("live-announcer"),
       tagline: byId("tagline"),
-      shortcutsHelp: byId("shortcuts-help"),
-      shortcutsModal: byId("shortcuts-modal"),
-      shortcutsClose: byId("shortcuts-close"),
       controls: {
         start: byId("start"),
         pause: byId("pause"),
