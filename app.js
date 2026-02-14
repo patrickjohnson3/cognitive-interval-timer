@@ -392,6 +392,7 @@
       state: byId("state"),
       time: byId("time"),
       hint: byId("hint"),
+      longHint: byId("long-hint"),
       cycleBadge: byId("cycle-badge"),
       today: byId("today"),
       long: byId("long"),
@@ -509,6 +510,7 @@
       dom.state.textContent = Core.stateLabel(state.timer.phase);
       dom.time.textContent = Core.formatTime(state.timer.remainingSec);
       dom.hint.textContent = Core.STATE_HINTS[state.timer.phase] || "";
+      dom.longHint.textContent = Core.STATE_LONG_HINTS[state.timer.phase] || "";
       dom.today.textContent = "Focus blocks today: " + state.stats.focusBlocksToday;
       dom.long.textContent = "Since long break: " + state.stats.focusBlocksSinceLong + "/" + state.settings.blocks_per_ultradian;
 

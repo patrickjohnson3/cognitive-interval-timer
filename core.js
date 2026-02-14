@@ -36,6 +36,14 @@
     long_break: "Deep reset: walk, snack, sunlight, breathe.",
   };
 
+  const STATE_LONG_HINTS = {
+    prime: "Stand up, take a few slow breaths, and clearly state the one specific thing you’re about to do. This helps your brain switch from wandering mode to focused mode so you start the work clean and intentional.",
+    focus: "",
+    recall: "",
+    break: "",
+    long_break: "",
+  };
+
   function clampInt(value, fallback, min, max) {
     const num = Number(value);
     if (!Number.isFinite(num)) return fallback;
@@ -180,6 +188,7 @@
     TICK_INTERVAL_MS,
     MAX_PHASE_TRANSITIONS_PER_TICK,
     STATE_HINTS,
+    STATE_LONG_HINTS,
     clampInt,
     normalizeSettings,
     normalizeStats,
