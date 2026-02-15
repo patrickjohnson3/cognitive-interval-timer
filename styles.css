@@ -105,7 +105,7 @@ h1 {
   font-size: var(--font-size-overline);
   text-transform: uppercase;
   letter-spacing: 0.09em;
-  box-shadow: var(--elevation-1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
 }
 
 .main {
@@ -211,6 +211,10 @@ button.primary:hover {
   box-shadow: 0 5px 12px var(--glow-strong);
 }
 
+#save.primary:hover {
+  box-shadow: 0 4px 10px var(--glow-soft);
+}
+
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
@@ -257,6 +261,10 @@ kbd {
   font-size: 0.92rem;
   letter-spacing: 0.02em;
   color: var(--text-primary, var(--color-text));
+}
+
+#label-phase-settings-heading {
+  margin-bottom: calc(var(--space-3) - 7px);
 }
 
 .settings-divider {
