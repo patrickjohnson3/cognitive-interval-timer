@@ -40,7 +40,12 @@
       dom.long.textContent = "Since Long Break: " + state.stats.focusBlocksSinceLong + "/" + state.settings.blocks_per_ultradian;
 
       const storageSuffix = storage.mode() === "memory" ? " (Volatile Storage)" : "";
-      dom.status.textContent = "Status: " + (state.timer.running ? "Running" : "Paused") + storageSuffix;
+      const statusLabel = state.timer.running
+        ? "Running"
+        : state.timer.hasStartedOnce
+          ? "Paused"
+          : "Idle";
+      dom.status.textContent = "Status: " + statusLabel + storageSuffix;
 
       dom.cycleBadge.textContent = "Cycle " + state.stats.focusBlocksToday;
 
