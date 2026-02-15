@@ -319,6 +319,61 @@ label {
   color: var(--sidebar-label-color);
 }
 
+.field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.tip-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.tip-trigger {
+  width: 1.05rem;
+  height: 1.05rem;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.tip-bubble {
+  position: absolute;
+  z-index: 30;
+  left: 50%;
+  bottom: calc(100% + var(--space-2));
+  transform: translateX(-50%) translateY(2px);
+  width: min(260px, 70vw);
+  padding: var(--space-2) var(--space-3);
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle, var(--color-border));
+  background: var(--panel-bg);
+  color: var(--text-primary, var(--color-text));
+  box-shadow: var(--elevation-2);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.tip-bubble strong {
+  display: block;
+  margin-bottom: var(--space-1);
+}
+
+.tip-bubble span {
+  display: block;
+  line-height: 1.35;
+}
+
+.tip-wrap:hover .tip-bubble,
+.tip-wrap:focus-within .tip-bubble {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
 input[type="number"],
 select {
   width: 100%;
