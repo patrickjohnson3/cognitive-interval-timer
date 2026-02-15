@@ -34,7 +34,12 @@ https://patrickjohnson3.github.io/cognitive-interval-timer/
 - `themes/dark.css` - dark theme tokens
 - `content.js` - phase copy/content and labels
 - `core.js` - timer/state business logic
-- `app.js` - app bootstrap, orchestration, storage/audio adapters
+- `app.js` - app bootstrap/wiring
+- `app-controller.js` - app orchestration and state coordination
+- `timer-engine.js` - timer loop and phase transition runtime
+- `storage.js` - storage adapter (localStorage with memory fallback)
+- `audio.js` - phase-change chime engine
+- `a11y.js` - accessibility helpers and announcement formatting
 - `ui-controls.js` - DOM event bindings
 - `ui-render.js` - UI rendering/hydration
 - `ui-announce.js` - live-region and save-message announcements
@@ -59,6 +64,14 @@ python3 -m http.server 5500
 Then open:
 
 - `http://localhost:5500/`
+
+## Tooling Setup
+
+Install dev tooling once:
+
+```bash
+npm install
+```
 
 ## Usage
 
@@ -103,7 +116,7 @@ Break:
 Run all tests:
 
 ```bash
-node --test tests/*.test.js
+npm test
 ```
 
 The suite includes:
@@ -113,6 +126,26 @@ The suite includes:
 - Contrast and grayscale-bound checks
 - UI token wiring checks
 - Break layout regression checks
+
+## Linting And Formatting
+
+Run lint checks:
+
+```bash
+npm run lint
+```
+
+Check formatting:
+
+```bash
+npm run format:check
+```
+
+Apply formatting:
+
+```bash
+npm run format
+```
 
 ## Persistence
 
