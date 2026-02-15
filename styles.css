@@ -265,18 +265,6 @@ kbd {
   margin: var(--space-3) 0;
 }
 
-.phase-subgroup + .phase-subgroup {
-  margin-top: var(--space-2);
-}
-
-.phase-subgroup h4 {
-  margin: 0 0 var(--space-2);
-  font-size: var(--font-size-overline);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--sidebar-label-color);
-}
-
 .settings-theme {
   display: flex;
   align-items: center;
@@ -293,6 +281,22 @@ kbd {
 .cycle-stack {
   display: grid;
   gap: var(--space-3);
+}
+
+.cycle-paired-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.cycle-col-heading {
+  margin: 0 0 var(--space-1);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-tertiary, var(--sidebar-label-color));
+  font-weight: 600;
 }
 
 label {
@@ -443,6 +447,14 @@ select {
 
   .settings {
     padding: var(--space-5);
+  }
+
+  .cycle-paired-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cycle-col-heading {
+    margin-top: var(--space-1);
   }
 }
 

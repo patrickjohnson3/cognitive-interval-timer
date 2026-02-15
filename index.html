@@ -73,123 +73,120 @@
 
         <section class="settings-section" aria-labelledby="label-phase-settings-heading">
           <h3 id="label-phase-settings-heading">Cycle Structure</h3>
-          <div class="phase-subgroup">
-            <h4>Work</h4>
-            <div class="cycle-stack">
-              <label>
-                <span class="field-label">
-                  <span id="label-prime">Prep</span>
-                  <span class="tip-wrap">
-                    <button
-                      type="button"
-                      class="tip-trigger"
-                      aria-label="Why 2 minutes for Prep?"
-                      aria-describedby="prep-default-tip"
-                    >?</button>
-                    <span class="tip-bubble" id="prep-default-tip" role="tooltip">
-                      <strong>Why 2 Minutes?</strong>
-                      <span>Two minutes is enough to define what "done" looks like without turning preparation into procrastination.</span>
-                    </span>
+          <div class="cycle-paired-grid">
+            <h4 class="cycle-col-heading">Work</h4>
+            <h4 class="cycle-col-heading">Breaks</h4>
+
+            <label>
+              <span class="field-label">
+                <span id="label-prime">Prep</span>
+                <span class="tip-wrap">
+                  <button
+                    type="button"
+                    class="tip-trigger"
+                    aria-label="Why 2 minutes for Prep?"
+                    aria-describedby="prep-default-tip"
+                  >?</button>
+                  <span class="tip-bubble" id="prep-default-tip" role="tooltip">
+                    <strong>Why 2 Minutes?</strong>
+                    <span>Two minutes is enough to define what "done" looks like without turning preparation into procrastination.</span>
                   </span>
                 </span>
-                <input id="prime" type="number" min="0" max="60" />
-              </label>
-              <label>
-                <span class="field-label">
-                  <span id="label-focus">Focus</span>
-                  <span class="tip-wrap">
-                    <button
-                      type="button"
-                      class="tip-trigger"
-                      aria-label="Why 45 minutes for Focus?"
-                      aria-describedby="focus-default-tip"
-                    >?</button>
-                    <span class="tip-bubble" id="focus-default-tip" role="tooltip">
-                      <strong>Why 45 Minutes?</strong>
-                      <span>Long enough to enter deep focus, short enough to avoid mental fatigue. Most people can sustain 1-2 strong blocks before performance drops.</span>
-                    </span>
+              </span>
+              <input id="prime" type="number" min="0" max="60" />
+            </label>
+            <label>
+              <span class="field-label">
+                <span id="label-focus">Focus</span>
+                <span class="tip-wrap">
+                  <button
+                    type="button"
+                    class="tip-trigger"
+                    aria-label="Why 45 minutes for Focus?"
+                    aria-describedby="focus-default-tip"
+                  >?</button>
+                  <span class="tip-bubble" id="focus-default-tip" role="tooltip">
+                    <strong>Why 45 Minutes?</strong>
+                    <span>Long enough to enter deep focus, short enough to avoid mental fatigue. Most people can sustain 1-2 strong blocks before performance drops.</span>
                   </span>
                 </span>
-                <input id="focus" type="number" min="1" max="180" />
-              </label>
-              <label>
-                <span class="field-label">
-                  <span id="label-recall">Recall</span>
-                  <span class="tip-wrap">
-                    <button
-                      type="button"
-                      class="tip-trigger"
-                      aria-label="Why reflect in Recall?"
-                      aria-describedby="recall-default-tip"
-                    >?</button>
-                    <span class="tip-bubble" id="recall-default-tip" role="tooltip">
-                      <strong>Why Reflect?</strong>
-                      <span>Writing what you did and learned strengthens memory and reduces cognitive residue before the next block.</span>
-                    </span>
+              </span>
+              <input id="focus" type="number" min="1" max="180" />
+            </label>
+
+            <label>
+              <span class="field-label">
+                <span id="label-recall">Recall</span>
+                <span class="tip-wrap">
+                  <button
+                    type="button"
+                    class="tip-trigger"
+                    aria-label="Why reflect in Recall?"
+                    aria-describedby="recall-default-tip"
+                  >?</button>
+                  <span class="tip-bubble" id="recall-default-tip" role="tooltip">
+                    <strong>Why Reflect?</strong>
+                    <span>Writing what you did and learned strengthens memory and reduces cognitive residue before the next block.</span>
                   </span>
                 </span>
-                <input id="recall" type="number" min="0" max="30" />
-              </label>
-            </div>
-          </div>
-          <div class="phase-subgroup">
-            <h4>Breaks</h4>
-            <div class="cycle-stack">
-              <label>
-                <span class="field-label">
-                  <span id="label-break">Short Break</span>
-                  <span class="tip-wrap">
-                    <button
-                      type="button"
-                      class="tip-trigger"
-                      aria-label="Why 15 minutes for Short Break?"
-                      aria-describedby="short-break-default-tip"
-                    >?</button>
-                    <span class="tip-bubble" id="short-break-default-tip" role="tooltip">
-                      <strong>Why 15 Minutes?</strong>
-                      <span>Brief movement and screen-free time restore attention better than quick dopamine hits.</span>
-                    </span>
+              </span>
+              <input id="recall" type="number" min="0" max="30" />
+            </label>
+            <label>
+              <span class="field-label">
+                <span id="label-break">Short Break</span>
+                <span class="tip-wrap">
+                  <button
+                    type="button"
+                    class="tip-trigger"
+                    aria-label="Why 15 minutes for Short Break?"
+                    aria-describedby="short-break-default-tip"
+                  >?</button>
+                  <span class="tip-bubble" id="short-break-default-tip" role="tooltip">
+                    <strong>Why 15 Minutes?</strong>
+                    <span>Brief movement and screen-free time restore attention better than quick dopamine hits.</span>
                   </span>
                 </span>
-                <input id="break" type="number" min="1" max="60" />
-              </label>
-              <label>
-                <span class="field-label">
-                  <span id="label-long_break">Long Break</span>
-                  <span class="tip-wrap">
-                    <button
-                      type="button"
-                      class="tip-trigger"
-                      aria-label="Why a longer reset for Long Break?"
-                      aria-describedby="long-break-default-tip"
-                    >?</button>
-                    <span class="tip-bubble" id="long-break-default-tip" role="tooltip">
-                      <strong>Why A Longer Reset?</strong>
-                      <span>After two deep focus blocks, your brain benefits from a fuller recovery window.</span>
-                    </span>
+              </span>
+              <input id="break" type="number" min="1" max="60" />
+            </label>
+
+            <label>
+              <span class="field-label">
+                <span id="label-long_break">Long Break</span>
+                <span class="tip-wrap">
+                  <button
+                    type="button"
+                    class="tip-trigger"
+                    aria-label="Why a longer reset for Long Break?"
+                    aria-describedby="long-break-default-tip"
+                  >?</button>
+                  <span class="tip-bubble" id="long-break-default-tip" role="tooltip">
+                    <strong>Why A Longer Reset?</strong>
+                    <span>After two deep focus blocks, your brain benefits from a fuller recovery window.</span>
                   </span>
                 </span>
-                <input id="long_break" type="number" min="1" max="90" />
-              </label>
-              <label>
-                <span class="field-label">
-                  <span id="label-blocks">Focus Blocks Before Long Break</span>
-                  <span class="tip-wrap">
-                    <button
-                      type="button"
-                      class="tip-trigger"
-                      aria-label="Why 2 focus blocks before Long Break?"
-                      aria-describedby="blocks-default-tip"
-                    >?</button>
-                    <span class="tip-bubble" id="blocks-default-tip" role="tooltip">
-                      <strong>Why 2 Blocks?</strong>
-                      <span>Attention naturally works in waves. Two strong efforts followed by recovery keeps output sustainable.</span>
-                    </span>
+              </span>
+              <input id="long_break" type="number" min="1" max="90" />
+            </label>
+            <label>
+              <span class="field-label">
+                <span id="label-blocks">Focus Blocks Before Long Break</span>
+                <span class="tip-wrap">
+                  <button
+                    type="button"
+                    class="tip-trigger"
+                    aria-label="Why 2 focus blocks before Long Break?"
+                    aria-describedby="blocks-default-tip"
+                  >?</button>
+                  <span class="tip-bubble" id="blocks-default-tip" role="tooltip">
+                    <strong>Why 2 Blocks?</strong>
+                    <span>Attention naturally works in waves. Two strong efforts followed by recovery keeps output sustainable.</span>
                   </span>
                 </span>
-                <input id="blocks_per_ultradian" type="number" min="1" max="8" />
-              </label>
-            </div>
+              </span>
+              <input id="blocks_per_ultradian" type="number" min="1" max="8" />
+            </label>
           </div>
         </section>
 

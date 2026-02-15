@@ -27,12 +27,14 @@ test("break settings keep all break controls in cycle structure", function () {
   assert(html.includes('id="label-blocks"'), "missing blocks label");
 });
 
-test("cycle structure uses single-column input stacks", function () {
+test("cycle structure uses paired two-column input rows", function () {
   const css = read("styles.css");
   const requiredSnippets = [
-    ".cycle-stack",
-    "display: grid;",
+    ".cycle-paired-grid",
+    "grid-template-columns: repeat(2, minmax(0, 1fr));",
     "gap: var(--space-3);",
+    ".cycle-col-heading",
+    "font-size: 0.72rem;",
     ".settings-divider",
     "height: 1px;",
   ];
