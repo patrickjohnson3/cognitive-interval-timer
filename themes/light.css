@@ -28,8 +28,8 @@
 
   --elevation-1: 0 2px 8px rgba(31, 41, 51, 0.07);
   --elevation-2: 0 8px 20px rgba(31, 41, 51, 0.1);
-  --elevation-3: 0 12px 28px rgba(31, 41, 51, 0.1);
-  --timer-text-color: #17212b;
+  --elevation-3: 0 10px 22px rgba(31, 41, 51, 0.08);
+  --timer-text-color: #22303c;
   --tagline-pill-bg: #eef2f6;
   --tagline-pill-border: #dde3ea;
   --settings-group-padding: var(--space-4);
@@ -39,7 +39,7 @@
   --hint-bg: linear-gradient(160deg, #eff6ff, #ffffff);
   --hint-border: var(--color-accent);
   --long-hint-bg: linear-gradient(165deg, #f5f3ff, #ffffff);
-  --long-hint-border: var(--color-recall-accent);
+  --long-hint-border: #6f5aa8;
   --badge-bg: linear-gradient(150deg, #f3f4f6, #ffffff);
   --badge-border: var(--color-border);
   --badge-text: var(--color-break-accent);

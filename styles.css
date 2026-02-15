@@ -322,6 +322,10 @@ label {
   color: var(--sidebar-label-color);
 }
 
+.long-break-row {
+  gap: calc(var(--space-1) - 1px);
+}
+
 .field-label {
   display: inline-flex;
   align-items: center;

@@ -37,12 +37,13 @@
 
   --elevation-1: 0 4px 12px rgba(0, 0, 0, 0.28);
   --elevation-2: 0 7px 18px rgba(0, 0, 0, 0.34);
-  --elevation-3: 0 12px 24px rgba(0, 0, 0, 0.36);
+  --elevation-3: 0 10px 20px rgba(0, 0, 0, 0.32);
+  --timer-text-color: #eef3ff;
 
   --hint-bg: linear-gradient(160deg, #1d2f4d, var(--color-surface));
   --hint-border: var(--color-accent);
   --long-hint-bg: linear-gradient(165deg, #24314a, var(--color-surface));
-  --long-hint-border: #73698d;
+  --long-hint-border: #6d6880;
   --badge-bg: linear-gradient(150deg, #2a3a55, var(--color-surface));
   --badge-border: var(--color-border);
   --badge-text: var(--color-long-break-accent);
