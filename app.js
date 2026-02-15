@@ -12,7 +12,7 @@
   const appState = {
     settings: Core.normalizeSettings(null),
     stats: Core.normalizeStats(null),
-    theme: "light",
+    theme: "dark",
     timer: {
       running: false,
       phase: "focus",
@@ -107,8 +107,8 @@
     appState.stats = Core.normalizeStats(storedStats, Core.dateKey());
     lastSavedStats = cloneStats(appState.stats);
 
-    const storedTheme = storage.getText(Core.STORAGE_KEYS.theme, "light");
-    appState.theme = storedTheme === "dark" ? "dark" : "light";
+    const storedTheme = storage.getText(Core.STORAGE_KEYS.theme, "dark");
+    appState.theme = storedTheme === "light" ? "light" : "dark";
 
     appState.timer.phase = Core.initialPhase(appState.settings);
     appState.timer.remainingSec = Core.phaseDurationSec(appState.timer.phase, appState.settings);
