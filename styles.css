@@ -233,12 +233,14 @@ kbd {
 
 .shortcut-hint {
   margin: var(--space-2) 0 0;
+  padding-inline-start: var(--space-1);
   color: var(--text-secondary, var(--color-muted));
   font-size: 0.86rem;
 }
 
 .stats {
   margin-top: var(--space-3);
+  padding-inline-start: var(--space-1);
   font-size: 0.92rem;
   color: var(--text-secondary, var(--color-muted));
   display: grid;
