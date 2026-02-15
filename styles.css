@@ -298,6 +298,12 @@ kbd {
   align-items: start;
 }
 
+.cycle-col {
+  display: grid;
+  gap: var(--space-1);
+  align-content: start;
+}
+
 .cycle-col-heading {
   margin: 0 0 var(--space-1);
   font-size: 0.72rem;

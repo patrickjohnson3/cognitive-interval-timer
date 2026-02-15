@@ -91,7 +91,9 @@
 
     Core.PHASES.forEach(function eachPhase(phase) {
       if (!dom.copy.phaseLabels[phase]) return;
-      dom.copy.phaseLabels[phase].textContent = Core.stateLabel(phase);
+      const contentPhaseConfig = Content.PHASE_CONFIG && Content.PHASE_CONFIG[phase];
+      dom.copy.phaseLabels[phase].textContent =
+        (contentPhaseConfig && contentPhaseConfig.settingsLabel) || Core.stateLabel(phase);
     });
   }
 
