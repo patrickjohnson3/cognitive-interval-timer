@@ -365,6 +365,14 @@ label {
   transition: opacity 120ms ease, transform 120ms ease;
 }
 
+.tip-bubble-below {
+  top: calc(100% + var(--space-2));
+  bottom: auto;
+  left: auto;
+  right: 0;
+  transform: translateY(-2px);
+}
+
 .tip-bubble strong {
   display: block;
   margin-bottom: var(--space-1);
@@ -379,6 +387,11 @@ label {
 .tip-wrap:focus-within .tip-bubble {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
+}
+
+.tip-wrap:hover .tip-bubble-below,
+.tip-wrap:focus-within .tip-bubble-below {
+  transform: translateY(0);
 }
 
 input[type="number"],
