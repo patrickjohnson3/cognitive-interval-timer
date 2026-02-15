@@ -21,6 +21,20 @@
     return Boolean(PHASE_CONFIG[key]);
   });
 
+  const PHASE = Object.freeze({
+    PREP: "prime",
+    FOCUS: "focus",
+    RECALL: "recall",
+    SHORT_BREAK: "break",
+    LONG_BREAK: "long_break",
+  });
+
+  const STATUS = Object.freeze({
+    IDLE: "idle",
+    RUNNING: "running",
+    PAUSED: "paused",
+  });
+
   const DEFAULT_SETTINGS = {
     prime: 2,
     focus: 45,
@@ -109,18 +123,29 @@
     return Math.max(0, minutes * 60);
   }
 
-  function nextPhase(current, stats, settings) {
-    if (current === "prime") return "focus";
-    if (current === "focus") return "recall";
-    if (current === "recall") {
-      return stats.focusBlocksSinceLong >= settings.blocks_per_ultradian ? "long_break" : "break";
+  function resolvePhaseTransition(from, context) {
+    const stats = context && context.stats ? context.stats : normalizeStats(null);
+    const settings = context && context.settings ? context.settings : normalizeSettings(null);
+
+    if (from === PHASE.PREP) return PHASE.FOCUS;
+    if (from === PHASE.FOCUS) return PHASE.RECALL;
+    if (from === PHASE.RECALL) {
+      return stats.focusBlocksSinceLong >= settings.blocks_per_ultradian ? PHASE.LONG_BREAK : PHASE.SHORT_BREAK;
     }
-    if (current === "break" || current === "long_break") return "focus";
+    if (from === PHASE.SHORT_BREAK || from === PHASE.LONG_BREAK) return PHASE.FOCUS;
     return initialPhase(settings);
   }
 
+  function canTransition(from, to, context) {
+    return resolvePhaseTransition(from, context) === to;
+  }
+
+  function nextPhase(current, stats, settings) {
+    return resolvePhaseTransition(current, { stats: stats, settings: settings });
+  }
+
   function isValidTransition(from, to, stats, settings) {
-    return nextPhase(from, stats, settings) === to;
+    return canTransition(from, to, { stats: stats, settings: settings });
   }
 
   function stateLabel(phase) {
@@ -196,7 +221,9 @@
   }
 
   return {
+    PHASE,
     PHASES,
+    STATUS,
     PHASE_CONFIG,
     DEFAULT_SETTINGS,
     STORAGE_KEYS,
@@ -213,6 +240,8 @@
     phaseDurationSec,
     nextPhase,
     isValidTransition,
+    resolvePhaseTransition,
+    canTransition,
     stateLabel,
     formatTime,
     consumeElapsed,

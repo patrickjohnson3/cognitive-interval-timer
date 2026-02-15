@@ -54,6 +54,11 @@ function createDeps() {
   };
 
   const Core = {
+    STATUS: {
+      IDLE: "idle",
+      RUNNING: "running",
+      PAUSED: "paused",
+    },
     stateLabel: function stateLabel() {
       return "Focus";
     },

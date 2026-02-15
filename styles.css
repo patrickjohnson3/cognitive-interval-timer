@@ -348,11 +348,20 @@ label {
 }
 
 .tip-bubble {
+  --tip-left: 50%;
+  --tip-right: auto;
+  --tip-top: auto;
+  --tip-bottom: calc(100% + var(--space-2));
+  --tip-shift-x: -50%;
+  --tip-shift-y-hidden: 2px;
+  --tip-shift-y-visible: 0;
   position: absolute;
   z-index: 30;
-  left: 50%;
-  bottom: calc(100% + var(--space-2));
-  transform: translateX(-50%) translateY(2px);
+  left: var(--tip-left);
+  right: var(--tip-right);
+  top: var(--tip-top);
+  bottom: var(--tip-bottom);
+  transform: translate(var(--tip-shift-x), var(--tip-shift-y-hidden));
   width: min(260px, 70vw);
   padding: var(--space-2) var(--space-3);
   border-radius: 10px;
@@ -365,12 +374,16 @@ label {
   transition: opacity 120ms ease, transform 120ms ease;
 }
 
-.tip-bubble-below {
-  top: calc(100% + var(--space-2));
-  bottom: auto;
-  left: auto;
-  right: 0;
-  transform: translateY(-2px);
+.tip-bubble--below {
+  --tip-top: calc(100% + var(--space-2));
+  --tip-bottom: auto;
+  --tip-shift-y-hidden: -2px;
+}
+
+.tip-bubble--align-right {
+  --tip-left: auto;
+  --tip-right: 0;
+  --tip-shift-x: 0;
 }
 
 .tip-bubble strong {
@@ -386,12 +399,7 @@ label {
 .tip-wrap:hover .tip-bubble,
 .tip-wrap:focus-within .tip-bubble {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
-.tip-wrap:hover .tip-bubble-below,
-.tip-wrap:focus-within .tip-bubble-below {
-  transform: translateY(0);
+  transform: translate(var(--tip-shift-x), var(--tip-shift-y-visible));
 }
 
 input[type="number"],

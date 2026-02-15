@@ -62,6 +62,30 @@
     startWithPrep: "Start With Prep Phase",
     autoStartNext: "Auto-Start Next Phase",
     soundOnPhaseChange: "Play Sound On Phase Change",
+    labels: {
+      focusBlocksTodayPrefix: "Focus Blocks Today: ",
+      sinceLongBreakPrefix: "Since Long Break: ",
+      statusPrefix: "Status: ",
+      cyclePrefix: "Cycle ",
+      unsavedChanges: "Unsaved Changes",
+      allSettingsSaved: "All Settings Saved",
+      sessionChangesPrefix: "Session Changes: ",
+      sessionChangesNone: "None",
+      autoStart: "Auto-Start",
+      sound: "Sound",
+      storageVolatileSuffix: " (Volatile Storage)",
+      documentTitleSeparator: " - ",
+    },
+    statusLabels: {
+      idle: "Idle",
+      running: "Running",
+      paused: "Paused",
+    },
+    announcements: {
+      phaseStartedSuffix: "Started",
+      settingsSaved: "Settings Saved.",
+      defaultsRestored: "Defaults Restored.",
+    },
   };
 
   return {
