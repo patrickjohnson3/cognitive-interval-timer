@@ -20,29 +20,25 @@ function read(file) {
   return fs.readFileSync(path.join(__dirname, "..", file), "utf8");
 }
 
-test("break settings keep paired long-break and block controls", function () {
+test("break settings keep all break controls in cycle structure", function () {
   const html = read("index.html");
-  assert(html.includes('class="break-short"'), "missing break-short field class");
-  assert(html.includes('class="break-long"'), "missing break-long field class");
-  assert(html.includes('class="break-blocks"'), "missing break-blocks field class");
+  assert(html.includes('id="label-break"'), "missing short break label");
+  assert(html.includes('id="label-long_break"'), "missing long break label");
+  assert(html.includes('id="label-blocks"'), "missing blocks label");
 });
 
-test("break layout grid placement enforces intended grouping", function () {
+test("cycle structure uses single-column input stacks", function () {
   const css = read("styles.css");
   const requiredSnippets = [
-    ".break-layout",
-    "grid-template-columns: repeat(2, minmax(0, 1fr));",
-    ".break-short",
-    "grid-row: 1;",
-    ".break-long",
-    "grid-row: 2;",
-    ".break-blocks",
-    "grid-column: 2 / 3;",
-    "grid-row: 2;",
+    ".cycle-stack",
+    "display: grid;",
+    "gap: var(--space-3);",
+    ".settings-divider",
+    "height: 1px;",
   ];
 
   requiredSnippets.forEach((snippet) => {
-    assert(css.includes(snippet), "missing break layout rule: " + snippet);
+    assert(css.includes(snippet), "missing cycle structure rule: " + snippet);
   });
 });
 

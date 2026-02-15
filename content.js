@@ -57,7 +57,7 @@
   ];
 
   const UI_COPY = {
-    phaseSettingsHeading: "Phase (minutes)",
+    phaseSettingsHeading: "Cycle Structure",
     blocksBeforeLongBreak: "Focus Blocks Before Long Break",
     startWithPrep: "Start With Prep Phase",
     autoStartNext: "Auto-Start Next Phase",

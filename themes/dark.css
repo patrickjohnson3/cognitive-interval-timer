@@ -28,6 +28,8 @@
   --text-secondary: #94a3b8;
   --text-tertiary: #7d8ea7;
   --sidebar-label-color: #8d9cb0;
+  --settings-card-border: rgba(51, 65, 85, 0.72);
+  --settings-divider-color: rgba(51, 65, 85, 0.62);
 
   --glow-soft: rgba(59, 130, 246, 0.14);
   --glow-strong: rgba(59, 130, 246, 0.12);

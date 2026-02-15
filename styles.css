@@ -241,22 +241,28 @@ kbd {
   gap: var(--space-1);
 }
 
-.settings-group {
-  border: 1px solid var(--border-subtle, var(--color-border));
-  border-radius: 12px;
+.settings {
+  padding: calc(var(--space-5) + var(--space-1));
+  border-color: var(--settings-card-border, var(--border-subtle, var(--color-border)));
+}
+
+.settings-section {
   background: var(--theme-row-bg);
+  border-radius: 10px;
   padding: var(--settings-group-padding);
 }
 
-.settings-group + .settings-group {
-  margin-top: var(--space-3);
-}
-
-.settings-group h3 {
+.settings-section h3 {
   margin: 0 0 var(--space-3);
   font-size: 0.92rem;
   letter-spacing: 0.02em;
   color: var(--text-primary, var(--color-text));
+}
+
+.settings-divider {
+  height: 1px;
+  background: var(--settings-divider-color, var(--border-subtle, var(--color-border)));
+  margin: var(--space-3) 0;
 }
 
 .phase-subgroup + .phase-subgroup {
@@ -269,28 +275,6 @@ kbd {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--sidebar-label-color);
-}
-
-.break-layout {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-3);
-  align-items: start;
-}
-
-.break-short {
-  grid-column: 1 / 2;
-  grid-row: 1;
-}
-
-.break-long {
-  grid-column: 1 / 2;
-  grid-row: 2;
-}
-
-.break-blocks {
-  grid-column: 2 / 3;
-  grid-row: 2;
 }
 
 .settings-theme {
@@ -306,9 +290,8 @@ kbd {
   min-width: 110px;
 }
 
-.grid {
+.cycle-stack {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-3);
 }
 
@@ -386,7 +369,7 @@ select {
 }
 
 .checks {
-  margin-top: var(--space-2);
+  margin-top: 0;
   display: grid;
   gap: var(--space-1);
 }
@@ -402,8 +385,11 @@ select {
 .actions {
   display: flex;
   gap: var(--space-2);
-  margin-top: var(--space-3);
   flex-wrap: wrap;
+}
+
+.settings-actions-wrap {
+  margin-top: var(--space-2);
 }
 
 .ok {
@@ -455,15 +441,8 @@ select {
     padding: var(--space-5);
   }
 
-  .break-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .break-short,
-  .break-long,
-  .break-blocks {
-    grid-column: auto;
-    grid-row: auto;
+  .settings {
+    padding: var(--space-5);
   }
 }
 

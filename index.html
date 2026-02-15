@@ -47,7 +47,8 @@
       </article>
 
       <aside class="panel settings" aria-label="Settings panel">
-        <section class="settings-group" aria-label="General controls">
+        <section class="settings-section" aria-label="Appearance section">
+          <h3>Appearance</h3>
           <div class="settings-theme">
             <label for="theme">Theme</label>
             <select id="theme" aria-label="Theme selector">
@@ -55,6 +56,12 @@
               <option value="dark">Dark</option>
             </select>
           </div>
+        </section>
+
+        <div class="settings-divider" aria-hidden="true"></div>
+
+        <section class="settings-section" aria-label="Behavior section">
+          <h3>Behavior</h3>
           <div class="checks">
             <label><input id="prime_enabled" type="checkbox" /> <span id="label-prime-enabled">Start With Prep Phase</span></label>
             <label><input id="auto_start" type="checkbox" /> <span id="label-auto-start">Auto-Start Next Phase</span></label>
@@ -62,11 +69,13 @@
           </div>
         </section>
 
-        <section class="settings-group" aria-labelledby="label-phase-settings-heading">
-          <h3 id="label-phase-settings-heading">Phase (minutes)</h3>
+        <div class="settings-divider" aria-hidden="true"></div>
+
+        <section class="settings-section" aria-labelledby="label-phase-settings-heading">
+          <h3 id="label-phase-settings-heading">Cycle Structure</h3>
           <div class="phase-subgroup">
             <h4>Work</h4>
-            <div class="grid">
+            <div class="cycle-stack">
               <label>
                 <span class="field-label">
                   <span id="label-prime">Prep</span>
@@ -124,9 +133,9 @@
             </div>
           </div>
           <div class="phase-subgroup">
-            <h4>Break</h4>
-            <div class="break-layout">
-              <label class="break-short">
+            <h4>Breaks</h4>
+            <div class="cycle-stack">
+              <label>
                 <span class="field-label">
                   <span id="label-break">Short Break</span>
                   <span class="tip-wrap">
@@ -144,7 +153,7 @@
                 </span>
                 <input id="break" type="number" min="1" max="60" />
               </label>
-              <label class="break-long">
+              <label>
                 <span class="field-label">
                   <span id="label-long_break">Long Break</span>
                   <span class="tip-wrap">
@@ -162,7 +171,7 @@
                 </span>
                 <input id="long_break" type="number" min="1" max="90" />
               </label>
-              <label class="break-blocks">
+              <label>
                 <span class="field-label">
                   <span id="label-blocks">Focus Blocks Before Long Break</span>
                   <span class="tip-wrap">
@@ -184,9 +193,12 @@
           </div>
         </section>
 
-        <div class="actions">
-          <button id="save" type="button" class="primary">Save settings</button>
-          <button id="defaults" type="button">Restore defaults</button>
+        <div class="settings-actions-wrap">
+          <div class="settings-divider" aria-hidden="true"></div>
+          <div class="actions">
+            <button id="save" type="button" class="primary">Save settings</button>
+            <button id="defaults" type="button">Restore defaults</button>
+          </div>
         </div>
         <div class="settings-state" id="dirty-indicator" aria-live="polite"></div>
         <div class="session-note" id="session-note" aria-live="polite"></div>

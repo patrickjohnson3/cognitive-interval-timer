@@ -33,6 +33,8 @@
   --tagline-pill-bg: #eef2f6;
   --tagline-pill-border: #dde3ea;
   --settings-group-padding: var(--space-4);
+  --settings-card-border: #dbe1e8;
+  --settings-divider-color: #e3e8ef;
 
   --hint-bg: linear-gradient(160deg, #eff6ff, #ffffff);
   --hint-border: var(--color-accent);
