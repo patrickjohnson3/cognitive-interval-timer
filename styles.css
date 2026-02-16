@@ -386,6 +386,12 @@ label {
   --tip-shift-x: 0;
 }
 
+.cycle-col:last-child .tip-bubble {
+  --tip-left: auto;
+  --tip-right: 0;
+  --tip-shift-x: 0;
+}
+
 .tip-bubble strong {
   display: block;
   margin-bottom: var(--space-1);
