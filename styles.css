@@ -485,6 +485,10 @@ select {
 }
 
 @media (max-width: 760px) {
+  .app {
+    overflow: visible;
+  }
+
   .main {
     grid-template-columns: 1fr;
   }
@@ -522,6 +526,14 @@ select {
     --tip-shift-y-hidden: -2px;
     width: auto;
     max-width: none;
+  }
+
+  #cycle-definition-tip {
+    --tip-left: 0;
+    --tip-right: auto;
+    --tip-shift-x: 0;
+    width: min(260px, calc(100vw - (var(--space-4) * 2)));
+    max-width: calc(100vw - (var(--space-4) * 2));
   }
 }
 
