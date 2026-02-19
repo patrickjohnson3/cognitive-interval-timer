@@ -504,6 +504,25 @@ select {
   .cycle-col-heading {
     margin-top: var(--space-1);
   }
+
+  .settings label {
+    position: relative;
+  }
+
+  .settings .tip-wrap {
+    position: static;
+  }
+
+  .settings .tip-bubble {
+    --tip-left: 0;
+    --tip-right: 0;
+    --tip-top: calc(100% + var(--space-1));
+    --tip-bottom: auto;
+    --tip-shift-x: 0;
+    --tip-shift-y-hidden: -2px;
+    width: auto;
+    max-width: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
