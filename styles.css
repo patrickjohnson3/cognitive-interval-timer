@@ -551,12 +551,15 @@ select {
   top: 100%;
   left: 50%;
   transform: translate(-50%, -1px);
-  min-width: 36px;
-  height: 18px;
+  width: 22px;
+  height: 14px;
   padding: 0;
-  border-radius: 0 0 10px 10px;
+  border-radius: 0 0 8px 8px;
   border-top: 0;
-  font-size: 0.75rem;
+  font-size: 0.68rem;
+  color: var(--text-tertiary, var(--sidebar-label-color));
+  opacity: 0;
+  transition: opacity 140ms ease, color 140ms ease;
 }
 
 :root[data-minimal-mode="true"] .minimal-exit-wrap {
@@ -566,6 +569,17 @@ select {
   left: 50%;
   transform: translateX(-50%);
   z-index: 70;
+}
+
+:root[data-minimal-mode="true"] .minimal-exit-wrap:hover .minimal-exit-reveal,
+:root[data-minimal-mode="true"] .minimal-exit-wrap:focus-within .minimal-exit-reveal,
+:root[data-minimal-mode="true"] .minimal-exit-wrap[data-open="true"] .minimal-exit-reveal {
+  opacity: 0.85;
+}
+
+:root[data-minimal-mode="true"] .minimal-exit-wrap:hover .minimal-exit-reveal,
+:root[data-minimal-mode="true"] .minimal-exit-wrap:focus-within .minimal-exit-reveal {
+  color: var(--text-primary, var(--color-text));
 }
 
 :root[data-minimal-mode="true"] .minimal-exit-wrap:hover .minimal-exit-panel,
