@@ -90,6 +90,13 @@
         if (key === "s") handlers.onShortcut("skip");
         if (key === "r") handlers.onShortcut("reset");
       });
+
+      window.addEventListener("click", function onWindowClick(event) {
+        if (!document.documentElement.hasAttribute("data-minimal-mode")) return;
+        if (event.button != null && event.button !== 0) return;
+        if (event.target && event.target.closest && event.target.closest("#minimal-exit-wrap")) return;
+        handlers.onShortcut("toggle");
+      });
     }
 
     return {
