@@ -143,13 +143,10 @@
     }
 
     function onExitMinimalMode() {
-      if (!appState.settings.minimal_mode_enabled) return;
-      appState.settings.minimal_mode_enabled = false;
-      storage.setJSON(Core.STORAGE_KEYS.settings, appState.settings);
-      render.hydrateSettingsForm(appState.settings);
+      if (!document.documentElement.hasAttribute("data-minimal-mode")) return;
+      dom.fields.minimal_mode_enabled.checked = false;
       applyMinimalMode(false);
-      appState.ui.settingsDirty = false;
-      onStateChange();
+      onSettingsInput(controls.readSettingsForm());
     }
 
     function sameSettings(a, b) {
