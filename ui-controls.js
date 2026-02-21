@@ -24,6 +24,7 @@
         auto_start: dom.fields.auto_start.checked,
         sound_enabled: dom.fields.sound_enabled.checked,
         fullscreen_enabled: dom.fields.fullscreen_enabled.checked,
+        minimal_mode_enabled: dom.fields.minimal_mode_enabled.checked,
       };
     }
 
@@ -38,6 +39,9 @@
       });
 
       dom.controls.defaults.addEventListener("click", handlers.onRestoreDefaults);
+      dom.controls.exitMinimalMode.addEventListener("click", function onExitMinimalModeClick() {
+        if (handlers.onExitMinimalMode) handlers.onExitMinimalMode();
+      });
       dom.theme.addEventListener("change", function themeChange(event) {
         handlers.onThemeChange(event.target.value);
       });
@@ -52,6 +56,9 @@
             if (key === "fullscreen_enabled" && handlers.onFullscreenToggle) {
               handlers.onFullscreenToggle(field.checked);
             }
+            if (key === "minimal_mode_enabled" && handlers.onMinimalModeToggle) {
+              handlers.onMinimalModeToggle(field.checked);
+            }
             handlers.onSettingsInput(readSettingsForm());
           });
           return;
@@ -63,6 +70,10 @@
       });
 
       window.addEventListener("keydown", function onKeydown(event) {
+        if (event.key === "Escape" && handlers.onExitMinimalMode) {
+          handlers.onExitMinimalMode();
+          return;
+        }
         if (isFormTarget(event.target)) return;
         const key = event.key.toLowerCase();
         if (key === " ") {

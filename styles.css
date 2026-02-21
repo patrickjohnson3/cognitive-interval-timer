@@ -472,6 +472,77 @@ select {
   box-shadow: 0 4px 12px var(--glow-soft);
 }
 
+:root[data-minimal-mode="true"] body {
+  padding: 0;
+}
+
+:root[data-minimal-mode="true"] .app {
+  width: 100%;
+  min-height: 100vh;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  overflow: visible;
+}
+
+:root[data-minimal-mode="true"] .header,
+:root[data-minimal-mode="true"] .settings,
+:root[data-minimal-mode="true"] .long-hint,
+:root[data-minimal-mode="true"] .controls,
+:root[data-minimal-mode="true"] .shortcut-hint,
+:root[data-minimal-mode="true"] .stats,
+:root[data-minimal-mode="true"] .settings-actions-wrap,
+:root[data-minimal-mode="true"] .settings-state,
+:root[data-minimal-mode="true"] .session-note,
+:root[data-minimal-mode="true"] .ok {
+  display: none !important;
+}
+
+:root[data-minimal-mode="true"] .main {
+  display: block;
+  min-height: 100vh;
+  padding: 0;
+}
+
+:root[data-minimal-mode="true"] .panel {
+  min-height: 100vh;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0 var(--space-5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+:root[data-minimal-mode="true"] .state,
+:root[data-minimal-mode="true"] .time,
+:root[data-minimal-mode="true"] .hint {
+  margin: 0;
+}
+
+:root[data-minimal-mode="true"] .hint {
+  max-width: min(680px, 92vw);
+  text-align: center;
+}
+
+.minimal-exit-btn {
+  display: none;
+}
+
+:root[data-minimal-mode="true"] .minimal-exit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  z-index: 60;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

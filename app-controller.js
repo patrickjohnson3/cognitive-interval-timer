@@ -78,8 +78,11 @@
         onShortcut: handleShortcut,
         onSettingsInput: onSettingsInput,
         onFullscreenToggle: onFullscreenToggle,
+        onMinimalModeToggle: onMinimalModeToggle,
+        onExitMinimalMode: onExitMinimalMode,
       });
 
+      applyMinimalMode(appState.settings.minimal_mode_enabled);
       timer.startTicker();
       onStateChange();
     }
@@ -96,6 +99,7 @@
       dom.copy.autoStart.textContent = Content.UI_COPY.autoStartNext;
       dom.copy.soundEnabled.textContent = Content.UI_COPY.soundOnPhaseChange;
       dom.copy.fullscreenEnabled.textContent = Content.UI_COPY.fullscreenMode;
+      dom.copy.minimalModeEnabled.textContent = Content.UI_COPY.minimalMode;
 
       Core.PHASES.forEach(function eachPhase(phase) {
         if (!dom.copy.phaseLabels[phase]) return;
@@ -134,6 +138,20 @@
       applyFullscreenSetting(enabled);
     }
 
+    function onMinimalModeToggle(enabled) {
+      applyMinimalMode(enabled);
+    }
+
+    function onExitMinimalMode() {
+      if (!appState.settings.minimal_mode_enabled) return;
+      appState.settings.minimal_mode_enabled = false;
+      storage.setJSON(Core.STORAGE_KEYS.settings, appState.settings);
+      render.hydrateSettingsForm(appState.settings);
+      applyMinimalMode(false);
+      appState.ui.settingsDirty = false;
+      onStateChange();
+    }
+
     function sameSettings(a, b) {
       return (
         a.prime === b.prime &&
@@ -145,7 +163,8 @@
         a.prime_enabled === b.prime_enabled &&
         a.auto_start === b.auto_start &&
         a.sound_enabled === b.sound_enabled &&
-        a.fullscreen_enabled === b.fullscreen_enabled
+        a.fullscreen_enabled === b.fullscreen_enabled &&
+        a.minimal_mode_enabled === b.minimal_mode_enabled
       );
     }
 
@@ -173,6 +192,7 @@
       appState.ui.settingsDirty = false;
       render.hydrateSettingsForm(appState.settings);
       applyFullscreenSetting(appState.settings.fullscreen_enabled);
+      applyMinimalMode(appState.settings.minimal_mode_enabled);
       announce.flashMessage(a11y.formatAnnouncement("settings_saved"));
 
       if (!appState.settings.prime_enabled && appState.timer.phase === Core.PHASE.PREP) {
@@ -193,6 +213,7 @@
 
       render.hydrateSettingsForm(appState.settings);
       applyFullscreenSetting(appState.settings.fullscreen_enabled);
+      applyMinimalMode(appState.settings.minimal_mode_enabled);
       timer.reset();
       announce.flashMessage(a11y.formatAnnouncement("defaults_restored"));
     }
@@ -219,6 +240,14 @@
         if (root.requestFullscreen) {
           root.requestFullscreen().catch(function ignoreFullscreenEnterError() {});
         }
+      }
+    }
+
+    function applyMinimalMode(enabled) {
+      if (enabled) {
+        document.documentElement.setAttribute("data-minimal-mode", "true");
+      } else {
+        document.documentElement.removeAttribute("data-minimal-mode");
       }
     }
 

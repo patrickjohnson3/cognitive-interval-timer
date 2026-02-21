@@ -87,6 +87,7 @@
         reset: byId("reset"),
         save: byId("save"),
         defaults: byId("defaults"),
+        exitMinimalMode: byId("exit-minimal-mode"),
       },
       fields: {
         prime: byId("prime"),
@@ -99,6 +100,7 @@
         auto_start: byId("auto_start"),
         sound_enabled: byId("sound_enabled"),
         fullscreen_enabled: byId("fullscreen_enabled"),
+        minimal_mode_enabled: byId("minimal_mode_enabled"),
       },
       copy: {
         phaseSettingsHeading: byId("label-phase-settings-heading"),
@@ -107,6 +109,7 @@
         autoStart: byId("label-auto-start"),
         soundEnabled: byId("label-sound-enabled"),
         fullscreenEnabled: byId("label-fullscreen-enabled"),
+        minimalModeEnabled: byId("label-minimal-mode-enabled"),
         phaseLabels: {
           prime: byId("label-prime"),
           focus: byId("label-focus"),
