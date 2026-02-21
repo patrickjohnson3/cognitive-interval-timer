@@ -49,6 +49,9 @@
 
         if (type === "checkbox" || tag === "SELECT") {
           field.addEventListener("change", function onChange() {
+            if (key === "fullscreen_enabled" && handlers.onFullscreenToggle) {
+              handlers.onFullscreenToggle(field.checked);
+            }
             handlers.onSettingsInput(readSettingsForm());
           });
           return;

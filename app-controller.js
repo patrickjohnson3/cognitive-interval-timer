@@ -77,6 +77,7 @@
         onThemeChange: controller.setTheme,
         onShortcut: handleShortcut,
         onSettingsInput: onSettingsInput,
+        onFullscreenToggle: onFullscreenToggle,
       });
 
       timer.startTicker();
@@ -127,6 +128,10 @@
       const normalized = Core.normalizeSettings(rawSettings);
       appState.ui.settingsDirty = !sameSettings(normalized, appState.settings);
       onStateChange();
+    }
+
+    function onFullscreenToggle(enabled) {
+      applyFullscreenSetting(enabled);
     }
 
     function sameSettings(a, b) {
