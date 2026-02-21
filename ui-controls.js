@@ -23,6 +23,7 @@
         prime_enabled: dom.fields.prime_enabled.checked,
         auto_start: dom.fields.auto_start.checked,
         sound_enabled: dom.fields.sound_enabled.checked,
+        fullscreen_enabled: dom.fields.fullscreen_enabled.checked,
       };
     }
 

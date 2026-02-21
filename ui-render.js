@@ -33,6 +33,7 @@
       dom.fields.prime_enabled.checked = settings.prime_enabled;
       dom.fields.auto_start.checked = settings.auto_start;
       dom.fields.sound_enabled.checked = settings.sound_enabled;
+      dom.fields.fullscreen_enabled.checked = settings.fullscreen_enabled;
     }
 
     function buildViewModel(state) {

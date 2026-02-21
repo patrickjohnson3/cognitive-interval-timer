@@ -94,6 +94,7 @@
       dom.copy.primeEnabled.textContent = Content.UI_COPY.startWithPrep;
       dom.copy.autoStart.textContent = Content.UI_COPY.autoStartNext;
       dom.copy.soundEnabled.textContent = Content.UI_COPY.soundOnPhaseChange;
+      dom.copy.fullscreenEnabled.textContent = Content.UI_COPY.fullscreenMode;
 
       Core.PHASES.forEach(function eachPhase(phase) {
         if (!dom.copy.phaseLabels[phase]) return;
@@ -138,7 +139,8 @@
         a.blocks_per_ultradian === b.blocks_per_ultradian &&
         a.prime_enabled === b.prime_enabled &&
         a.auto_start === b.auto_start &&
-        a.sound_enabled === b.sound_enabled
+        a.sound_enabled === b.sound_enabled &&
+        a.fullscreen_enabled === b.fullscreen_enabled
       );
     }
 
@@ -165,6 +167,7 @@
 
       appState.ui.settingsDirty = false;
       render.hydrateSettingsForm(appState.settings);
+      applyFullscreenSetting(appState.settings.fullscreen_enabled);
       announce.flashMessage(a11y.formatAnnouncement("settings_saved"));
 
       if (!appState.settings.prime_enabled && appState.timer.phase === Core.PHASE.PREP) {
@@ -184,6 +187,7 @@
       appState.ui.sessionFlags.changedSound = false;
 
       render.hydrateSettingsForm(appState.settings);
+      applyFullscreenSetting(appState.settings.fullscreen_enabled);
       timer.reset();
       announce.flashMessage(a11y.formatAnnouncement("defaults_restored"));
     }
@@ -193,6 +197,24 @@
       storage.setText(Core.STORAGE_KEYS.theme, appState.theme);
       render.hydrateTheme(appState.theme);
       onStateChange();
+    }
+
+    function applyFullscreenSetting(enabled) {
+      const root = document.documentElement;
+      const activeFullscreen = document.fullscreenElement || null;
+
+      if (!enabled && activeFullscreen) {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(function ignoreFullscreenExitError() {});
+        }
+        return;
+      }
+
+      if (enabled && !activeFullscreen) {
+        if (root.requestFullscreen) {
+          root.requestFullscreen().catch(function ignoreFullscreenEnterError() {});
+        }
+      }
     }
 
     function handleShortcut(action) {

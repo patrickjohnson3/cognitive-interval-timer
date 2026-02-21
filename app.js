@@ -98,6 +98,7 @@
         prime_enabled: byId("prime_enabled"),
         auto_start: byId("auto_start"),
         sound_enabled: byId("sound_enabled"),
+        fullscreen_enabled: byId("fullscreen_enabled"),
       },
       copy: {
         phaseSettingsHeading: byId("label-phase-settings-heading"),
@@ -105,6 +106,7 @@
         primeEnabled: byId("label-prime-enabled"),
         autoStart: byId("label-auto-start"),
         soundEnabled: byId("label-sound-enabled"),
+        fullscreenEnabled: byId("label-fullscreen-enabled"),
         phaseLabels: {
           prime: byId("label-prime"),
           focus: byId("label-focus"),

@@ -45,6 +45,7 @@
     prime_enabled: true,
     auto_start: true,
     sound_enabled: true,
+    fullscreen_enabled: false,
   };
 
   const STORAGE_KEYS = {
@@ -87,6 +88,8 @@
       prime_enabled: typeof merged.prime_enabled === "boolean" ? merged.prime_enabled : DEFAULT_SETTINGS.prime_enabled,
       auto_start: typeof merged.auto_start === "boolean" ? merged.auto_start : DEFAULT_SETTINGS.auto_start,
       sound_enabled: typeof merged.sound_enabled === "boolean" ? merged.sound_enabled : DEFAULT_SETTINGS.sound_enabled,
+      fullscreen_enabled:
+        typeof merged.fullscreen_enabled === "boolean" ? merged.fullscreen_enabled : DEFAULT_SETTINGS.fullscreen_enabled,
     };
   }
 

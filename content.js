@@ -62,6 +62,7 @@
     startWithPrep: "Start With Prep Phase",
     autoStartNext: "Auto-Start Next Phase",
     soundOnPhaseChange: "Play Sound On Phase Change",
+    fullscreenMode: "Fullscreen",
     labels: {
       focusBlocksTodayPrefix: "Focus Blocks Today: ",
       sinceLongBreakPrefix: "Since Long Break: ",
