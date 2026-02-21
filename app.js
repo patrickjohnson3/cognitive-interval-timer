@@ -87,6 +87,8 @@
         reset: byId("reset"),
         save: byId("save"),
         defaults: byId("defaults"),
+        exitMinimalModeWrap: byId("minimal-exit-wrap"),
+        exitMinimalModeReveal: byId("minimal-exit-reveal"),
         exitMinimalMode: byId("exit-minimal-mode"),
       },
       fields: {

@@ -223,7 +223,12 @@
   </main>
 
   <div id="live-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
-  <button id="exit-minimal-mode" type="button" class="minimal-exit-btn">Exit Minimal Mode</button>
+  <div id="minimal-exit-wrap" class="minimal-exit-wrap" aria-hidden="true">
+    <button id="minimal-exit-reveal" type="button" class="minimal-exit-reveal" aria-label="Show minimal mode controls">˅</button>
+    <div class="minimal-exit-panel">
+      <button id="exit-minimal-mode" type="button" class="minimal-exit-btn">Exit Minimal Mode</button>
+    </div>
+  </div>
 
   <script src="content.js"></script>
   <script src="core.js"></script>

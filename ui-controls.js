@@ -39,7 +39,12 @@
       });
 
       dom.controls.defaults.addEventListener("click", handlers.onRestoreDefaults);
+      dom.controls.exitMinimalModeReveal.addEventListener("click", function onMinimalRevealClick() {
+        const open = dom.controls.exitMinimalModeWrap.getAttribute("data-open") === "true";
+        dom.controls.exitMinimalModeWrap.setAttribute("data-open", open ? "false" : "true");
+      });
       dom.controls.exitMinimalMode.addEventListener("click", function onExitMinimalModeClick() {
+        dom.controls.exitMinimalModeWrap.setAttribute("data-open", "false");
         if (handlers.onExitMinimalMode) handlers.onExitMinimalMode();
       });
       dom.theme.addEventListener("change", function themeChange(event) {
@@ -71,6 +76,7 @@
 
       window.addEventListener("keydown", function onKeydown(event) {
         if (event.key === "Escape" && handlers.onExitMinimalMode) {
+          dom.controls.exitMinimalModeWrap.setAttribute("data-open", "false");
           handlers.onExitMinimalMode();
           return;
         }

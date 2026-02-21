@@ -529,18 +529,49 @@ select {
   text-align: center;
 }
 
-.minimal-exit-btn {
+.minimal-exit-wrap {
   display: none;
 }
 
-:root[data-minimal-mode="true"] .minimal-exit-btn {
-  display: inline-flex;
-  align-items: center;
+.minimal-exit-panel {
+  display: flex;
   justify-content: center;
+  padding: var(--space-2) var(--space-3);
+  background: var(--panel-bg);
+  border: 1px solid var(--border-subtle, var(--color-border));
+  border-top: 0;
+  border-radius: 0 0 12px 12px;
+  box-shadow: var(--elevation-2);
+  transform: translateY(calc(-100% + 10px));
+  transition: transform 160ms ease;
+}
+
+.minimal-exit-reveal {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, -1px);
+  min-width: 36px;
+  height: 18px;
+  padding: 0;
+  border-radius: 0 0 10px 10px;
+  border-top: 0;
+  font-size: 0.75rem;
+}
+
+:root[data-minimal-mode="true"] .minimal-exit-wrap {
+  display: block;
   position: fixed;
-  right: var(--space-4);
-  bottom: var(--space-4);
-  z-index: 60;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 70;
+}
+
+:root[data-minimal-mode="true"] .minimal-exit-wrap:hover .minimal-exit-panel,
+:root[data-minimal-mode="true"] .minimal-exit-wrap:focus-within .minimal-exit-panel,
+:root[data-minimal-mode="true"] .minimal-exit-wrap[data-open="true"] .minimal-exit-panel {
+  transform: translateY(0);
 }
 
 .sr-only {
