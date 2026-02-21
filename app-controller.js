@@ -246,8 +246,10 @@
     function applyMinimalMode(enabled) {
       if (enabled) {
         document.documentElement.setAttribute("data-minimal-mode", "true");
+        applyFullscreenSetting(true);
       } else {
         document.documentElement.removeAttribute("data-minimal-mode");
+        applyFullscreenSetting(appState.settings.fullscreen_enabled);
       }
     }
 
