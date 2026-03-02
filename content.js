@@ -63,6 +63,7 @@
     autoStartNext: "Auto-Start Next Phase",
     soundOnPhaseChange: "Play Sound On Phase Change",
     fullscreenMode: "Fullscreen",
+    minimalMode: "Minimal Mode",
     labels: {
       focusBlocksTodayPrefix: "Focus Blocks Today: ",
       sinceLongBreakPrefix: "Since Long Break: ",

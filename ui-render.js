@@ -34,6 +34,7 @@
       dom.fields.auto_start.checked = settings.auto_start;
       dom.fields.sound_enabled.checked = settings.sound_enabled;
       dom.fields.fullscreen_enabled.checked = settings.fullscreen_enabled;
+      dom.fields.minimal_mode_enabled.checked = settings.minimal_mode_enabled;
     }
 
     function buildViewModel(state) {

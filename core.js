@@ -46,6 +46,7 @@
     auto_start: true,
     sound_enabled: true,
     fullscreen_enabled: false,
+    minimal_mode_enabled: false,
   };
 
   const STORAGE_KEYS = {
@@ -90,6 +91,8 @@
       sound_enabled: typeof merged.sound_enabled === "boolean" ? merged.sound_enabled : DEFAULT_SETTINGS.sound_enabled,
       fullscreen_enabled:
         typeof merged.fullscreen_enabled === "boolean" ? merged.fullscreen_enabled : DEFAULT_SETTINGS.fullscreen_enabled,
+      minimal_mode_enabled:
+        typeof merged.minimal_mode_enabled === "boolean" ? merged.minimal_mode_enabled : DEFAULT_SETTINGS.minimal_mode_enabled,
     };
   }
 
