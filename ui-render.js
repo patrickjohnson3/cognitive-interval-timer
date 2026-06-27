@@ -108,8 +108,8 @@
       dom.longHint.textContent = vm.longHintText;
       dom.today.textContent = vm.todayText;
       dom.long.textContent = vm.sinceLongText;
-      dom.cycleBadge.textContent = vm.focusBlockText;
-      dom.cycleBadge.setAttribute("aria-label", vm.focusBlockAriaLabel);
+      dom.focusBlockBadge.textContent = vm.focusBlockText;
+      dom.focusBlockBadge.setAttribute("aria-label", vm.focusBlockAriaLabel);
       dom.dirtyIndicator.textContent = vm.dirtyText;
       dom.sessionNote.textContent = vm.sessionChangesText;
       updatePrimaryButton(vm);

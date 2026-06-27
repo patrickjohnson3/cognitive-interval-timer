@@ -73,7 +73,7 @@
       time: byId("time"),
       hint: byId("hint"),
       longHint: byId("long-hint"),
-      cycleBadge: byId("cycle-badge"),
+      focusBlockBadge: byId("focus-block-badge"),
       today: byId("today"),
       long: byId("long"),
       saveMsg: byId("save-msg"),

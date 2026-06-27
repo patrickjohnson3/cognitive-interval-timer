@@ -40,7 +40,7 @@ function createDeps() {
     longHint: textNode(),
     today: textNode(),
     long: textNode(),
-    cycleBadge: textNode(),
+    focusBlockBadge: textNode(),
     dirtyIndicator: textNode(),
     sessionNote: textNode(),
     controls: {
@@ -161,8 +161,8 @@ test("focus block badge shows Ready before timer has started", function () {
   const render = UIRender.create(deps);
   const state = baseState();
   render.render(state);
-  assert(deps.dom.cycleBadge.textContent === "Focus Block\nReady", "expected ready focus block label");
-  assert(deps.dom.cycleBadge.attributes["aria-label"] === "Focus Block Ready", "expected ready aria label");
+  assert(deps.dom.focusBlockBadge.textContent === "Focus Block\nReady", "expected ready focus block label");
+  assert(deps.dom.focusBlockBadge.attributes["aria-label"] === "Focus Block Ready", "expected ready aria label");
 });
 
 test("document title stays static before timer has started", function () {
@@ -189,8 +189,8 @@ test("focus block badge uses one-based display after timer has started", functio
   const state = baseState();
   state.timer.hasStartedOnce = true;
   render.render(state);
-  assert(deps.dom.cycleBadge.textContent === "Focus Block 1", "expected first focus block label");
-  assert(deps.dom.cycleBadge.attributes["aria-label"] === "Focus Block 1", "expected first focus block aria label");
+  assert(deps.dom.focusBlockBadge.textContent === "Focus Block 1", "expected first focus block label");
+  assert(deps.dom.focusBlockBadge.attributes["aria-label"] === "Focus Block 1", "expected first focus block aria label");
 });
 
 test("primary button shows Pause while timer is running", function () {

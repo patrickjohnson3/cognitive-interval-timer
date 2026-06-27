@@ -108,7 +108,7 @@ h1 {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
 }
 
-#cycle-badge {
+#focus-block-badge {
   text-align: center;
   white-space: pre-line;
 }
@@ -473,7 +473,7 @@ select {
   font-weight: 700;
 }
 
-.cycle-wrap {
+.focus-block-wrap {
   display: flex;
   align-items: center;
   gap: var(--space-2);
