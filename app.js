@@ -1,6 +1,7 @@
 (function bootstrapApp() {
   const Core = window.PomodoroCore;
   const Content = window.PomodoroContent;
+  const ViewModel = window.PomodoroViewModel;
   const UIAnnounce = window.PomodoroUIAnnounce;
   const UIRender = window.PomodoroUIRender;
   const UIControls = window.PomodoroUIControls;
@@ -12,7 +13,7 @@
   const AppController = window.PomodoroAppController;
   const A11y = window.PomodoroA11y;
 
-  if (!Core || !Content || !UIAnnounce || !UIRender || !UIControls || !Storage || !Audio || !WakeLock || !DisplayMode || !TimerEngine || !AppController || !A11y) {
+  if (!Core || !Content || !ViewModel || !UIAnnounce || !UIRender || !UIControls || !Storage || !Audio || !WakeLock || !DisplayMode || !TimerEngine || !AppController || !A11y) {
     throw new Error("Missing required modules. Ensure all scripts load before app.js");
   }
 
@@ -22,6 +23,7 @@
   const wakeLock = WakeLock.createController();
   const a11y = A11y.create({ Content: Content });
   const announce = UIAnnounce.create(dom);
+  const viewModel = ViewModel.create({ Core: Core, Content: Content });
 
   let app = null;
 
@@ -40,8 +42,7 @@
 
   const render = UIRender.create({
     dom: dom,
-    Core: Core,
-    Content: Content,
+    viewModel: viewModel,
     storage: storage,
   });
 

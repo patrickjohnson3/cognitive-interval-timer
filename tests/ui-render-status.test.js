@@ -1,4 +1,5 @@
 const UIRender = require("../ui-render.js");
+const ViewModel = require("../view-model.js");
 
 global.document = {
   title: "",
@@ -110,7 +111,7 @@ function createDeps() {
     },
   };
 
-  return { dom, Core, Content, storage };
+  return { dom, viewModel: ViewModel.create({ Core, Content }), storage };
 }
 
 function baseState() {
