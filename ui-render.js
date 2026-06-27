@@ -9,10 +9,8 @@
     const dom = deps.dom;
     const Core = deps.Core;
     const Content = deps.Content || {};
-    const storage = deps.storage;
     const uiCopy = Content.UI_COPY || {};
     const labels = uiCopy.labels || {};
-    const statusLabels = uiCopy.statusLabels || {};
 
     function setTagline(text) {
       dom.tagline.textContent = text;
@@ -45,10 +43,6 @@
           ? Core.STATUS.PAUSED
           : Core.STATUS.IDLE;
 
-      const storageSuffix = storage.mode() === "memory" ? (labels.storageVolatileSuffix || " (Volatile Storage)") : "";
-      const statusLabel =
-        statusLabels[statusKey] ||
-        (statusKey ? statusKey.charAt(0).toUpperCase() + statusKey.slice(1) : "");
       const primaryActionLabels = labels.primaryActionLabels || {};
       const primaryActionAriaLabels = labels.primaryActionAriaLabels || {};
       const changed = [];
@@ -66,7 +60,6 @@
           state.stats.focusBlocksSinceLong +
           "/" +
           state.settings.blocks_per_ultradian,
-        statusText: (labels.statusPrefix || "Status: ") + statusLabel + storageSuffix,
         cycleText: (labels.cyclePrefix || "Cycle ") + state.stats.focusBlocksToday,
         dirtyText: state.ui.settingsDirty
           ? labels.unsavedChanges || "Unsaved Changes"
@@ -107,7 +100,6 @@
       dom.longHint.textContent = vm.longHintText;
       dom.today.textContent = vm.todayText;
       dom.long.textContent = vm.sinceLongText;
-      dom.status.textContent = vm.statusText;
       dom.cycleBadge.textContent = vm.cycleText;
       dom.dirtyIndicator.textContent = vm.dirtyText;
       dom.sessionNote.textContent = vm.sessionChangesText;

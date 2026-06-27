@@ -40,7 +40,6 @@ function createDeps() {
     longHint: textNode(),
     today: textNode(),
     long: textNode(),
-    status: textNode(),
     cycleBadge: textNode(),
     dirtyIndicator: textNode(),
     sessionNote: textNode(),
@@ -134,14 +133,6 @@ function baseState() {
   };
 }
 
-test("status shows Idle before timer has started", function () {
-  const deps = createDeps();
-  const render = UIRender.create(deps);
-  const state = baseState();
-  render.render(state);
-  assert(deps.dom.status.textContent === "Status: Idle", "expected Idle before first start");
-});
-
 test("primary button shows Start before timer has started", function () {
   const deps = createDeps();
   const render = UIRender.create(deps);
@@ -159,15 +150,6 @@ test("document title stays static before timer has started", function () {
   assert(document.title === "Cognitive Interval Timer", "expected static document title before first start");
 });
 
-test("status shows Paused after timer has started at least once", function () {
-  const deps = createDeps();
-  const render = UIRender.create(deps);
-  const state = baseState();
-  state.timer.hasStartedOnce = true;
-  render.render(state);
-  assert(deps.dom.status.textContent === "Status: Paused", "expected Paused after first start");
-});
-
 test("primary button shows Resume after timer is paused", function () {
   const deps = createDeps();
   const render = UIRender.create(deps);
@@ -176,16 +158,6 @@ test("primary button shows Resume after timer is paused", function () {
   render.render(state);
   assert(deps.dom.controls.start.textContent === "▶ Resume", "expected Resume label while paused");
   assert(deps.dom.controls.start.attributes["aria-label"] === "Resume timer", "expected Resume aria label");
-});
-
-test("status shows Running when timer is active", function () {
-  const deps = createDeps();
-  const render = UIRender.create(deps);
-  const state = baseState();
-  state.timer.running = true;
-  state.timer.hasStartedOnce = true;
-  render.render(state);
-  assert(deps.dom.status.textContent === "Status: Running", "expected Running while active");
 });
 
 test("primary button shows Pause while timer is running", function () {

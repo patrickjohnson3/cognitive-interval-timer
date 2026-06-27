@@ -76,7 +76,6 @@
       cycleBadge: byId("cycle-badge"),
       today: byId("today"),
       long: byId("long"),
-      status: byId("status"),
       saveMsg: byId("save-msg"),
       dirtyIndicator: byId("dirty-indicator"),
       sessionNote: byId("session-note"),

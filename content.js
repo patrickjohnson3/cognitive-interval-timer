@@ -68,7 +68,6 @@
     labels: {
       focusBlocksTodayPrefix: "Focus Blocks Today: ",
       sinceLongBreakPrefix: "Since Long Break: ",
-      statusPrefix: "Status: ",
       cyclePrefix: "Cycle ",
       unsavedChanges: "Unsaved Changes",
       allSettingsSaved: "All Settings Saved",
@@ -76,7 +75,6 @@
       sessionChangesNone: "None",
       autoStart: "Auto-Start",
       sound: "Sound",
-      storageVolatileSuffix: " (Volatile Storage)",
       documentTitleSeparator: " - ",
       documentTitleBase: "Cognitive Interval Timer",
       primaryActionLabels: {
@@ -89,11 +87,6 @@
         running: "Pause timer",
         paused: "Resume timer",
       },
-    },
-    statusLabels: {
-      idle: "Idle",
-      running: "Running",
-      paused: "Paused",
     },
     announcements: {
       phaseStartedSuffix: "Started",
