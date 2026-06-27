@@ -1,3 +1,4 @@
+// Accessibility helpers for tooltip ARIA wiring and live-region announcement text.
 (function initA11y(root, factory) {
   if (typeof module === "object" && module.exports) {
     module.exports = factory();
