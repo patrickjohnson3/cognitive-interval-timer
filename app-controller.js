@@ -14,6 +14,7 @@
     const timer = deps.timer;
     const storage = deps.storage;
     const audio = deps.audio;
+    const wakeLock = deps.wakeLock;
     const a11y = deps.a11y;
     const dom = deps.dom;
 
@@ -79,9 +80,11 @@
         onSettingsInput: onSettingsInput,
         onFullscreenToggle: onFullscreenToggle,
         onMinimalModeToggle: onMinimalModeToggle,
+        onWakeLockToggle: onWakeLockToggle,
         onExitMinimalMode: onExitMinimalMode,
       });
 
+      applyWakeLockSetting(appState.settings.wake_lock_enabled);
       applyMinimalMode(appState.settings.minimal_mode_enabled);
       timer.startTicker();
       onStateChange();
@@ -100,6 +103,7 @@
       dom.copy.soundEnabled.textContent = Content.UI_COPY.soundOnPhaseChange;
       dom.copy.fullscreenEnabled.textContent = Content.UI_COPY.fullscreenMode;
       dom.copy.minimalModeEnabled.textContent = Content.UI_COPY.minimalMode;
+      dom.copy.wakeLockEnabled.textContent = Content.UI_COPY.keepScreenAwake;
 
       Core.PHASES.forEach(function eachPhase(phase) {
         if (!dom.copy.phaseLabels[phase]) return;
@@ -142,6 +146,10 @@
       applyMinimalMode(enabled);
     }
 
+    function onWakeLockToggle(enabled) {
+      applyWakeLockSetting(enabled);
+    }
+
     function onExitMinimalMode() {
       if (!document.documentElement.hasAttribute("data-minimal-mode")) return;
       dom.fields.minimal_mode_enabled.checked = false;
@@ -161,7 +169,8 @@
         a.auto_start === b.auto_start &&
         a.sound_enabled === b.sound_enabled &&
         a.fullscreen_enabled === b.fullscreen_enabled &&
-        a.minimal_mode_enabled === b.minimal_mode_enabled
+        a.minimal_mode_enabled === b.minimal_mode_enabled &&
+        a.wake_lock_enabled === b.wake_lock_enabled
       );
     }
 
@@ -188,6 +197,7 @@
 
       appState.ui.settingsDirty = false;
       render.hydrateSettingsForm(appState.settings);
+      applyWakeLockSetting(appState.settings.wake_lock_enabled);
       applyFullscreenSetting(appState.settings.fullscreen_enabled);
       applyMinimalMode(appState.settings.minimal_mode_enabled);
       announce.flashMessage(a11y.formatAnnouncement("settings_saved"));
@@ -209,6 +219,7 @@
       appState.ui.sessionFlags.changedSound = false;
 
       render.hydrateSettingsForm(appState.settings);
+      applyWakeLockSetting(appState.settings.wake_lock_enabled);
       applyFullscreenSetting(appState.settings.fullscreen_enabled);
       applyMinimalMode(appState.settings.minimal_mode_enabled);
       timer.reset();
@@ -238,6 +249,11 @@
           root.requestFullscreen().catch(function ignoreFullscreenEnterError() {});
         }
       }
+    }
+
+    function applyWakeLockSetting(enabled) {
+      if (!wakeLock || typeof wakeLock.setEnabled !== "function") return;
+      wakeLock.setEnabled(enabled);
     }
 
     function applyMinimalMode(enabled) {

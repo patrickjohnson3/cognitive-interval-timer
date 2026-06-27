@@ -25,6 +25,7 @@
         sound_enabled: dom.fields.sound_enabled.checked,
         fullscreen_enabled: dom.fields.fullscreen_enabled.checked,
         minimal_mode_enabled: dom.fields.minimal_mode_enabled.checked,
+        wake_lock_enabled: dom.fields.wake_lock_enabled.checked,
       };
     }
 
@@ -63,6 +64,9 @@
             }
             if (key === "minimal_mode_enabled" && handlers.onMinimalModeToggle) {
               handlers.onMinimalModeToggle(field.checked);
+            }
+            if (key === "wake_lock_enabled" && handlers.onWakeLockToggle) {
+              handlers.onWakeLockToggle(field.checked);
             }
             handlers.onSettingsInput(readSettingsForm());
           });

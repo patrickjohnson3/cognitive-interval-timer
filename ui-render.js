@@ -35,6 +35,7 @@
       dom.fields.sound_enabled.checked = settings.sound_enabled;
       dom.fields.fullscreen_enabled.checked = settings.fullscreen_enabled;
       dom.fields.minimal_mode_enabled.checked = settings.minimal_mode_enabled;
+      dom.fields.wake_lock_enabled.checked = settings.wake_lock_enabled;
     }
 
     function buildViewModel(state) {

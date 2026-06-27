@@ -6,17 +6,19 @@
   const UIControls = window.PomodoroUIControls;
   const Storage = window.PomodoroStorage;
   const Audio = window.PomodoroAudio;
+  const WakeLock = window.PomodoroWakeLock;
   const TimerEngine = window.PomodoroTimerEngine;
   const AppController = window.PomodoroAppController;
   const A11y = window.PomodoroA11y;
 
-  if (!Core || !Content || !UIAnnounce || !UIRender || !UIControls || !Storage || !Audio || !TimerEngine || !AppController || !A11y) {
+  if (!Core || !Content || !UIAnnounce || !UIRender || !UIControls || !Storage || !Audio || !WakeLock || !TimerEngine || !AppController || !A11y) {
     throw new Error("Missing required modules. Ensure all scripts load before app.js");
   }
 
   const dom = createDOM();
   const storage = Storage.createAdapter();
   const audio = Audio.createEngine();
+  const wakeLock = WakeLock.createController();
   const a11y = A11y.create({ Content: Content });
   const announce = UIAnnounce.create(dom);
 
@@ -53,6 +55,7 @@
     timer: timer,
     storage: storage,
     audio: audio,
+    wakeLock: wakeLock,
     a11y: a11y,
     dom: dom,
   });
@@ -103,6 +106,7 @@
         sound_enabled: byId("sound_enabled"),
         fullscreen_enabled: byId("fullscreen_enabled"),
         minimal_mode_enabled: byId("minimal_mode_enabled"),
+        wake_lock_enabled: byId("wake_lock_enabled"),
       },
       copy: {
         phaseSettingsHeading: byId("label-phase-settings-heading"),
@@ -112,6 +116,7 @@
         soundEnabled: byId("label-sound-enabled"),
         fullscreenEnabled: byId("label-fullscreen-enabled"),
         minimalModeEnabled: byId("label-minimal-mode-enabled"),
+        wakeLockEnabled: byId("label-wake-lock-enabled"),
         phaseLabels: {
           prime: byId("label-prime"),
           focus: byId("label-focus"),

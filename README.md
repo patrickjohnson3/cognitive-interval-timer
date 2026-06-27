@@ -24,6 +24,9 @@ https://patrickjohnson3.github.io/cognitive-interval-timer/
 - Daily focus block tracking
 - Unsaved settings indicator
 - Keyboard shortcuts for timer control
+- Fullscreen mode
+- Best-effort keep-screen-awake mode on browsers with Screen Wake Lock support
+- Minimal mode with centered phase, timer, and phase tagline
 - No build step required
 
 ## Project Structure
@@ -39,6 +42,7 @@ https://patrickjohnson3.github.io/cognitive-interval-timer/
 - `timer-engine.js` - timer loop and phase transition runtime
 - `storage.js` - storage adapter (localStorage with memory fallback)
 - `audio.js` - phase-change chime engine
+- `wake-lock.js` - best-effort Screen Wake Lock API integration
 - `a11y.js` - accessibility helpers and announcement formatting
 - `ui-controls.js` - DOM event bindings
 - `ui-render.js` - UI rendering/hydration
@@ -82,11 +86,14 @@ npm install
 - `Skip`
 - `Reset`
 
+In minimal mode, left-clicking or tapping the screen starts and pauses the timer.
+
 ### Keyboard shortcuts
 
 - `Space` - Start/Pause
 - `S` - Skip phase
 - `R` - Reset timer
+- `Esc` - Exit minimal mode
 
 ### Settings
 
@@ -96,6 +103,21 @@ General:
 - Start with prep phase
 - Auto-start next phase
 - Play sound on phase change
+- Fullscreen
+- Keep screen awake
+- Minimal mode
+
+Keep screen awake:
+
+- Uses the browser Screen Wake Lock API when available
+- Re-requests the wake lock when the page becomes visible again
+- Falls back silently on unsupported browsers
+
+Minimal mode:
+
+- Shows only the phase name, timer, and phase tagline
+- Requests fullscreen when enabled
+- Can be exited with `Esc` or the hidden top panel
 
 Phase (minutes):
 

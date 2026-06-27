@@ -64,6 +64,7 @@
     soundOnPhaseChange: "Play Sound On Phase Change",
     fullscreenMode: "Fullscreen",
     minimalMode: "Minimal Mode",
+    keepScreenAwake: "Keep Screen Awake",
     labels: {
       focusBlocksTodayPrefix: "Focus Blocks Today: ",
       sinceLongBreakPrefix: "Since Long Break: ",
