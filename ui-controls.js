@@ -101,6 +101,10 @@
         if (event.target && event.target.closest && event.target.closest("#minimal-exit-wrap")) return;
         handlers.onShortcut("toggle");
       });
+
+      document.addEventListener("fullscreenchange", function onFullscreenChange() {
+        if (handlers.onFullscreenChange) handlers.onFullscreenChange(Boolean(document.fullscreenElement));
+      });
     }
 
     return {

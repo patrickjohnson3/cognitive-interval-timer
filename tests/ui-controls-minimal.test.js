@@ -77,6 +77,7 @@ function createDom() {
 function bindWithBrowserStubs() {
   const dom = createDom();
   const windowListeners = {};
+  const documentListeners = {};
   const documentElement = {
     attrs: {},
     hasAttribute: function hasAttribute(name) {
@@ -121,6 +122,9 @@ function bindWithBrowserStubs() {
     onFullscreenToggle: function onFullscreenToggle(enabled) {
       calls.push("fullscreen:" + enabled);
     },
+    onFullscreenChange: function onFullscreenChange(enabled) {
+      calls.push("fullscreen-change:" + enabled);
+    },
     onMinimalModeToggle: function onMinimalModeToggle(enabled) {
       calls.push("minimal:" + enabled);
     },
@@ -132,7 +136,13 @@ function bindWithBrowserStubs() {
     },
   };
 
-  global.document = { documentElement };
+  global.document = {
+    documentElement,
+    fullscreenElement: null,
+    addEventListener: function addEventListener(type, handler) {
+      documentListeners[type] = handler;
+    },
+  };
   global.window = {
     addEventListener: function addEventListener(type, handler) {
       windowListeners[type] = handler;
@@ -140,7 +150,7 @@ function bindWithBrowserStubs() {
   };
 
   UIControls.create(dom).bindControls(handlers);
-  return { calls, dom, documentElement, windowListeners };
+  return { calls, dom, documentElement, documentListeners, windowListeners };
 }
 
 test("minimal mode checkbox triggers minimal handler and dirty settings handler", function () {
@@ -159,6 +169,17 @@ test("fullscreen checkbox triggers fullscreen handler and dirty settings handler
 
   assert(ctx.calls.includes("fullscreen:true"), "expected fullscreen toggle handler");
   assert(ctx.calls.includes("settings"), "expected settings dirty handler");
+});
+
+test("fullscreenchange handler receives actual fullscreen state", function () {
+  const ctx = bindWithBrowserStubs();
+  global.document.fullscreenElement = ctx.documentElement;
+  ctx.documentListeners.fullscreenchange();
+  global.document.fullscreenElement = null;
+  ctx.documentListeners.fullscreenchange();
+
+  assert(ctx.calls.includes("fullscreen-change:true"), "expected fullscreen enter notification");
+  assert(ctx.calls.includes("fullscreen-change:false"), "expected fullscreen exit notification");
 });
 
 test("wake lock checkbox triggers wake lock handler and dirty settings handler", function () {

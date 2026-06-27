@@ -79,6 +79,7 @@
         onShortcut: handleShortcut,
         onSettingsInput: onSettingsInput,
         onFullscreenToggle: onFullscreenToggle,
+        onFullscreenChange: onFullscreenChange,
         onMinimalModeToggle: onMinimalModeToggle,
         onWakeLockToggle: onWakeLockToggle,
         onExitMinimalMode: onExitMinimalMode,
@@ -140,6 +141,12 @@
 
     function onFullscreenToggle(enabled) {
       applyFullscreenSetting(enabled);
+    }
+
+    function onFullscreenChange(isFullscreen) {
+      if (isFullscreen || !dom.fields.fullscreen_enabled.checked) return;
+      dom.fields.fullscreen_enabled.checked = false;
+      onSettingsInput(controls.readSettingsForm());
     }
 
     function onMinimalModeToggle(enabled) {
