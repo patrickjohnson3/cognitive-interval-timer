@@ -1,6 +1,7 @@
 const AppController = require("../app-controller.js");
 const Core = require("../core.js");
 const Content = require("../content.js");
+const DisplayMode = require("../display-mode.js");
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -180,6 +181,7 @@ function setup(options) {
         wakeLockCalls.push(Boolean(enabled));
       },
     },
+    DisplayMode,
     a11y: {
       applyAriaDefaults: function applyAriaDefaults() {},
       formatAnnouncement: function formatAnnouncement() {

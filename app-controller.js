@@ -15,8 +15,15 @@
     const storage = deps.storage;
     const audio = deps.audio;
     const wakeLock = deps.wakeLock;
+    const DisplayMode = deps.DisplayMode;
     const a11y = deps.a11y;
     const dom = deps.dom;
+    const displayMode = DisplayMode.create({
+      dom: dom,
+      wakeLock: wakeLock,
+      documentRef: document,
+      onFullscreenUnavailable: reconcileFullscreenUnavailable,
+    });
 
     const appState = {
       settings: Core.normalizeSettings(null),
@@ -259,23 +266,7 @@
     }
 
     function applyFullscreenSetting(enabled) {
-      const root = document.documentElement;
-      const activeFullscreen = document.fullscreenElement || null;
-
-      if (!enabled && activeFullscreen) {
-        if (document.exitFullscreen) {
-          document.exitFullscreen().catch(function ignoreFullscreenExitError() {});
-        }
-        return;
-      }
-
-      if (enabled && !activeFullscreen) {
-        if (root.requestFullscreen) {
-          root.requestFullscreen().catch(function handleFullscreenEnterError() {
-            reconcileFullscreenUnavailable();
-          });
-        }
-      }
+      displayMode.applyFullscreen(enabled);
     }
 
     function reconcileFullscreenUnavailable() {
@@ -295,24 +286,15 @@
     }
 
     function applyWakeLockSetting(enabled) {
-      if (!wakeLock || typeof wakeLock.setEnabled !== "function") return;
-      wakeLock.setEnabled(enabled);
+      displayMode.applyWakeLock(enabled);
     }
 
     function enableWakeLockField() {
-      dom.fields.wake_lock_enabled.checked = true;
-      applyWakeLockSetting(true);
+      displayMode.enableWakeLockField();
     }
 
     function applyMinimalMode(enabled) {
-      if (enabled) {
-        document.documentElement.setAttribute("data-minimal-mode", "true");
-        enableWakeLockField();
-        applyFullscreenSetting(true);
-      } else {
-        document.documentElement.removeAttribute("data-minimal-mode");
-        applyFullscreenSetting(appState.settings.fullscreen_enabled);
-      }
+      displayMode.applyMinimalMode(enabled, appState.settings);
     }
 
     function handleShortcut(action) {

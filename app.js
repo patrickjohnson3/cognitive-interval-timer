@@ -7,11 +7,12 @@
   const Storage = window.PomodoroStorage;
   const Audio = window.PomodoroAudio;
   const WakeLock = window.PomodoroWakeLock;
+  const DisplayMode = window.PomodoroDisplayMode;
   const TimerEngine = window.PomodoroTimerEngine;
   const AppController = window.PomodoroAppController;
   const A11y = window.PomodoroA11y;
 
-  if (!Core || !Content || !UIAnnounce || !UIRender || !UIControls || !Storage || !Audio || !WakeLock || !TimerEngine || !AppController || !A11y) {
+  if (!Core || !Content || !UIAnnounce || !UIRender || !UIControls || !Storage || !Audio || !WakeLock || !DisplayMode || !TimerEngine || !AppController || !A11y) {
     throw new Error("Missing required modules. Ensure all scripts load before app.js");
   }
 
@@ -56,6 +57,7 @@
     storage: storage,
     audio: audio,
     wakeLock: wakeLock,
+    DisplayMode: DisplayMode,
     a11y: a11y,
     dom: dom,
   });
