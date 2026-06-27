@@ -140,6 +140,9 @@
     }
 
     function onFullscreenToggle(enabled) {
+      if (enabled) {
+        enableWakeLockField();
+      }
       applyFullscreenSetting(enabled);
     }
 
@@ -186,6 +189,9 @@
       const oldPhaseDuration = Core.phaseDurationSec(appState.timer.phase, previousSettings);
       const elapsedInPhase = Math.max(0, oldPhaseDuration - appState.timer.remainingSec);
       const next = Core.normalizeSettings(rawSettings);
+      if (next.fullscreen_enabled || next.minimal_mode_enabled) {
+        next.wake_lock_enabled = true;
+      }
 
       if (next.auto_start !== appState.settings.auto_start) {
         appState.ui.sessionFlags.changedAutoStart = true;
@@ -263,9 +269,15 @@
       wakeLock.setEnabled(enabled);
     }
 
+    function enableWakeLockField() {
+      dom.fields.wake_lock_enabled.checked = true;
+      applyWakeLockSetting(true);
+    }
+
     function applyMinimalMode(enabled) {
       if (enabled) {
         document.documentElement.setAttribute("data-minimal-mode", "true");
+        enableWakeLockField();
         applyFullscreenSetting(true);
       } else {
         document.documentElement.removeAttribute("data-minimal-mode");
