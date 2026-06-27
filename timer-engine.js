@@ -52,6 +52,7 @@
       state.stats = Core.rolloverStats(state.stats, Core.dateKey());
       state.timer.running = false;
       state.timer.lastTickMs = null;
+      state.timer.hasStartedOnce = false;
       state.timer.phase = phase;
       state.timer.remainingSec = Core.phaseDurationSec(phase, state.settings);
       hooks.onStateChange();
