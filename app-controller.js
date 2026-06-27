@@ -116,12 +116,32 @@
       dom.copy.fullscreenEnabled.textContent = Content.UI_COPY.fullscreenMode;
       dom.copy.minimalModeEnabled.textContent = Content.UI_COPY.minimalMode;
       dom.copy.wakeLockEnabled.textContent = Content.UI_COPY.keepScreenAwake;
+      applyTooltipCopy();
 
       Core.PHASES.forEach(function eachPhase(phase) {
         if (!dom.copy.phaseLabels[phase]) return;
         const contentPhaseConfig = Content.PHASE_CONFIG && Content.PHASE_CONFIG[phase];
         dom.copy.phaseLabels[phase].textContent =
           (contentPhaseConfig && contentPhaseConfig.settingsLabel) || Core.stateLabel(phase);
+      });
+    }
+
+    function applyTooltipCopy() {
+      if (!document.querySelectorAll) return;
+      const tooltips = Content.UI_COPY.tooltips || {};
+      const wrappers = document.querySelectorAll("[data-tooltip-key]");
+      wrappers.forEach(function eachTooltip(wrapper) {
+        const copy = tooltips[wrapper.getAttribute("data-tooltip-key")];
+        if (!copy) return;
+
+        const trigger = wrapper.querySelector(".tip-trigger");
+        const bubble = wrapper.querySelector(".tip-bubble");
+        const heading = bubble && bubble.querySelector("strong");
+        const body = bubble && bubble.querySelector("span");
+
+        if (trigger) trigger.setAttribute("aria-label", copy.triggerLabel);
+        if (heading) heading.textContent = copy.heading;
+        if (body) body.textContent = copy.body;
       });
     }
 

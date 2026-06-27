@@ -95,6 +95,43 @@
       settingsSaved: "Settings Saved.",
       defaultsRestored: "Defaults Restored.",
     },
+    tooltips: {
+      focusBlockDefinition: {
+        triggerLabel: "What is a focus block?",
+        heading: "What is a focus block?",
+        body: "One focused work effort, followed by recall and then a break.",
+      },
+      prepDefault: {
+        triggerLabel: "Why 2 minutes for Prep?",
+        heading: "Why 2 Minutes?",
+        body: 'Two minutes is enough to define what "done" looks like without turning preparation into procrastination.',
+      },
+      focusDefault: {
+        triggerLabel: "Why 45 minutes for Focus?",
+        heading: "Why 45 Minutes?",
+        body: "Long enough to enter deep focus, short enough to avoid mental fatigue. Most people can sustain 1-2 strong blocks before performance drops.",
+      },
+      recallDefault: {
+        triggerLabel: "Why reflect in Recall?",
+        heading: "Why Reflect?",
+        body: "Writing what you did and learned strengthens memory and reduces cognitive residue before the next block.",
+      },
+      shortBreakDefault: {
+        triggerLabel: "Why 15 minutes for Short Break?",
+        heading: "Why 15 Minutes?",
+        body: "Brief movement and screen-free time restore attention better than quick dopamine hits.",
+      },
+      longBreakDefault: {
+        triggerLabel: "Why a longer reset for Long Break?",
+        heading: "Why a Longer Reset?",
+        body: "After two deep focus blocks, your brain benefits from a fuller recovery window.",
+      },
+      blocksDefault: {
+        triggerLabel: "Why 2 focus blocks before Long Break?",
+        heading: "Why 2 Blocks?",
+        body: "Attention naturally works in waves. Two strong efforts followed by recovery keeps output sustainable.",
+      },
+    },
   };
 
   return {
