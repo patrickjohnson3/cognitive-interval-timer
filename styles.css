@@ -176,6 +176,13 @@ h1 {
   gap: var(--space-2);
 }
 
+.controls button {
+  width: 9.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 button,
 input,
 select {
