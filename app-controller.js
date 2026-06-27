@@ -93,11 +93,7 @@
         onExitMinimalMode: onExitMinimalMode,
       });
 
-      applyWakeLockSetting(appState.settings.wake_lock_enabled);
-      if (appState.settings.fullscreen_enabled && !appState.settings.minimal_mode_enabled) {
-        applyFullscreenSetting(true);
-      }
-      applyMinimalMode(appState.settings.minimal_mode_enabled);
+      applySettingsSideEffects({ hydrateForm: false });
       timer.startTicker();
       onStateChange();
     }
@@ -227,10 +223,7 @@
       const previousSettings = appState.settings;
       const oldPhaseDuration = Core.phaseDurationSec(appState.timer.phase, previousSettings);
       const elapsedInPhase = Math.max(0, oldPhaseDuration - appState.timer.remainingSec);
-      const next = Core.normalizeSettings(rawSettings);
-      if (next.fullscreen_enabled || next.minimal_mode_enabled) {
-        next.wake_lock_enabled = true;
-      }
+      const next = normalizeSettingsForPersistence(rawSettings);
 
       if (next.auto_start !== appState.settings.auto_start) {
         appState.ui.sessionFlags.changedAutoStart = true;
@@ -248,16 +241,10 @@
       }
 
       appState.ui.settingsDirty = false;
-      render.hydrateSettingsForm(appState.settings);
-      applyWakeLockSetting(appState.settings.wake_lock_enabled);
-      applyFullscreenSetting(appState.settings.fullscreen_enabled);
-      applyMinimalMode(appState.settings.minimal_mode_enabled);
+      const resetToFocus = applySettingsSideEffects({ correctPrepPhase: true });
       announce.flashMessage(a11y.formatAnnouncement("settings_saved"));
 
-      if (!appState.settings.prime_enabled && appState.timer.phase === Core.PHASE.PREP) {
-        timer.resetToPhase(Core.PHASE.FOCUS);
-        return;
-      }
+      if (resetToFocus) return;
 
       onStateChange();
     }
@@ -270,12 +257,32 @@
       appState.ui.sessionFlags.changedAutoStart = false;
       appState.ui.sessionFlags.changedSound = false;
 
-      render.hydrateSettingsForm(appState.settings);
-      applyWakeLockSetting(appState.settings.wake_lock_enabled);
-      applyFullscreenSetting(appState.settings.fullscreen_enabled);
-      applyMinimalMode(appState.settings.minimal_mode_enabled);
+      applySettingsSideEffects();
       timer.reset();
       announce.flashMessage(a11y.formatAnnouncement("defaults_restored"));
+    }
+
+    function normalizeSettingsForPersistence(rawSettings) {
+      const next = Core.normalizeSettings(rawSettings);
+      if (next.fullscreen_enabled || next.minimal_mode_enabled) {
+        next.wake_lock_enabled = true;
+      }
+      return next;
+    }
+
+    function applySettingsSideEffects(options) {
+      const config = Object.assign({ hydrateForm: true, correctPrepPhase: false }, options || {});
+      if (config.hydrateForm) {
+        render.hydrateSettingsForm(appState.settings);
+      }
+      applyWakeLockSetting(appState.settings.wake_lock_enabled);
+      applyMinimalMode(appState.settings.minimal_mode_enabled);
+
+      if (config.correctPrepPhase && !appState.settings.prime_enabled && appState.timer.phase === Core.PHASE.PREP) {
+        timer.resetToPhase(Core.PHASE.FOCUS);
+        return true;
+      }
+      return false;
     }
 
     function setTheme(nextTheme) {
