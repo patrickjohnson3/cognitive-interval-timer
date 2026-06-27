@@ -154,7 +154,7 @@
       if (enabled) {
         enableWakeLockField();
       }
-      applyFullscreenSetting(enabled);
+      return applyFullscreenSetting(enabled);
     }
 
     function onPrimaryAction() {
@@ -172,7 +172,7 @@
     }
 
     function onMinimalModeToggle(enabled) {
-      applyMinimalMode(enabled);
+      return applyMinimalMode(enabled);
     }
 
     function onWakeLockToggle(enabled) {
@@ -266,7 +266,7 @@
     }
 
     function applyFullscreenSetting(enabled) {
-      displayMode.applyFullscreen(enabled);
+      return displayMode.applyFullscreen(enabled);
     }
 
     function reconcileFullscreenUnavailable() {
@@ -294,7 +294,7 @@
     }
 
     function applyMinimalMode(enabled) {
-      displayMode.applyMinimalMode(enabled, appState.settings);
+      return displayMode.applyMinimalMode(enabled, appState.settings);
     }
 
     function handleShortcut(action) {

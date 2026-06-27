@@ -18,16 +18,33 @@
 
       if (!enabled && activeFullscreen) {
         if (doc.exitFullscreen) {
-          doc.exitFullscreen().catch(function ignoreFullscreenExitError() {});
+          return Promise.resolve(doc.exitFullscreen())
+            .then(function fullscreenExited() {
+              return false;
+            })
+            .catch(function fullscreenExitFailed() {
+              return Boolean(doc.fullscreenElement);
+            });
         }
-        return;
+        return Promise.resolve(Boolean(doc.fullscreenElement));
       }
 
+      if (!enabled) return Promise.resolve(false);
+      if (activeFullscreen) return Promise.resolve(true);
+
       if (enabled && !activeFullscreen && root && root.requestFullscreen) {
-        root.requestFullscreen().catch(function handleFullscreenEnterError() {
-          onFullscreenUnavailable();
-        });
+        return Promise.resolve(root.requestFullscreen())
+          .then(function fullscreenEntered() {
+            return true;
+          })
+          .catch(function handleFullscreenEnterError() {
+            onFullscreenUnavailable();
+            return false;
+          });
       }
+
+      if (enabled) onFullscreenUnavailable();
+      return Promise.resolve(false);
     }
 
     function applyWakeLock(enabled) {
@@ -44,10 +61,10 @@
       if (enabled) {
         doc.documentElement.setAttribute("data-minimal-mode", "true");
         enableWakeLockField();
-        applyFullscreen(true);
+        return applyFullscreen(true);
       } else {
         doc.documentElement.removeAttribute("data-minimal-mode");
-        applyFullscreen(Boolean(settings && settings.fullscreen_enabled));
+        return applyFullscreen(Boolean(settings && settings.fullscreen_enabled));
       }
     }
 

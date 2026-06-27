@@ -9,13 +9,31 @@ function assert(condition, message) {
 
 function test(name, fn) {
   try {
-    fn();
+    const result = fn();
+    if (result && typeof result.then === "function") {
+      result
+        .then(function asyncPass() {
+          console.log("PASS", name);
+        })
+        .catch(function asyncFail(err) {
+          console.error("FAIL", name);
+          console.error("  " + err.message);
+          process.exitCode = 1;
+        });
+      return;
+    }
     console.log("PASS", name);
   } catch (err) {
     console.error("FAIL", name);
     console.error("  " + err.message);
     process.exitCode = 1;
   }
+}
+
+function flushPromises() {
+  return new Promise(function resolveSoon(resolve) {
+    setTimeout(resolve, 0);
+  });
 }
 
 function createNode(value) {
@@ -90,11 +108,7 @@ function setup(options) {
       requestFullscreen: function requestFullscreen() {
         fullscreenRequests.push(true);
         if (config.rejectFullscreen) {
-          return {
-            catch: function catchFullscreenError(handler) {
-              handler(new Error("fullscreen unavailable"));
-            },
-          };
+          return Promise.reject(new Error("fullscreen unavailable"));
         }
         return Promise.resolve();
       },
@@ -250,21 +264,22 @@ test("saving fullscreen normalizes keep screen awake on", function () {
   assert(saved.wake_lock_enabled === true, "expected wake lock setting to be forced on");
 });
 
-test("fullscreen rejection clears fullscreen field", function () {
+test("fullscreen rejection clears fullscreen field", async function () {
   const ctx = setup({ rejectFullscreen: true });
   ctx.dom.fields.fullscreen_enabled.checked = true;
-  ctx.boundHandlers.onFullscreenToggle(true);
+  await ctx.boundHandlers.onFullscreenToggle(true);
 
   assert(ctx.dom.fields.fullscreen_enabled.checked === false, "expected fullscreen checkbox to clear");
   assert(ctx.app.state.ui.settingsDirty === true, "expected auto-enabled wake lock to remain unsaved");
 });
 
-test("saved fullscreen is cleared when fullscreen request fails on startup", function () {
+test("saved fullscreen is cleared when fullscreen request fails on startup", async function () {
   const ctx = setup({
     rejectFullscreen: true,
     storedSettings: Core.normalizeSettings({ fullscreen_enabled: true, wake_lock_enabled: true }),
   });
 
+  await flushPromises();
   assert(ctx.fullscreenRequests.includes(true), "expected saved fullscreen to request fullscreen");
   assert(ctx.dom.fields.fullscreen_enabled.checked === false, "expected fullscreen checkbox to clear");
   assert(ctx.stored[Core.STORAGE_KEYS.settings].fullscreen_enabled === false, "expected saved fullscreen to clear");
@@ -299,7 +314,3 @@ test("saving minimal mode normalizes keep screen awake on", function () {
   assert(saved.minimal_mode_enabled === true, "expected minimal mode setting to save");
   assert(saved.wake_lock_enabled === true, "expected wake lock setting to be forced on");
 });
-
-if (!process.exitCode) {
-  console.log("All tests passed.");
-}
