@@ -68,7 +68,8 @@
     labels: {
       focusBlocksTodayPrefix: "Focus Blocks Today: ",
       sinceLongBreakPrefix: "Since Long Break: ",
-      cyclePrefix: "Cycle ",
+      focusBlockPrefix: "Focus Block ",
+      focusBlockReady: "Focus Block\nReady",
       unsavedChanges: "Unsaved Changes",
       allSettingsSaved: "All Settings Saved",
       sessionChangesPrefix: "Session Changes: ",

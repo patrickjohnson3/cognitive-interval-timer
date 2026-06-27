@@ -91,6 +91,8 @@ function createDeps() {
       labels: {
         documentTitleBase: "Cognitive Interval Timer",
         documentTitleSeparator: " - ",
+        focusBlockPrefix: "Focus Block ",
+        focusBlockReady: "Focus Block\nReady",
         primaryActionLabels: {
           idle: "▶ Start",
           running: "⏸ Pause",
@@ -142,6 +144,15 @@ test("primary button shows Start before timer has started", function () {
   assert(deps.dom.controls.start.attributes["aria-label"] === "Start timer", "expected Start aria label");
 });
 
+test("focus block badge shows Ready before timer has started", function () {
+  const deps = createDeps();
+  const render = UIRender.create(deps);
+  const state = baseState();
+  render.render(state);
+  assert(deps.dom.cycleBadge.textContent === "Focus Block\nReady", "expected ready focus block label");
+  assert(deps.dom.cycleBadge.attributes["aria-label"] === "Focus Block Ready", "expected ready aria label");
+});
+
 test("document title stays static before timer has started", function () {
   const deps = createDeps();
   const render = UIRender.create(deps);
@@ -158,6 +169,26 @@ test("primary button shows Resume after timer is paused", function () {
   render.render(state);
   assert(deps.dom.controls.start.textContent === "▶ Resume", "expected Resume label while paused");
   assert(deps.dom.controls.start.attributes["aria-label"] === "Resume timer", "expected Resume aria label");
+});
+
+test("focus block badge uses one-based display after timer has started", function () {
+  const deps = createDeps();
+  const render = UIRender.create(deps);
+  const state = baseState();
+  state.timer.hasStartedOnce = true;
+  render.render(state);
+  assert(deps.dom.cycleBadge.textContent === "Focus Block 1", "expected first focus block label");
+  assert(deps.dom.cycleBadge.attributes["aria-label"] === "Focus Block 1", "expected first focus block aria label");
+});
+
+test("focus block badge increments from completed focus blocks", function () {
+  const deps = createDeps();
+  const render = UIRender.create(deps);
+  const state = baseState();
+  state.timer.hasStartedOnce = true;
+  state.stats.focusBlocksToday = 2;
+  render.render(state);
+  assert(deps.dom.cycleBadge.textContent === "Focus Block 3", "expected one-based next focus block label");
 });
 
 test("primary button shows Pause while timer is running", function () {

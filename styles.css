@@ -108,6 +108,11 @@ h1 {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
 }
 
+#cycle-badge {
+  text-align: center;
+  white-space: pre-line;
+}
+
 .main {
   display: grid;
   grid-template-columns: 1.35fr 1fr;
@@ -651,7 +656,7 @@ select {
     max-width: none;
   }
 
-  #cycle-definition-tip {
+  #focus-block-definition-tip {
     --tip-left: 0;
     --tip-right: auto;
     --tip-shift-x: 0;

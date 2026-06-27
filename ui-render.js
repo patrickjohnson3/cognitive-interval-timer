@@ -60,7 +60,12 @@
           state.stats.focusBlocksSinceLong +
           "/" +
           state.settings.blocks_per_ultradian,
-        cycleText: (labels.cyclePrefix || "Cycle ") + state.stats.focusBlocksToday,
+        focusBlockText: state.timer.hasStartedOnce
+          ? (labels.focusBlockPrefix || "Focus Block ") + (state.stats.focusBlocksToday + 1)
+          : labels.focusBlockReady || "Focus Block\nReady",
+        focusBlockAriaLabel: state.timer.hasStartedOnce
+          ? (labels.focusBlockPrefix || "Focus Block ") + (state.stats.focusBlocksToday + 1)
+          : (labels.focusBlockReady || "Focus Block Ready").replace(/\s+/g, " "),
         dirtyText: state.ui.settingsDirty
           ? labels.unsavedChanges || "Unsaved Changes"
           : labels.allSettingsSaved || "All Settings Saved",
@@ -100,7 +105,8 @@
       dom.longHint.textContent = vm.longHintText;
       dom.today.textContent = vm.todayText;
       dom.long.textContent = vm.sinceLongText;
-      dom.cycleBadge.textContent = vm.cycleText;
+      dom.cycleBadge.textContent = vm.focusBlockText;
+      dom.cycleBadge.setAttribute("aria-label", vm.focusBlockAriaLabel);
       dom.dirtyIndicator.textContent = vm.dirtyText;
       dom.sessionNote.textContent = vm.sessionChangesText;
       updatePrimaryButton(vm);
