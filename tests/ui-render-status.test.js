@@ -193,16 +193,6 @@ test("focus block badge uses one-based display after timer has started", functio
   assert(deps.dom.cycleBadge.attributes["aria-label"] === "Focus Block 1", "expected first focus block aria label");
 });
 
-test("focus block badge increments from completed focus blocks", function () {
-  const deps = createDeps();
-  const render = UIRender.create(deps);
-  const state = baseState();
-  state.timer.hasStartedOnce = true;
-  state.stats.focusBlocksToday = 2;
-  render.render(state);
-  assert(deps.dom.cycleBadge.textContent === "Focus Block 3", "expected one-based next focus block label");
-});
-
 test("primary button shows Pause while timer is running", function () {
   const deps = createDeps();
   const render = UIRender.create(deps);

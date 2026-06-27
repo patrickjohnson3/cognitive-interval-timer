@@ -87,6 +87,9 @@
       });
 
       applyWakeLockSetting(appState.settings.wake_lock_enabled);
+      if (appState.settings.fullscreen_enabled && !appState.settings.minimal_mode_enabled) {
+        applyFullscreenSetting(true);
+      }
       applyMinimalMode(appState.settings.minimal_mode_enabled);
       timer.startTicker();
       onStateChange();
@@ -268,9 +271,27 @@
 
       if (enabled && !activeFullscreen) {
         if (root.requestFullscreen) {
-          root.requestFullscreen().catch(function ignoreFullscreenEnterError() {});
+          root.requestFullscreen().catch(function handleFullscreenEnterError() {
+            reconcileFullscreenUnavailable();
+          });
         }
       }
+    }
+
+    function reconcileFullscreenUnavailable() {
+      if (dom.fields.fullscreen_enabled.checked) {
+        dom.fields.fullscreen_enabled.checked = false;
+      }
+
+      if (appState.settings.fullscreen_enabled) {
+        appState.settings = Core.normalizeSettings(
+          Object.assign({}, appState.settings, { fullscreen_enabled: false })
+        );
+        storage.setJSON(Core.STORAGE_KEYS.settings, appState.settings);
+        render.hydrateSettingsForm(appState.settings);
+      }
+
+      onSettingsInput(controls.readSettingsForm());
     }
 
     function applyWakeLockSetting(enabled) {

@@ -61,9 +61,13 @@ function createDom() {
   };
 }
 
-function setup() {
+function setup(options) {
+  const config = options || {};
   const dom = createDom();
   const stored = {};
+  if (config.storedSettings) {
+    stored[Core.STORAGE_KEYS.settings] = config.storedSettings;
+  }
   const fullscreenRequests = [];
   let boundHandlers = null;
   const wakeLockCalls = [];
@@ -84,6 +88,13 @@ function setup() {
       },
       requestFullscreen: function requestFullscreen() {
         fullscreenRequests.push(true);
+        if (config.rejectFullscreen) {
+          return {
+            catch: function catchFullscreenError(handler) {
+              handler(new Error("fullscreen unavailable"));
+            },
+          };
+        }
         return Promise.resolve();
       },
     },
@@ -235,6 +246,26 @@ test("saving fullscreen normalizes keep screen awake on", function () {
   const saved = ctx.stored[Core.STORAGE_KEYS.settings];
   assert(saved.fullscreen_enabled === true, "expected fullscreen setting to save");
   assert(saved.wake_lock_enabled === true, "expected wake lock setting to be forced on");
+});
+
+test("fullscreen rejection clears fullscreen field", function () {
+  const ctx = setup({ rejectFullscreen: true });
+  ctx.dom.fields.fullscreen_enabled.checked = true;
+  ctx.boundHandlers.onFullscreenToggle(true);
+
+  assert(ctx.dom.fields.fullscreen_enabled.checked === false, "expected fullscreen checkbox to clear");
+  assert(ctx.app.state.ui.settingsDirty === true, "expected auto-enabled wake lock to remain unsaved");
+});
+
+test("saved fullscreen is cleared when fullscreen request fails on startup", function () {
+  const ctx = setup({
+    rejectFullscreen: true,
+    storedSettings: Core.normalizeSettings({ fullscreen_enabled: true, wake_lock_enabled: true }),
+  });
+
+  assert(ctx.fullscreenRequests.includes(true), "expected saved fullscreen to request fullscreen");
+  assert(ctx.dom.fields.fullscreen_enabled.checked === false, "expected fullscreen checkbox to clear");
+  assert(ctx.stored[Core.STORAGE_KEYS.settings].fullscreen_enabled === false, "expected saved fullscreen to clear");
 });
 
 test("minimal mode toggle enables keep screen awake", function () {
