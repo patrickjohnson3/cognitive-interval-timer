@@ -14,13 +14,13 @@
 
     function readSettingsForm() {
       return {
-        prime: dom.fields.prime.value,
+        prep: dom.fields.prep.value,
         focus: dom.fields.focus.value,
         recall: dom.fields.recall.value,
         break: dom.fields.break.value,
         long_break: dom.fields.long_break.value,
         blocks_per_ultradian: dom.fields.blocks_per_ultradian.value,
-        prime_enabled: dom.fields.prime_enabled.checked,
+        prep_enabled: dom.fields.prep_enabled.checked,
         auto_start: dom.fields.auto_start.checked,
         sound_enabled: dom.fields.sound_enabled.checked,
         fullscreen_enabled: dom.fields.fullscreen_enabled.checked,

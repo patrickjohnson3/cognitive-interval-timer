@@ -106,7 +106,7 @@
     function applyStaticCopy() {
       dom.copy.phaseSettingsHeading.textContent = Content.UI_COPY.phaseSettingsHeading;
       dom.copy.blocks.textContent = Content.UI_COPY.blocksBeforeLongBreak;
-      dom.copy.primeEnabled.textContent = Content.UI_COPY.startWithPrep;
+      dom.copy.prepEnabled.textContent = Content.UI_COPY.startWithPrep;
       dom.copy.autoStart.textContent = Content.UI_COPY.autoStartNext;
       dom.copy.soundEnabled.textContent = Content.UI_COPY.soundOnPhaseChange;
       dom.copy.fullscreenEnabled.textContent = Content.UI_COPY.fullscreenMode;
@@ -204,13 +204,13 @@
 
     function sameSettings(a, b) {
       return (
-        a.prime === b.prime &&
+        a.prep === b.prep &&
         a.focus === b.focus &&
         a.recall === b.recall &&
         a.break === b.break &&
         a.long_break === b.long_break &&
         a.blocks_per_ultradian === b.blocks_per_ultradian &&
-        a.prime_enabled === b.prime_enabled &&
+        a.prep_enabled === b.prep_enabled &&
         a.auto_start === b.auto_start &&
         a.sound_enabled === b.sound_enabled &&
         a.fullscreen_enabled === b.fullscreen_enabled &&
@@ -278,7 +278,7 @@
       applyWakeLockSetting(appState.settings.wake_lock_enabled);
       applyMinimalMode(appState.settings.minimal_mode_enabled);
 
-      if (config.correctPrepPhase && !appState.settings.prime_enabled && appState.timer.phase === Core.PHASE.PREP) {
+      if (config.correctPrepPhase && !appState.settings.prep_enabled && appState.timer.phase === Core.PHASE.PREP) {
         timer.resetToPhase(Core.PHASE.FOCUS);
         return true;
       }

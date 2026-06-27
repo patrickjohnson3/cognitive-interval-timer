@@ -5,16 +5,16 @@
     root.PomodoroContent = factory();
   }
 })(typeof self !== "undefined" ? self : this, function makeContent() {
-  const PHASE_ORDER = ["prime", "focus", "recall", "break", "long_break"];
+  const PHASE_ORDER = ["prep", "focus", "recall", "break", "long_break"];
 
   const PHASE_CONFIG = {
-    prime: {
+    prep: {
       displayName: "Prep",
       settingsLabel: "Prep",
       shortHint: "Prepare your mind. Choose one clear goal.",
       longHint:
         "Stand up, take a few slow breaths, and clearly state the one specific thing you’re about to do. This helps your brain switch from wandering mode to focused mode so you start the work clean and intentional.",
-      durationKey: "prime",
+      durationKey: "prep",
     },
     focus: {
       displayName: "Focus",

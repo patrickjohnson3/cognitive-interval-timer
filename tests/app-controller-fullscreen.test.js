@@ -49,14 +49,14 @@ function createDom() {
     copy: {
       phaseSettingsHeading: createNode(),
       blocks: createNode(),
-      primeEnabled: createNode(),
+      prepEnabled: createNode(),
       autoStart: createNode(),
       soundEnabled: createNode(),
       fullscreenEnabled: createNode(),
       minimalModeEnabled: createNode(),
       wakeLockEnabled: createNode(),
       phaseLabels: {
-        prime: createNode(),
+        prep: createNode(),
         focus: createNode(),
         recall: createNode(),
         break: createNode(),
@@ -64,13 +64,13 @@ function createDom() {
       },
     },
     fields: {
-      prime: createNode(2),
+      prep: createNode(2),
       focus: createNode(45),
       recall: createNode(3),
       break: createNode(15),
       long_break: createNode(25),
       blocks_per_ultradian: createNode(2),
-      prime_enabled: createNode(),
+      prep_enabled: createNode(),
       auto_start: createNode(),
       sound_enabled: createNode(),
       fullscreen_enabled: createNode(),
@@ -125,13 +125,13 @@ function setup(options) {
     },
     readSettingsForm: function readSettingsForm() {
       return {
-        prime: dom.fields.prime.value,
+        prep: dom.fields.prep.value,
         focus: dom.fields.focus.value,
         recall: dom.fields.recall.value,
         break: dom.fields.break.value,
         long_break: dom.fields.long_break.value,
         blocks_per_ultradian: dom.fields.blocks_per_ultradian.value,
-        prime_enabled: dom.fields.prime_enabled.checked,
+        prep_enabled: dom.fields.prep_enabled.checked,
         auto_start: dom.fields.auto_start.checked,
         sound_enabled: dom.fields.sound_enabled.checked,
         fullscreen_enabled: dom.fields.fullscreen_enabled.checked,
@@ -245,13 +245,13 @@ test("fullscreen toggle enables keep screen awake", function () {
 test("saving fullscreen normalizes keep screen awake on", function () {
   const ctx = setup();
   ctx.app.controller.saveSettings({
-    prime: 2,
+    prep: 2,
     focus: 45,
     recall: 3,
     break: 15,
     long_break: 25,
     blocks_per_ultradian: 2,
-    prime_enabled: true,
+    prep_enabled: true,
     auto_start: true,
     sound_enabled: true,
     fullscreen_enabled: true,
@@ -296,13 +296,13 @@ test("minimal mode toggle enables keep screen awake", function () {
 test("saving minimal mode normalizes keep screen awake on", function () {
   const ctx = setup();
   ctx.app.controller.saveSettings({
-    prime: 2,
+    prep: 2,
     focus: 45,
     recall: 3,
     break: 15,
     long_break: 25,
     blocks_per_ultradian: 2,
-    prime_enabled: true,
+    prep_enabled: true,
     auto_start: true,
     sound_enabled: true,
     fullscreen_enabled: false,

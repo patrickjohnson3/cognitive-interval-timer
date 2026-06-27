@@ -32,7 +32,7 @@ test("rolloverStats resets daily count but preserves long-break counter", functi
 });
 
 test("consumeElapsed transitions and credits focus completion", function () {
-  const settings = Core.normalizeSettings({ focus: 1, recall: 1, break: 1, long_break: 1, prime: 1, blocks_per_ultradian: 2 });
+  const settings = Core.normalizeSettings({ focus: 1, recall: 1, break: 1, long_break: 1, prep: 1, blocks_per_ultradian: 2 });
   const timer = { running: true, phase: "focus", remainingSec: 10 };
   const stats = Core.normalizeStats({ dateKey: Core.dateKey(), focusBlocksToday: 0, focusBlocksSinceLong: 0 });
 
@@ -44,7 +44,7 @@ test("consumeElapsed transitions and credits focus completion", function () {
 
 test("consumeElapsed handles large elapsed time without dropping transitions", function () {
   const settings = Core.normalizeSettings({
-    prime: 1,
+    prep: 1,
     focus: 1,
     recall: 1,
     break: 1,
@@ -63,11 +63,11 @@ test("consumeElapsed handles large elapsed time without dropping transitions", f
 
 test("consumeElapsed follows a full two-block cycle into long break", function () {
   const settings = Core.normalizeSettings({
-    prime_enabled: true,
+    prep_enabled: true,
     blocks_per_ultradian: 2,
     auto_start: true,
   });
-  let timer = { running: true, phase: "prime", remainingSec: 1 };
+  let timer = { running: true, phase: "prep", remainingSec: 1 };
   let stats = Core.normalizeStats({ dateKey: Core.dateKey(), focusBlocksToday: 0, focusBlocksSinceLong: 0 });
   const phases = [timer.phase];
 
@@ -84,7 +84,7 @@ test("consumeElapsed follows a full two-block cycle into long break", function (
   }
 
   assert(
-    phases.join(" > ") === "prime > focus > recall > break > focus > recall > long_break",
+    phases.join(" > ") === "prep > focus > recall > break > focus > recall > long_break",
     "unexpected phase sequence: " + phases.join(" > ")
   );
   assert(stats.focusBlocksToday === 2, "expected two completed focus blocks");
@@ -111,6 +111,12 @@ test("all phases have short and long guidance text", function () {
 test("normalizeSettings preserves wake lock preference", function () {
   const settings = Core.normalizeSettings({ wake_lock_enabled: true });
   assert(settings.wake_lock_enabled === true, "expected wake lock preference to normalize");
+});
+
+test("normalizeSettings accepts legacy prime setting keys", function () {
+  const settings = Core.normalizeSettings({ prime: 4, prime_enabled: false });
+  assert(settings.prep === 4, "expected legacy prime duration to map to prep");
+  assert(settings.prep_enabled === false, "expected legacy prime_enabled to map to prep_enabled");
 });
 
 if (!process.exitCode) {

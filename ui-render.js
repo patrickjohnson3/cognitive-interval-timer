@@ -19,13 +19,13 @@
     }
 
     function hydrateSettingsForm(settings) {
-      dom.fields.prime.value = settings.prime;
+      dom.fields.prep.value = settings.prep;
       dom.fields.focus.value = settings.focus;
       dom.fields.recall.value = settings.recall;
       dom.fields.break.value = settings.break;
       dom.fields.long_break.value = settings.long_break;
       dom.fields.blocks_per_ultradian.value = settings.blocks_per_ultradian;
-      dom.fields.prime_enabled.checked = settings.prime_enabled;
+      dom.fields.prep_enabled.checked = settings.prep_enabled;
       dom.fields.auto_start.checked = settings.auto_start;
       dom.fields.sound_enabled.checked = settings.sound_enabled;
       dom.fields.fullscreen_enabled.checked = settings.fullscreen_enabled;

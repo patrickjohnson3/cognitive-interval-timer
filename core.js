@@ -7,10 +7,10 @@
 })(typeof self !== "undefined" ? self : this, function makeCore(Content) {
   const phaseOrder = Array.isArray(Content.PHASE_ORDER) && Content.PHASE_ORDER.length > 0
     ? Content.PHASE_ORDER.slice()
-    : ["prime", "focus", "recall", "break", "long_break"];
+    : ["prep", "focus", "recall", "break", "long_break"];
 
   const PHASE_CONFIG = Content.PHASE_CONFIG || {
-    prime: { displayName: "Prep", shortHint: "Prepare", longHint: "", durationKey: "prime" },
+    prep: { displayName: "Prep", shortHint: "Prepare", longHint: "", durationKey: "prep" },
     focus: { displayName: "Focus", shortHint: "Focus", longHint: "", durationKey: "focus" },
     recall: { displayName: "Recall", shortHint: "Recall", longHint: "", durationKey: "recall" },
     break: { displayName: "Short Break", shortHint: "Break", longHint: "", durationKey: "break" },
@@ -22,7 +22,7 @@
   });
 
   const PHASE = Object.freeze({
-    PREP: "prime",
+    PREP: "prep",
     FOCUS: "focus",
     RECALL: "recall",
     SHORT_BREAK: "break",
@@ -36,13 +36,13 @@
   });
 
   const DEFAULT_SETTINGS = {
-    prime: 2,
+    prep: 2,
     focus: 45,
     recall: 3,
     break: 15,
     long_break: 25,
     blocks_per_ultradian: 2,
-    prime_enabled: true,
+    prep_enabled: true,
     auto_start: true,
     sound_enabled: true,
     fullscreen_enabled: false,
@@ -79,15 +79,26 @@
   }
 
   function normalizeSettings(source) {
-    const merged = Object.assign({}, DEFAULT_SETTINGS, source || {});
+    const input = source || {};
+    const legacyAliases = {};
+    if (Object.prototype.hasOwnProperty.call(input, "prime") && !Object.prototype.hasOwnProperty.call(input, "prep")) {
+      legacyAliases.prep = input.prime;
+    }
+    if (
+      Object.prototype.hasOwnProperty.call(input, "prime_enabled") &&
+      !Object.prototype.hasOwnProperty.call(input, "prep_enabled")
+    ) {
+      legacyAliases.prep_enabled = input.prime_enabled;
+    }
+    const merged = Object.assign({}, DEFAULT_SETTINGS, legacyAliases, input);
     return {
-      prime: clampInt(merged.prime, DEFAULT_SETTINGS.prime, 0, 60),
+      prep: clampInt(merged.prep, DEFAULT_SETTINGS.prep, 0, 60),
       focus: clampInt(merged.focus, DEFAULT_SETTINGS.focus, 1, 180),
       recall: clampInt(merged.recall, DEFAULT_SETTINGS.recall, 0, 30),
       break: clampInt(merged.break, DEFAULT_SETTINGS.break, 1, 60),
       long_break: clampInt(merged.long_break, DEFAULT_SETTINGS.long_break, 1, 90),
       blocks_per_ultradian: clampInt(merged.blocks_per_ultradian, DEFAULT_SETTINGS.blocks_per_ultradian, 1, 8),
-      prime_enabled: typeof merged.prime_enabled === "boolean" ? merged.prime_enabled : DEFAULT_SETTINGS.prime_enabled,
+      prep_enabled: typeof merged.prep_enabled === "boolean" ? merged.prep_enabled : DEFAULT_SETTINGS.prep_enabled,
       auto_start: typeof merged.auto_start === "boolean" ? merged.auto_start : DEFAULT_SETTINGS.auto_start,
       sound_enabled: typeof merged.sound_enabled === "boolean" ? merged.sound_enabled : DEFAULT_SETTINGS.sound_enabled,
       fullscreen_enabled:
@@ -123,7 +134,7 @@
   }
 
   function initialPhase(settings) {
-    return settings.prime_enabled ? "prime" : "focus";
+    return settings.prep_enabled ? "prep" : "focus";
   }
 
   function phaseDurationSec(phase, settings) {
