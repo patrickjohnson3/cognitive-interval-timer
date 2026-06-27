@@ -23,7 +23,13 @@ function test(name, fn) {
 }
 
 function textNode() {
-  return { textContent: "" };
+  return {
+    textContent: "",
+    attributes: {},
+    setAttribute: function setAttribute(name, value) {
+      this.attributes[name] = String(value);
+    },
+  };
 }
 
 function createDeps() {
@@ -39,7 +45,7 @@ function createDeps() {
     dirtyIndicator: textNode(),
     sessionNote: textNode(),
     controls: {
-      pause: textNode(),
+      start: textNode(),
     },
     theme: { value: "dark" },
     tagline: textNode(),
@@ -86,8 +92,16 @@ function createDeps() {
       labels: {
         documentTitleBase: "Cognitive Interval Timer",
         documentTitleSeparator: " - ",
-        pauseButton: "⏸ Pause",
-        resumeButton: "▶ Resume",
+        primaryActionLabels: {
+          idle: "▶ Start",
+          running: "⏸ Pause",
+          paused: "▶ Resume",
+        },
+        primaryActionAriaLabels: {
+          idle: "Start timer",
+          running: "Pause timer",
+          paused: "Resume timer",
+        },
       },
     },
   };
@@ -128,6 +142,15 @@ test("status shows Idle before timer has started", function () {
   assert(deps.dom.status.textContent === "Status: Idle", "expected Idle before first start");
 });
 
+test("primary button shows Start before timer has started", function () {
+  const deps = createDeps();
+  const render = UIRender.create(deps);
+  const state = baseState();
+  render.render(state);
+  assert(deps.dom.controls.start.textContent === "▶ Start", "expected Start label before first start");
+  assert(deps.dom.controls.start.attributes["aria-label"] === "Start timer", "expected Start aria label");
+});
+
 test("document title stays static before timer has started", function () {
   const deps = createDeps();
   const render = UIRender.create(deps);
@@ -145,13 +168,14 @@ test("status shows Paused after timer has started at least once", function () {
   assert(deps.dom.status.textContent === "Status: Paused", "expected Paused after first start");
 });
 
-test("pause button shows Resume after timer is paused", function () {
+test("primary button shows Resume after timer is paused", function () {
   const deps = createDeps();
   const render = UIRender.create(deps);
   const state = baseState();
   state.timer.hasStartedOnce = true;
   render.render(state);
-  assert(deps.dom.controls.pause.textContent === "▶ Resume", "expected Resume label while paused");
+  assert(deps.dom.controls.start.textContent === "▶ Resume", "expected Resume label while paused");
+  assert(deps.dom.controls.start.attributes["aria-label"] === "Resume timer", "expected Resume aria label");
 });
 
 test("status shows Running when timer is active", function () {
@@ -164,14 +188,15 @@ test("status shows Running when timer is active", function () {
   assert(deps.dom.status.textContent === "Status: Running", "expected Running while active");
 });
 
-test("pause button shows Pause while timer is running", function () {
+test("primary button shows Pause while timer is running", function () {
   const deps = createDeps();
   const render = UIRender.create(deps);
   const state = baseState();
   state.timer.running = true;
   state.timer.hasStartedOnce = true;
   render.render(state);
-  assert(deps.dom.controls.pause.textContent === "⏸ Pause", "expected Pause label while running");
+  assert(deps.dom.controls.start.textContent === "⏸ Pause", "expected Pause label while running");
+  assert(deps.dom.controls.start.attributes["aria-label"] === "Pause timer", "expected Pause aria label");
 });
 
 test("document title includes timer after timer has started", function () {

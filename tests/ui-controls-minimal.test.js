@@ -47,7 +47,6 @@ function createDom() {
   return {
     controls: {
       start: createNode({ id: "start" }),
-      pause: createNode({ id: "pause" }),
       skip: createNode({ id: "skip" }),
       reset: createNode({ id: "reset" }),
       save: createNode({ id: "save" }),
@@ -94,6 +93,9 @@ function bindWithBrowserStubs() {
   const handlers = {
     onStart: function onStart() {
       calls.push("start");
+    },
+    onPrimaryAction: function onPrimaryAction() {
+      calls.push("primary");
     },
     onPause: function onPause() {
       calls.push("pause");
@@ -160,6 +162,13 @@ test("minimal mode checkbox triggers minimal handler and dirty settings handler"
 
   assert(ctx.calls.includes("minimal:true"), "expected minimal mode toggle handler");
   assert(ctx.calls.includes("settings"), "expected settings dirty handler");
+});
+
+test("primary action button triggers primary action handler", function () {
+  const ctx = bindWithBrowserStubs();
+  ctx.dom.controls.start.listeners.click();
+
+  assert(ctx.calls.includes("primary"), "expected primary action handler");
 });
 
 test("fullscreen checkbox triggers fullscreen handler and dirty settings handler", function () {

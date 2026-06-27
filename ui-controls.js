@@ -30,8 +30,7 @@
     }
 
     function bindControls(handlers) {
-      dom.controls.start.addEventListener("click", handlers.onStart);
-      dom.controls.pause.addEventListener("click", handlers.onPauseResume || handlers.onPause);
+      dom.controls.start.addEventListener("click", handlers.onPrimaryAction || handlers.onStart);
       dom.controls.skip.addEventListener("click", handlers.onSkip);
       dom.controls.reset.addEventListener("click", handlers.onReset);
 

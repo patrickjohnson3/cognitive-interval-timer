@@ -81,18 +81,17 @@ npm install
 
 ### Timer controls
 
-- `▶ Start`
-- `⏸ Pause` / `▶ Resume`
+- `▶ Start` / `⏸ Pause` / `▶ Resume`
 - `⏭ Next Phase`
 - `↺ Restart Block`
 
-In minimal mode, left-clicking or tapping the screen starts and pauses the timer.
+In minimal mode, left-clicking or tapping the screen starts, pauses, and resumes the timer.
 
 ### Keyboard shortcuts
 
-- `Space` - Start/Pause
-- `S` - Skip phase
-- `R` - Reset timer
+- `Space` - Start/Pause/Resume
+- `S` - Next phase
+- `R` - Restart block
 - `Esc` - Exit minimal mode
 
 ### Settings

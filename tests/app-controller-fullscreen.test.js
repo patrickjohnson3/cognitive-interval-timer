@@ -67,6 +67,7 @@ function setup() {
   const fullscreenRequests = [];
   let boundHandlers = null;
   const wakeLockCalls = [];
+  const timerCalls = [];
 
   global.document = {
     fullscreenElement: null,
@@ -138,8 +139,12 @@ function setup() {
     controls,
     timer: {
       startTicker: function startTicker() {},
-      start: function start() {},
-      pause: function pause() {},
+      start: function start() {
+        timerCalls.push("start");
+      },
+      pause: function pause() {
+        timerCalls.push("pause");
+      },
       skip: function skip() {},
       reset: function reset() {},
       resetToPhase: function resetToPhase() {},
@@ -174,8 +179,33 @@ function setup() {
   });
 
   app.controller.initialize();
-  return { app, boundHandlers, dom, fullscreenRequests, stored, wakeLockCalls };
+  return { app, boundHandlers, dom, fullscreenRequests, stored, timerCalls, wakeLockCalls };
 }
+
+test("primary action starts before timer has started", function () {
+  const ctx = setup();
+  ctx.boundHandlers.onPrimaryAction();
+
+  assert(ctx.timerCalls.includes("start"), "expected primary action to start timer");
+});
+
+test("primary action pauses while timer is running", function () {
+  const ctx = setup();
+  ctx.app.state.timer.running = true;
+  ctx.app.state.timer.hasStartedOnce = true;
+  ctx.boundHandlers.onPrimaryAction();
+
+  assert(ctx.timerCalls.includes("pause"), "expected primary action to pause timer");
+});
+
+test("primary action resumes while timer is paused", function () {
+  const ctx = setup();
+  ctx.app.state.timer.running = false;
+  ctx.app.state.timer.hasStartedOnce = true;
+  ctx.boundHandlers.onPrimaryAction();
+
+  assert(ctx.timerCalls.includes("start"), "expected primary action to resume timer");
+});
 
 test("fullscreen toggle enables keep screen awake", function () {
   const ctx = setup();

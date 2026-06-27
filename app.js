@@ -85,7 +85,6 @@
       tagline: byId("tagline"),
       controls: {
         start: byId("start"),
-        pause: byId("pause"),
         skip: byId("skip"),
         reset: byId("reset"),
         save: byId("save"),

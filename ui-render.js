@@ -49,6 +49,8 @@
       const statusLabel =
         statusLabels[statusKey] ||
         (statusKey ? statusKey.charAt(0).toUpperCase() + statusKey.slice(1) : "");
+      const primaryActionLabels = labels.primaryActionLabels || {};
+      const primaryActionAriaLabels = labels.primaryActionAriaLabels || {};
       const changed = [];
       if (state.ui.sessionFlags.changedAutoStart) changed.push(labels.autoStart || "Auto-Start");
       if (state.ui.sessionFlags.changedSound) changed.push(labels.sound || "Sound");
@@ -73,10 +75,20 @@
           changed.length > 0
             ? (labels.sessionChangesPrefix || "Session Changes: ") + changed.join(", ")
             : (labels.sessionChangesPrefix || "Session Changes: ") + (labels.sessionChangesNone || "None"),
-        pauseButtonText:
-          state.timer.hasStartedOnce && !state.timer.running
-            ? labels.resumeButton || "▶ Resume"
-            : labels.pauseButton || "⏸ Pause",
+        primaryButtonText:
+          primaryActionLabels[statusKey] ||
+          (statusKey === Core.STATUS.RUNNING
+            ? "⏸ Pause"
+            : statusKey === Core.STATUS.PAUSED
+              ? "▶ Resume"
+              : "▶ Start"),
+        primaryButtonAriaLabel:
+          primaryActionAriaLabels[statusKey] ||
+          (statusKey === Core.STATUS.RUNNING
+            ? "Pause timer"
+            : statusKey === Core.STATUS.PAUSED
+              ? "Resume timer"
+              : "Start timer"),
         titleText: state.timer.hasStartedOnce
           ? Core.formatTime(state.timer.remainingSec) +
             (labels.documentTitleSeparator || " - ") +
@@ -99,12 +111,18 @@
       dom.cycleBadge.textContent = vm.cycleText;
       dom.dirtyIndicator.textContent = vm.dirtyText;
       dom.sessionNote.textContent = vm.sessionChangesText;
-      dom.controls.pause.textContent = vm.pauseButtonText;
+      updatePrimaryButton(vm);
       document.title = vm.titleText;
+    }
+
+    function updatePrimaryButton(vm) {
+      dom.controls.start.textContent = vm.primaryButtonText;
+      dom.controls.start.setAttribute("aria-label", vm.primaryButtonAriaLabel);
     }
 
     return {
       buildViewModel,
+      updatePrimaryButton,
       setTagline,
       hydrateTheme,
       hydrateSettingsForm,

@@ -79,8 +79,16 @@
       storageVolatileSuffix: " (Volatile Storage)",
       documentTitleSeparator: " - ",
       documentTitleBase: "Cognitive Interval Timer",
-      pauseButton: "⏸ Pause",
-      resumeButton: "▶ Resume",
+      primaryActionLabels: {
+        idle: "▶ Start",
+        running: "⏸ Pause",
+        paused: "▶ Resume",
+      },
+      primaryActionAriaLabels: {
+        idle: "Start timer",
+        running: "Pause timer",
+        paused: "Resume timer",
+      },
     },
     statusLabels: {
       idle: "Idle",

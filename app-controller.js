@@ -71,7 +71,7 @@
       controls.bindControls({
         onStart: controller.start,
         onPause: controller.pause,
-        onPauseResume: onPauseResume,
+        onPrimaryAction: onPrimaryAction,
         onSkip: controller.skip,
         onReset: controller.reset,
         onSaveSettings: controller.saveSettings,
@@ -147,16 +147,12 @@
       applyFullscreenSetting(enabled);
     }
 
-    function onPauseResume() {
+    function onPrimaryAction() {
       if (appState.timer.running) {
         timer.pause();
         return;
       }
-      if (appState.timer.hasStartedOnce) {
-        timer.start();
-        return;
-      }
-      timer.pause();
+      timer.start();
     }
 
     function onFullscreenChange(isFullscreen) {
