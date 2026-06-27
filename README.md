@@ -83,7 +83,7 @@ npm install
 
 - `▶ Start` / `⏸ Pause` / `▶ Resume`
 - `⏭ Next Phase`
-- `↺ Next Block`
+- `↺ Restart Block`
 
 In minimal mode, left-clicking or tapping the screen starts, pauses, and resumes the timer.
 
@@ -91,7 +91,7 @@ In minimal mode, left-clicking or tapping the screen starts, pauses, and resumes
 
 - `Space` - Start/Pause/Resume
 - `S` - Next Phase
-- `R` - Next Block
+- `R` - Restart Block
 - `Esc` - Exit minimal mode
 
 ### Settings
