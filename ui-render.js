@@ -73,6 +73,10 @@
           changed.length > 0
             ? (labels.sessionChangesPrefix || "Session Changes: ") + changed.join(", ")
             : (labels.sessionChangesPrefix || "Session Changes: ") + (labels.sessionChangesNone || "None"),
+        pauseButtonText:
+          state.timer.hasStartedOnce && !state.timer.running
+            ? labels.resumeButton || "▶ Resume"
+            : labels.pauseButton || "⏸ Pause",
         titleText: state.timer.hasStartedOnce
           ? Core.formatTime(state.timer.remainingSec) +
             (labels.documentTitleSeparator || " - ") +
@@ -95,6 +99,7 @@
       dom.cycleBadge.textContent = vm.cycleText;
       dom.dirtyIndicator.textContent = vm.dirtyText;
       dom.sessionNote.textContent = vm.sessionChangesText;
+      dom.controls.pause.textContent = vm.pauseButtonText;
       document.title = vm.titleText;
     }
 

@@ -38,6 +38,9 @@ function createDeps() {
     cycleBadge: textNode(),
     dirtyIndicator: textNode(),
     sessionNote: textNode(),
+    controls: {
+      pause: textNode(),
+    },
     theme: { value: "dark" },
     tagline: textNode(),
     fields: {
@@ -83,6 +86,8 @@ function createDeps() {
       labels: {
         documentTitleBase: "Cognitive Interval Timer",
         documentTitleSeparator: " - ",
+        pauseButton: "⏸ Pause",
+        resumeButton: "▶ Resume",
       },
     },
   };
@@ -140,6 +145,15 @@ test("status shows Paused after timer has started at least once", function () {
   assert(deps.dom.status.textContent === "Status: Paused", "expected Paused after first start");
 });
 
+test("pause button shows Resume after timer is paused", function () {
+  const deps = createDeps();
+  const render = UIRender.create(deps);
+  const state = baseState();
+  state.timer.hasStartedOnce = true;
+  render.render(state);
+  assert(deps.dom.controls.pause.textContent === "▶ Resume", "expected Resume label while paused");
+});
+
 test("status shows Running when timer is active", function () {
   const deps = createDeps();
   const render = UIRender.create(deps);
@@ -148,6 +162,16 @@ test("status shows Running when timer is active", function () {
   state.timer.hasStartedOnce = true;
   render.render(state);
   assert(deps.dom.status.textContent === "Status: Running", "expected Running while active");
+});
+
+test("pause button shows Pause while timer is running", function () {
+  const deps = createDeps();
+  const render = UIRender.create(deps);
+  const state = baseState();
+  state.timer.running = true;
+  state.timer.hasStartedOnce = true;
+  render.render(state);
+  assert(deps.dom.controls.pause.textContent === "⏸ Pause", "expected Pause label while running");
 });
 
 test("document title includes timer after timer has started", function () {

@@ -71,6 +71,7 @@
       controls.bindControls({
         onStart: controller.start,
         onPause: controller.pause,
+        onPauseResume: onPauseResume,
         onSkip: controller.skip,
         onReset: controller.reset,
         onSaveSettings: controller.saveSettings,
@@ -144,6 +145,18 @@
         enableWakeLockField();
       }
       applyFullscreenSetting(enabled);
+    }
+
+    function onPauseResume() {
+      if (appState.timer.running) {
+        timer.pause();
+        return;
+      }
+      if (appState.timer.hasStartedOnce) {
+        timer.start();
+        return;
+      }
+      timer.pause();
     }
 
     function onFullscreenChange(isFullscreen) {

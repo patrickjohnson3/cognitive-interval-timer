@@ -79,6 +79,8 @@
       storageVolatileSuffix: " (Volatile Storage)",
       documentTitleSeparator: " - ",
       documentTitleBase: "Cognitive Interval Timer",
+      pauseButton: "⏸ Pause",
+      resumeButton: "▶ Resume",
     },
     statusLabels: {
       idle: "Idle",
