@@ -54,11 +54,14 @@
         timeText: Core.formatTime(state.timer.remainingSec),
         hintText: Core.STATE_HINTS[state.timer.phase] || "",
         longHintText: Core.STATE_LONG_HINTS[state.timer.phase] || "",
-        todayText: (labels.focusBlocksTodayPrefix || "Focus Blocks Today: ") + state.stats.focusBlocksToday,
+        todayText:
+          (labels.focusBlocksTodayPrefix || "today: ") +
+          state.stats.focusBlocksToday +
+          (labels.focusBlocksTodaySuffix || " focus blocks"),
         sinceLongText:
-          (labels.sinceLongBreakPrefix || "Since Long Break: ") +
+          (labels.sinceLongBreakPrefix || "long break: ") +
           state.stats.focusBlocksSinceLong +
-          "/" +
+          " / " +
           state.settings.blocks_per_ultradian,
         focusBlockText: state.timer.hasStartedOnce
           ? (labels.focusBlockPrefix || "Focus Block ") + (state.stats.focusBlocksToday + 1)

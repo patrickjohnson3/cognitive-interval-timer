@@ -91,6 +91,9 @@ function createDeps() {
       labels: {
         documentTitleBase: "Cognitive Interval Timer",
         documentTitleSeparator: " - ",
+        focusBlocksTodayPrefix: "today: ",
+        focusBlocksTodaySuffix: " focus blocks",
+        sinceLongBreakPrefix: "long break: ",
         focusBlockPrefix: "Focus Block ",
         focusBlockReady: "Focus Block\nReady",
         primaryActionLabels: {
@@ -142,6 +145,15 @@ test("primary button shows Start before timer has started", function () {
   render.render(state);
   assert(deps.dom.controls.start.textContent === "▶ Start", "expected Start label before first start");
   assert(deps.dom.controls.start.attributes["aria-label"] === "Start timer", "expected Start aria label");
+});
+
+test("stats use compact lowercase labels", function () {
+  const deps = createDeps();
+  const render = UIRender.create(deps);
+  const state = baseState();
+  render.render(state);
+  assert(deps.dom.today.textContent === "today: 0 focus blocks", "expected compact today stats");
+  assert(deps.dom.long.textContent === "long break: 0 / 2", "expected compact long break stats");
 });
 
 test("focus block badge shows Ready before timer has started", function () {

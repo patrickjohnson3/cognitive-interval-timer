@@ -66,8 +66,9 @@
     minimalMode: "Minimal Mode",
     keepScreenAwake: "Keep Screen Awake",
     labels: {
-      focusBlocksTodayPrefix: "Focus Blocks Today: ",
-      sinceLongBreakPrefix: "Since Long Break: ",
+      focusBlocksTodayPrefix: "today: ",
+      focusBlocksTodaySuffix: " focus blocks",
+      sinceLongBreakPrefix: "long break: ",
       focusBlockPrefix: "Focus Block ",
       focusBlockReady: "Focus Block\nReady",
       unsavedChanges: "Unsaved Changes",
