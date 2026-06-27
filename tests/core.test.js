@@ -61,6 +61,36 @@ test("consumeElapsed handles large elapsed time without dropping transitions", f
   assert(out.remainingElapsed === 0, "elapsed time should be fully consumed");
 });
 
+test("consumeElapsed follows a full two-block cycle into long break", function () {
+  const settings = Core.normalizeSettings({
+    prime_enabled: true,
+    blocks_per_ultradian: 2,
+    auto_start: true,
+  });
+  let timer = { running: true, phase: "prime", remainingSec: 1 };
+  let stats = Core.normalizeStats({ dateKey: Core.dateKey(), focusBlocksToday: 0, focusBlocksSinceLong: 0 });
+  const phases = [timer.phase];
+
+  while (timer.phase !== "long_break") {
+    const out = Core.consumeElapsed(timer, 1, settings, stats, { autoStart: true });
+    assert(out.events.length === 1, "expected exactly one transition");
+    timer = out.timer;
+    stats = out.stats;
+    phases.push(timer.phase);
+
+    if (timer.phase !== "long_break") {
+      timer.remainingSec = 1;
+    }
+  }
+
+  assert(
+    phases.join(" > ") === "prime > focus > recall > break > focus > recall > long_break",
+    "unexpected phase sequence: " + phases.join(" > ")
+  );
+  assert(stats.focusBlocksToday === 2, "expected two completed focus blocks");
+  assert(stats.focusBlocksSinceLong === 0, "expected long break to reset since-long counter");
+});
+
 test("stateLabel maps all phases to configured display names", function () {
   Core.PHASES.forEach(function eachPhase(phase) {
     const expected = Core.PHASE_CONFIG[phase].displayName;
