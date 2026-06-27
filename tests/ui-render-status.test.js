@@ -78,7 +78,16 @@ function createDeps() {
     },
   };
 
-  return { dom, Core, storage };
+  const Content = {
+    UI_COPY: {
+      labels: {
+        documentTitleBase: "Cognitive Interval Timer",
+        documentTitleSeparator: " - ",
+      },
+    },
+  };
+
+  return { dom, Core, Content, storage };
 }
 
 function baseState() {
@@ -114,6 +123,14 @@ test("status shows Idle before timer has started", function () {
   assert(deps.dom.status.textContent === "Status: Idle", "expected Idle before first start");
 });
 
+test("document title stays static before timer has started", function () {
+  const deps = createDeps();
+  const render = UIRender.create(deps);
+  const state = baseState();
+  render.render(state);
+  assert(document.title === "Cognitive Interval Timer", "expected static document title before first start");
+});
+
 test("status shows Paused after timer has started at least once", function () {
   const deps = createDeps();
   const render = UIRender.create(deps);
@@ -131,6 +148,18 @@ test("status shows Running when timer is active", function () {
   state.timer.hasStartedOnce = true;
   render.render(state);
   assert(deps.dom.status.textContent === "Status: Running", "expected Running while active");
+});
+
+test("document title includes timer after timer has started", function () {
+  const deps = createDeps();
+  const render = UIRender.create(deps);
+  const state = baseState();
+  state.timer.hasStartedOnce = true;
+  render.render(state);
+  assert(
+    document.title === "00:10 - Focus | Cognitive Interval Timer",
+    "expected timer document title after first start"
+  );
 });
 
 if (!process.exitCode) {

@@ -78,6 +78,7 @@
       sound: "Sound",
       storageVolatileSuffix: " (Volatile Storage)",
       documentTitleSeparator: " - ",
+      documentTitleBase: "Cognitive Interval Timer",
     },
     statusLabels: {
       idle: "Idle",

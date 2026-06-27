@@ -73,10 +73,13 @@
           changed.length > 0
             ? (labels.sessionChangesPrefix || "Session Changes: ") + changed.join(", ")
             : (labels.sessionChangesPrefix || "Session Changes: ") + (labels.sessionChangesNone || "None"),
-        titleText:
-          Core.formatTime(state.timer.remainingSec) +
-          (labels.documentTitleSeparator || " - ") +
-          Core.stateLabel(state.timer.phase),
+        titleText: state.timer.hasStartedOnce
+          ? Core.formatTime(state.timer.remainingSec) +
+            (labels.documentTitleSeparator || " - ") +
+            Core.stateLabel(state.timer.phase) +
+            " | " +
+            (labels.documentTitleBase || "Cognitive Interval Timer")
+          : labels.documentTitleBase || "Cognitive Interval Timer",
       };
     }
 
