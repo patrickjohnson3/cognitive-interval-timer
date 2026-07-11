@@ -25,6 +25,10 @@ module.exports = [
         Map: "readonly",
         Date: "readonly",
         JSON: "readonly",
+        URL: "readonly",
+        Promise: "readonly",
+        caches: "readonly",
+        fetch: "readonly",
       },
     },
     rules: {
