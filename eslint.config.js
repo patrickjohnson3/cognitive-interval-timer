@@ -7,6 +7,7 @@ module.exports = [
       sourceType: "script",
       globals: {
         window: "readonly",
+        self: "readonly",
         document: "readonly",
         navigator: "readonly",
         localStorage: "readonly",
@@ -14,6 +15,9 @@ module.exports = [
         webkitAudioContext: "readonly",
         module: "readonly",
         require: "readonly",
+        process: "readonly",
+        global: "readonly",
+        __dirname: "readonly",
         console: "readonly",
         setInterval: "readonly",
         clearInterval: "readonly",
