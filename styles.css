@@ -14,7 +14,7 @@
   --space-nudge: calc(4px * var(--density-scale));
   --space-chip-y: calc(9px * var(--density-scale));
   --space-chip-x: calc(14px * var(--density-scale));
-  --font-main: "Space Grotesk", sans-serif;
+  --font-main: "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
   --font-size-label: 0.85rem;
   --font-size-label-strong: 0.9rem;
   --font-size-overline: 0.82rem;

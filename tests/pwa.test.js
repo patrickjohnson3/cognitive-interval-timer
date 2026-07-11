@@ -28,6 +28,12 @@ test("index links PWA manifest and registration script", function () {
   assert(html.includes('<script src="pwa.js"></script>'), "missing PWA registration script");
 });
 
+test("app shell does not depend on external runtime assets", function () {
+  const html = readProjectFile("index.html");
+
+  assert(!/https?:\/\//.test(html), "expected index shell to avoid external runtime URLs");
+});
+
 test("manifest has installable app metadata and icons", function () {
   const manifest = JSON.parse(readProjectFile("manifest.webmanifest"));
 
