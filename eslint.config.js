@@ -22,6 +22,7 @@ module.exports = [
         setInterval: "readonly",
         clearInterval: "readonly",
         setTimeout: "readonly",
+        clearTimeout: "readonly",
         Map: "readonly",
         Date: "readonly",
         JSON: "readonly",
@@ -31,6 +32,7 @@ module.exports = [
         fetch: "readonly",
         Response: "readonly",
         HTMLElement: "readonly",
+        WebSocket: "readonly",
       },
     },
     rules: {

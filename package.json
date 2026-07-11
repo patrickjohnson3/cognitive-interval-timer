@@ -5,6 +5,7 @@
   "description": "Client-side cognitive interval timer with phase-based workflow.",
   "scripts": {
     "test": "node --test tests/*.test.js",
+    "test:pwa:offline": "node tests/pwa-offline-smoke.js",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
