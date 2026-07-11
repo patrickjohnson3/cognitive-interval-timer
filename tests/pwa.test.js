@@ -119,6 +119,16 @@ test("service worker caches the app shell", function () {
   });
 });
 
+test("service worker derives cache name from one app version", function () {
+  const serviceWorker = readProjectFile("service-worker.js");
+
+  assert(serviceWorker.includes("const APP_VERSION = "), "missing app version constant");
+  assert(
+    serviceWorker.includes('const CACHE_NAME = "cognitive-interval-timer-" + APP_VERSION;'),
+    "cache name should derive from app version"
+  );
+});
+
 test("every service worker app-shell asset exists locally", function () {
   const missing = appShellAssets()
     .filter(function ignoreRoot(asset) {

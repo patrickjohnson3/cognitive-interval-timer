@@ -1,4 +1,5 @@
-const CACHE_NAME = "cognitive-interval-timer-v2";
+const APP_VERSION = "2026.07.10-pwa.1";
+const CACHE_NAME = "cognitive-interval-timer-" + APP_VERSION;
 const APP_SHELL = [
   "./",
   "./index.html",
