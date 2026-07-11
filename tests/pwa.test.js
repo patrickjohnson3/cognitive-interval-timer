@@ -57,6 +57,14 @@ test("index links a dedicated 180px Apple touch icon", function () {
   assert(dimensions.width === 180 && dimensions.height === 180, "expected 180x180 Apple touch icon");
 });
 
+test("index includes iOS standalone PWA metadata", function () {
+  const html = readProjectFile("index.html");
+
+  assert(html.includes('<meta name="apple-mobile-web-app-capable" content="yes" />'), "missing iOS capable meta");
+  assert(html.includes('<meta name="apple-mobile-web-app-title"'), "missing iOS app title meta");
+  assert(html.includes('<meta name="apple-mobile-web-app-status-bar-style"'), "missing iOS status bar meta");
+});
+
 test("app shell does not depend on external runtime assets", function () {
   const html = readProjectFile("index.html");
 
