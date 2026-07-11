@@ -1,4 +1,4 @@
-const APP_VERSION = "2026.07.10-pwa.1";
+const APP_VERSION = "2026.07.11-pwa.2";
 const CACHE_NAME = "cognitive-interval-timer-" + APP_VERSION;
 const APP_SHELL = [
   "./",

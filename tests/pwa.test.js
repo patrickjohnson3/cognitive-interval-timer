@@ -170,10 +170,17 @@ test("PWA registration exposes a user-controlled update flow", function () {
 });
 
 test("PWA registration handles browser install prompt", function () {
+  const html = readProjectFile("index.html");
   const pwa = readProjectFile("pwa.js");
+  const css = readProjectFile("styles.css");
 
+  assert(html.includes('id="pwa-install-slot"'), "missing install prompt slot");
   assert(pwa.includes("beforeinstallprompt"), "missing install prompt event handler");
-  assert(pwa.includes("Install App"), "missing install button text");
+  assert(pwa.includes("pwa-install-slot"), "install prompt should render into settings slot");
+  assert(pwa.includes("Install for offline use."), "missing install prompt copy");
+  assert(pwa.includes("pwa-install-button"), "missing install button id");
   assert(pwa.includes("deferredInstallPrompt"), "missing deferred install prompt state");
   assert(pwa.includes("appinstalled"), "missing installed cleanup handler");
+  assert(css.includes(".pwa-install-card"), "missing install card styles");
+  assert(!css.includes("#pwa-install,\n#pwa-update"), "install prompt should not share fixed update styling");
 });

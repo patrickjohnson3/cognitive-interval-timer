@@ -4,18 +4,35 @@
   let refreshing = false;
   let deferredInstallPrompt = null;
 
+  function getInstallSlot() {
+    return document.getElementById("pwa-install-slot");
+  }
+
   function removeInstallButton() {
-    const button = document.getElementById("pwa-install");
-    if (button) button.remove();
+    const card = document.getElementById("pwa-install");
+    const slot = getInstallSlot();
+    if (card) card.remove();
+    if (slot) slot.hidden = true;
   }
 
   function showInstallPrompt() {
     if (!deferredInstallPrompt || document.getElementById("pwa-install")) return;
 
+    const slot = getInstallSlot();
+    if (!slot) return;
+
+    const card = document.createElement("div");
+    card.id = "pwa-install";
+    card.className = "pwa-install-card";
+
+    const copy = document.createElement("p");
+    copy.className = "pwa-install-copy";
+    copy.textContent = "Install for offline use.";
+
     const button = document.createElement("button");
-    button.id = "pwa-install";
+    button.id = "pwa-install-button";
     button.type = "button";
-    button.textContent = "Install App";
+    button.textContent = "Install";
     button.setAttribute("aria-label", "Install app");
     button.addEventListener("click", function installApp() {
       const promptEvent = deferredInstallPrompt;
@@ -24,7 +41,10 @@
       promptEvent.prompt();
       promptEvent.userChoice.catch(function ignoreInstallChoiceError() {});
     });
-    document.body.appendChild(button);
+
+    card.append(copy, button);
+    slot.hidden = false;
+    slot.appendChild(card);
   }
 
   function showUpdatePrompt(registration) {

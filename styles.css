@@ -299,6 +299,40 @@ kbd {
   margin: var(--space-3) 0;
 }
 
+.pwa-install-slot {
+  margin-top: var(--space-3);
+}
+
+.pwa-install-slot[hidden] {
+  display: none;
+}
+
+.pwa-install-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--border-subtle, var(--color-border));
+  border-radius: 10px;
+  background: var(--theme-row-bg);
+}
+
+.pwa-install-copy {
+  margin: 0;
+  color: var(--text-secondary, var(--color-muted));
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+#pwa-install-button {
+  flex: 0 0 auto;
+  padding: var(--space-2) var(--space-3);
+  color: var(--text-primary, var(--color-text));
+  background: var(--color-button);
+  box-shadow: none;
+}
+
 .settings-theme {
   display: flex;
   align-items: center;
@@ -624,16 +658,11 @@ select {
   border: 0;
 }
 
-#pwa-install,
 #pwa-update {
   position: fixed;
   bottom: var(--space-4);
   z-index: 90;
   box-shadow: var(--elevation-2);
-}
-
-#pwa-install {
-  left: var(--space-4);
 }
 
 #pwa-update {
@@ -655,6 +684,15 @@ select {
 
   .settings {
     padding: var(--space-5);
+  }
+
+  .pwa-install-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  #pwa-install-button {
+    width: 100%;
   }
 
   .cycle-paired-grid {
