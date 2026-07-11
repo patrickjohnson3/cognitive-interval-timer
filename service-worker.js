@@ -24,6 +24,8 @@ const APP_SHELL = [
   "./assets/icons/apple-touch-icon.png",
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png",
+  "./assets/icons/maskable-192.png",
+  "./assets/icons/maskable-512.png",
 ];
 
 self.addEventListener("install", function installServiceWorker(event) {

@@ -73,7 +73,21 @@ test("manifest has installable app metadata and icons", function () {
   manifest.icons.forEach(function eachIcon(icon) {
     assert(fs.existsSync(path.join(__dirname, "..", icon.src)), "missing icon file " + icon.src);
     assert(icon.type === "image/png", "expected png icon " + icon.src);
-    assert(icon.purpose === "any", "generated icons should not claim maskable support");
+    const dimensions = pngDimensions(icon.src);
+    const declaredSize = Number(icon.sizes.split("x")[0]);
+    assert(dimensions.width === declaredSize && dimensions.height === declaredSize, "icon size mismatch " + icon.src);
+  });
+});
+
+test("manifest includes dedicated maskable icons", function () {
+  const manifest = JSON.parse(readProjectFile("manifest.webmanifest"));
+  const maskableIcons = manifest.icons.filter(function isMaskable(icon) {
+    return icon.purpose === "maskable";
+  });
+
+  assert(maskableIcons.length >= 2, "expected dedicated maskable icons");
+  maskableIcons.forEach(function eachMaskableIcon(icon) {
+    assert(icon.src.includes("maskable-"), "maskable icon should use dedicated asset " + icon.src);
   });
 });
 
@@ -88,6 +102,8 @@ test("service worker caches the app shell", function () {
     "./assets/icons/apple-touch-icon.png",
     "./assets/icons/icon-192.png",
     "./assets/icons/icon-512.png",
+    "./assets/icons/maskable-192.png",
+    "./assets/icons/maskable-512.png",
   ];
 
   expectedAssets.forEach(function eachAsset(asset) {
