@@ -612,12 +612,20 @@ select {
   border: 0;
 }
 
+#pwa-install,
 #pwa-update {
   position: fixed;
-  right: var(--space-4);
   bottom: var(--space-4);
   z-index: 90;
   box-shadow: var(--elevation-2);
+}
+
+#pwa-install {
+  left: var(--space-4);
+}
+
+#pwa-update {
+  right: var(--space-4);
 }
 
 @media (max-width: 760px) {

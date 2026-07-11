@@ -134,3 +134,12 @@ test("PWA registration exposes a user-controlled update flow", function () {
   assert(serviceWorker.includes("SKIP_WAITING"), "missing skip-waiting message handler");
   assert(!serviceWorker.includes("self.skipWaiting();\n});\n\nself.addEventListener(\"activate\""), "install should not force skipWaiting");
 });
+
+test("PWA registration handles browser install prompt", function () {
+  const pwa = readProjectFile("pwa.js");
+
+  assert(pwa.includes("beforeinstallprompt"), "missing install prompt event handler");
+  assert(pwa.includes("Install App"), "missing install button text");
+  assert(pwa.includes("deferredInstallPrompt"), "missing deferred install prompt state");
+  assert(pwa.includes("appinstalled"), "missing installed cleanup handler");
+});

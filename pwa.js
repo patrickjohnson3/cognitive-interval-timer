@@ -2,6 +2,30 @@
   if (!("serviceWorker" in navigator)) return;
 
   let refreshing = false;
+  let deferredInstallPrompt = null;
+
+  function removeInstallButton() {
+    const button = document.getElementById("pwa-install");
+    if (button) button.remove();
+  }
+
+  function showInstallPrompt() {
+    if (!deferredInstallPrompt || document.getElementById("pwa-install")) return;
+
+    const button = document.createElement("button");
+    button.id = "pwa-install";
+    button.type = "button";
+    button.textContent = "Install App";
+    button.setAttribute("aria-label", "Install app");
+    button.addEventListener("click", function installApp() {
+      const promptEvent = deferredInstallPrompt;
+      deferredInstallPrompt = null;
+      removeInstallButton();
+      promptEvent.prompt();
+      promptEvent.userChoice.catch(function ignoreInstallChoiceError() {});
+    });
+    document.body.appendChild(button);
+  }
 
   function showUpdatePrompt(registration) {
     if (!registration || !registration.waiting || document.getElementById("pwa-update")) return;
@@ -23,6 +47,17 @@
     if (refreshing) return;
     refreshing = true;
     window.location.reload();
+  });
+
+  window.addEventListener("beforeinstallprompt", function onBeforeInstallPrompt(event) {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    showInstallPrompt();
+  });
+
+  window.addEventListener("appinstalled", function onAppInstalled() {
+    deferredInstallPrompt = null;
+    removeInstallButton();
   });
 
   window.addEventListener("load", function onWindowLoad() {
