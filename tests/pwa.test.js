@@ -28,6 +28,15 @@ function pngDimensions(file) {
   };
 }
 
+function appShellAssets() {
+  const serviceWorker = readProjectFile("service-worker.js");
+  const match = serviceWorker.match(/const APP_SHELL = \[([\s\S]*?)\];/);
+  assert(match, "missing APP_SHELL asset list");
+  return Array.from(match[1].matchAll(/"([^"]+)"/g)).map(function toAsset(entry) {
+    return entry[1];
+  });
+}
+
 test("index links PWA manifest and registration script", function () {
   const html = readProjectFile("index.html");
 
@@ -84,6 +93,18 @@ test("service worker caches the app shell", function () {
   expectedAssets.forEach(function eachAsset(asset) {
     assert(serviceWorker.includes('"' + asset + '"'), "missing cached asset " + asset);
   });
+});
+
+test("every service worker app-shell asset exists locally", function () {
+  const missing = appShellAssets()
+    .filter(function ignoreRoot(asset) {
+      return asset !== "./";
+    })
+    .filter(function isMissing(asset) {
+      return !fs.existsSync(path.join(__dirname, "..", asset.replace(/^\.\//, "")));
+    });
+
+  assert(missing.length === 0, "missing app-shell assets: " + missing.join(", "));
 });
 
 test("service worker avoids cache-first navigation responses", function () {
