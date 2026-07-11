@@ -30,6 +30,7 @@ module.exports = [
         caches: "readonly",
         fetch: "readonly",
         Response: "readonly",
+        HTMLElement: "readonly",
       },
     },
     rules: {

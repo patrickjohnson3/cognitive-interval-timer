@@ -612,6 +612,14 @@ select {
   border: 0;
 }
 
+#pwa-update {
+  position: fixed;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  z-index: 90;
+  box-shadow: var(--elevation-2);
+}
+
 @media (max-width: 760px) {
   .app {
     overflow: visible;

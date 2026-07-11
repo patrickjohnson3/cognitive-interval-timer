@@ -32,7 +32,12 @@ self.addEventListener("install", function installServiceWorker(event) {
       return cache.addAll(APP_SHELL);
     })
   );
-  self.skipWaiting();
+});
+
+self.addEventListener("message", function handleServiceWorkerMessage(event) {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener("activate", function activateServiceWorker(event) {

@@ -123,3 +123,14 @@ test("service worker returns a response for uncached offline assets", function (
   assert(serviceWorker.includes("Offline asset unavailable."), "missing uncached offline asset fallback");
   assert(serviceWorker.includes("status: 503"), "expected explicit offline asset status");
 });
+
+test("PWA registration exposes a user-controlled update flow", function () {
+  const pwa = readProjectFile("pwa.js");
+  const serviceWorker = readProjectFile("service-worker.js");
+
+  assert(pwa.includes("Update Available"), "missing update prompt text");
+  assert(pwa.includes("controllerchange"), "missing reload-after-update handler");
+  assert(pwa.includes("SKIP_WAITING"), "missing skip-waiting message from page");
+  assert(serviceWorker.includes("SKIP_WAITING"), "missing skip-waiting message handler");
+  assert(!serviceWorker.includes("self.skipWaiting();\n});\n\nself.addEventListener(\"activate\""), "install should not force skipWaiting");
+});
