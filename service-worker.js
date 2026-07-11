@@ -1,4 +1,4 @@
-const CACHE_NAME = "cognitive-interval-timer-v1";
+const CACHE_NAME = "cognitive-interval-timer-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -55,19 +55,34 @@ self.addEventListener("activate", function activateServiceWorker(event) {
   );
 });
 
-self.addEventListener("fetch", function cacheFirstForAppShell(event) {
+self.addEventListener("fetch", function handleFetch(event) {
   const request = event.request;
   if (request.method !== "GET") return;
 
   const requestUrl = new URL(request.url);
   if (requestUrl.origin !== self.location.origin) return;
 
-  event.respondWith(
-    caches.match(request).then(function serveCachedResponse(cached) {
-      if (cached) return cached;
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request)
+        .then(function useFreshNavigation(response) {
+          const responseCopy = response.clone();
+          caches.open(CACHE_NAME).then(function cacheNavigation(cache) {
+            cache.put("./index.html", responseCopy);
+          });
+          return response;
+        })
+        .catch(function fallBackToCachedShell() {
+          return caches.match("./index.html");
+        })
+    );
+    return;
+  }
 
-      return fetch(request)
-        .then(function cacheNetworkResponse(response) {
+  event.respondWith(
+    caches.match(request).then(function serveCachedThenRefresh(cached) {
+      const networkFetch = fetch(request)
+        .then(function cacheFreshAsset(response) {
           if (!response || response.status !== 200 || response.type !== "basic") {
             return response;
           }
@@ -78,12 +93,11 @@ self.addEventListener("fetch", function cacheFirstForAppShell(event) {
           });
           return response;
         })
-        .catch(function fallBackToShell() {
-          if (request.mode === "navigate") {
-            return caches.match("./index.html");
-          }
+        .catch(function fallBackToCachedAsset() {
           return caches.match(request);
         });
+
+      return cached || networkFetch;
     })
   );
 });

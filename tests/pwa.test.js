@@ -63,3 +63,11 @@ test("service worker caches the app shell", function () {
     assert(serviceWorker.includes('"' + asset + '"'), "missing cached asset " + asset);
   });
 });
+
+test("service worker avoids cache-first navigation responses", function () {
+  const serviceWorker = readProjectFile("service-worker.js");
+
+  assert(serviceWorker.includes('request.mode === "navigate"'), "expected explicit navigation handling");
+  assert(serviceWorker.includes("useFreshNavigation"), "expected network-first navigation strategy");
+  assert(!serviceWorker.includes("cacheFirstForAppShell"), "unexpected cache-first fetch handler name");
+});
