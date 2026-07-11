@@ -80,24 +80,20 @@ self.addEventListener("fetch", function handleFetch(event) {
   }
 
   event.respondWith(
-    caches.match(request).then(function serveCachedThenRefresh(cached) {
-      const networkFetch = fetch(request)
-        .then(function cacheFreshAsset(response) {
-          if (!response || response.status !== 200 || response.type !== "basic") {
-            return response;
-          }
-
-          const responseCopy = response.clone();
-          caches.open(CACHE_NAME).then(function cacheResponse(cache) {
-            cache.put(request, responseCopy);
-          });
+    fetch(request)
+      .then(function useFreshAsset(response) {
+        if (!response || response.status !== 200 || response.type !== "basic") {
           return response;
-        })
-        .catch(function fallBackToCachedAsset() {
-          return caches.match(request);
-        });
+        }
 
-      return cached || networkFetch;
-    })
+        const responseCopy = response.clone();
+        caches.open(CACHE_NAME).then(function cacheResponse(cache) {
+          cache.put(request, responseCopy);
+        });
+        return response;
+      })
+      .catch(function fallBackToCachedAsset() {
+        return caches.match(request);
+      })
   );
 });

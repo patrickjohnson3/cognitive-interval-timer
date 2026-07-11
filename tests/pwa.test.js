@@ -71,4 +71,6 @@ test("service worker avoids cache-first navigation responses", function () {
   assert(serviceWorker.includes('request.mode === "navigate"'), "expected explicit navigation handling");
   assert(serviceWorker.includes("useFreshNavigation"), "expected network-first navigation strategy");
   assert(!serviceWorker.includes("cacheFirstForAppShell"), "unexpected cache-first fetch handler name");
+  assert(serviceWorker.includes("useFreshAsset"), "expected network-first asset strategy");
+  assert(!serviceWorker.includes("return cached || networkFetch"), "unexpected stale-first asset strategy");
 });
