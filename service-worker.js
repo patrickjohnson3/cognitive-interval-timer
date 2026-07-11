@@ -93,7 +93,9 @@ self.addEventListener("fetch", function handleFetch(event) {
         return response;
       })
       .catch(function fallBackToCachedAsset() {
-        return caches.match(request);
+        return caches.match(request).then(function useCachedAsset(cached) {
+          return cached || new Response("Offline asset unavailable.", { status: 503, statusText: "Offline" });
+        });
       })
   );
 });

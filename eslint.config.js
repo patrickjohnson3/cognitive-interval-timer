@@ -29,6 +29,7 @@ module.exports = [
         Promise: "readonly",
         caches: "readonly",
         fetch: "readonly",
+        Response: "readonly",
       },
     },
     rules: {

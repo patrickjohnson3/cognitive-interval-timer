@@ -74,3 +74,10 @@ test("service worker avoids cache-first navigation responses", function () {
   assert(serviceWorker.includes("useFreshAsset"), "expected network-first asset strategy");
   assert(!serviceWorker.includes("return cached || networkFetch"), "unexpected stale-first asset strategy");
 });
+
+test("service worker returns a response for uncached offline assets", function () {
+  const serviceWorker = readProjectFile("service-worker.js");
+
+  assert(serviceWorker.includes("Offline asset unavailable."), "missing uncached offline asset fallback");
+  assert(serviceWorker.includes("status: 503"), "expected explicit offline asset status");
+});
