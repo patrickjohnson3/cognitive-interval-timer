@@ -20,12 +20,32 @@ function readProjectFile(file) {
   return fs.readFileSync(path.join(__dirname, "..", file), "utf8");
 }
 
+function pngDimensions(file) {
+  const png = fs.readFileSync(path.join(__dirname, "..", file));
+  return {
+    width: png.readUInt32BE(16),
+    height: png.readUInt32BE(20),
+  };
+}
+
 test("index links PWA manifest and registration script", function () {
   const html = readProjectFile("index.html");
 
   assert(html.includes('<link rel="manifest" href="manifest.webmanifest" />'), "missing manifest link");
   assert(html.includes('<meta name="theme-color"'), "missing theme-color meta");
   assert(html.includes('<script src="pwa.js"></script>'), "missing PWA registration script");
+});
+
+test("index links a dedicated 180px Apple touch icon", function () {
+  const html = readProjectFile("index.html");
+  const iconPath = "assets/icons/apple-touch-icon.png";
+  const dimensions = pngDimensions(iconPath);
+
+  assert(
+    html.includes('<link rel="apple-touch-icon" sizes="180x180" href="' + iconPath + '" />'),
+    "missing dedicated Apple touch icon link"
+  );
+  assert(dimensions.width === 180 && dimensions.height === 180, "expected 180x180 Apple touch icon");
 });
 
 test("app shell does not depend on external runtime assets", function () {
@@ -56,6 +76,7 @@ test("service worker caches the app shell", function () {
     "./styles.css",
     "./app.js",
     "./pwa.js",
+    "./assets/icons/apple-touch-icon.png",
     "./assets/icons/icon-192.png",
     "./assets/icons/icon-512.png",
   ];

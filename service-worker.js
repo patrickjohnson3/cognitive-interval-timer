@@ -21,6 +21,7 @@ const APP_SHELL = [
   "./app-controller.js",
   "./app.js",
   "./pwa.js",
+  "./assets/icons/apple-touch-icon.png",
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png",
 ];
