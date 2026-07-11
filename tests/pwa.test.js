@@ -44,6 +44,7 @@ test("manifest has installable app metadata and icons", function () {
   manifest.icons.forEach(function eachIcon(icon) {
     assert(fs.existsSync(path.join(__dirname, "..", icon.src)), "missing icon file " + icon.src);
     assert(icon.type === "image/png", "expected png icon " + icon.src);
+    assert(icon.purpose === "any", "generated icons should not claim maskable support");
   });
 });
 
