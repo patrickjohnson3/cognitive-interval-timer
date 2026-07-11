@@ -163,6 +163,10 @@ test("PWA registration exposes a user-controlled update flow", function () {
   const serviceWorker = readProjectFile("service-worker.js");
 
   assert(pwa.includes("Update Available"), "missing update prompt text");
+  assert(pwa.includes("isInstalledDisplayMode"), "missing installed-mode update guard");
+  assert(pwa.includes("(display-mode: standalone)"), "missing standalone display-mode check");
+  assert(pwa.includes("(display-mode: fullscreen)"), "missing fullscreen display-mode check");
+  assert(pwa.includes("(display-mode: minimal-ui)"), "missing minimal-ui display-mode check");
   assert(pwa.includes("controllerchange"), "missing reload-after-update handler");
   assert(pwa.includes("SKIP_WAITING"), "missing skip-waiting message from page");
   assert(serviceWorker.includes("SKIP_WAITING"), "missing skip-waiting message handler");

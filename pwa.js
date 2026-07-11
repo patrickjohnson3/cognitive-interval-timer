@@ -15,6 +15,13 @@
     if (slot) slot.hidden = true;
   }
 
+  function isInstalledDisplayMode() {
+    const installedDisplayModeQueries = ["(display-mode: standalone)", "(display-mode: fullscreen)", "(display-mode: minimal-ui)"];
+    return installedDisplayModeQueries.some(function hasDisplayMode(query) {
+      return window.matchMedia(query).matches;
+    });
+  }
+
   function showInstallPrompt() {
     if (!deferredInstallPrompt || document.getElementById("pwa-install")) return;
 
@@ -48,7 +55,7 @@
   }
 
   function showUpdatePrompt(registration) {
-    if (!registration || !registration.waiting || document.getElementById("pwa-update")) return;
+    if (!isInstalledDisplayMode() || !registration || !registration.waiting || document.getElementById("pwa-update")) return;
 
     const button = document.createElement("button");
     button.id = "pwa-update";
