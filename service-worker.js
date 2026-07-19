@@ -31,7 +31,6 @@ const OPTIONAL_APP_SHELL = [
   "./assets/icons/maskable-192.png",
   "./assets/icons/maskable-512.png",
 ];
-const APP_SHELL = REQUIRED_APP_SHELL.concat(OPTIONAL_APP_SHELL);
 
 function cacheOptionalAsset(cache, asset) {
   return fetch(asset)
