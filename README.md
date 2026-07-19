@@ -124,9 +124,9 @@ Minimal mode:
 
 PWA install/offline behavior:
 
-- Browsers that support install prompts can show an `Install App` button.
+- Browsers that support install prompts can show an in-settings `Install` card.
 - Installed or previously opened sessions can load the cached app shell offline.
-- When a new service worker is waiting, the app shows `Update Available`; clicking it activates the update and reloads.
+- In installed display modes, a waiting service worker shows `Update Available`; clicking it activates the update and reloads.
 - Offline support covers local app assets. User settings and stats still persist in `localStorage`.
 
 Phase (minutes):
@@ -175,7 +175,7 @@ To test service-worker updates locally:
 1. Serve the app from a local HTTP server.
 2. Open the app once so the service worker installs.
 3. Change `APP_VERSION` in `service-worker.js`.
-4. Reload the page while online.
+4. Launch or reload the installed PWA while online.
 5. Confirm the `Update Available` button appears.
 6. Click it and verify the page reloads into the new version.
 
