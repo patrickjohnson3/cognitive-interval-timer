@@ -61,7 +61,10 @@ test("index includes iOS standalone PWA metadata", function () {
   const html = readProjectFile("index.html");
 
   assert(html.includes('<meta name="apple-mobile-web-app-capable" content="yes" />'), "missing iOS capable meta");
-  assert(html.includes('<meta name="apple-mobile-web-app-title"'), "missing iOS app title meta");
+  assert(
+    html.includes('<meta name="apple-mobile-web-app-title" content="CogTimer" />'),
+    "iOS app title should match manifest short_name"
+  );
   assert(html.includes('<meta name="apple-mobile-web-app-status-bar-style"'), "missing iOS status bar meta");
 });
 
