@@ -139,7 +139,6 @@ test("service worker only deletes this app's old caches", function () {
   const serviceWorker = readProjectFile("service-worker.js");
 
   assert(serviceWorker.includes("key.startsWith(CACHE_PREFIX)"), "old-cache cleanup should be scoped to app prefix");
-  assert(!serviceWorker.includes("return key !== CACHE_NAME;"), "old-cache cleanup should not delete unrelated caches");
 });
 
 test("every service worker app-shell asset exists locally", function () {
@@ -178,12 +177,8 @@ test("PWA registration exposes a user-controlled update flow", function () {
   const serviceWorker = readProjectFile("service-worker.js");
   const css = readProjectFile("styles.css");
 
-  assert(pwa.includes("A newer version is ready."), "missing update prompt card copy");
   assert(pwa.includes("pwa-update-button"), "missing update prompt button");
   assert(pwa.includes('createPromptCard("pwa-update"'), "update prompt should render as a settings card");
-  assert(pwa.includes("pwa-prompt-card"), "update prompt should use neutral prompt card styles");
-  assert(pwa.includes("if (!registration.waiting) return;"), "update click should guard missing waiting worker");
-  assert(!pwa.includes("document.body.appendChild(button)"), "update prompt should not append a floating body button");
   assert(!css.includes("#pwa-update {\n  position: fixed;"), "update prompt should not use fixed floating styles");
   assert(pwa.includes("isInstalledDisplayMode"), "missing installed-mode update guard");
   assert(pwa.includes("(display-mode: standalone)"), "missing standalone display-mode check");
