@@ -77,6 +77,10 @@ self.addEventListener("fetch", function handleFetch(event) {
     event.respondWith(
       fetch(request)
         .then(function useFreshNavigation(response) {
+          if (!response || !response.ok || response.type !== "basic") {
+            return response;
+          }
+
           const responseCopy = response.clone();
           event.waitUntil(
             caches.open(CACHE_NAME).then(function cacheNavigation(cache) {
