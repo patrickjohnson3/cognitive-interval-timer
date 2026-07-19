@@ -182,6 +182,7 @@ test("PWA registration exposes a user-controlled update flow", function () {
   assert(pwa.includes("pwa-update-button"), "missing update prompt button");
   assert(pwa.includes('createPromptCard("pwa-update"'), "update prompt should render as a settings card");
   assert(pwa.includes("pwa-prompt-card"), "update prompt should use neutral prompt card styles");
+  assert(pwa.includes("if (!registration.waiting) return;"), "update click should guard missing waiting worker");
   assert(!pwa.includes("document.body.appendChild(button)"), "update prompt should not append a floating body button");
   assert(!css.includes("#pwa-update {\n  position: fixed;"), "update prompt should not use fixed floating styles");
   assert(pwa.includes("isInstalledDisplayMode"), "missing installed-mode update guard");

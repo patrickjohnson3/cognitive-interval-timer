@@ -94,9 +94,10 @@
     button.textContent = "Update";
     button.setAttribute("aria-label", "Update app to the latest version");
     button.addEventListener("click", function updateApp() {
-      registration.waiting.postMessage({ type: "SKIP_WAITING" });
+      if (!registration.waiting) return;
       button.disabled = true;
       button.textContent = "Updating...";
+      registration.waiting.postMessage({ type: "SKIP_WAITING" });
     });
     card.appendChild(button);
     slot.hidden = false;
