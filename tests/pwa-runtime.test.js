@@ -34,6 +34,15 @@ function readProjectFile(file) {
   return fs.readFileSync(path.join(__dirname, "..", file), "utf8");
 }
 
+function currentServiceWorkerCacheName() {
+  const serviceWorker = readProjectFile("service-worker.js");
+  const prefixMatch = serviceWorker.match(/const CACHE_PREFIX = "([^"]+)";/);
+  const nameMatch = serviceWorker.match(/const CACHE_NAME = CACHE_PREFIX \+ "([^"]+)";/);
+
+  assert(prefixMatch && nameMatch, "expected service worker cache constants");
+  return prefixMatch[1] + nameMatch[1];
+}
+
 function flushPromises() {
   return new Promise(function resolveSoon(resolve) {
     setTimeout(resolve, 0);
@@ -194,13 +203,14 @@ test("PWA update click tolerates a missing waiting worker", async function () {
 test("service worker deletes only this app's old caches", async function () {
   const deleted = [];
   const listeners = {};
+  const currentCache = currentServiceWorkerCacheName();
   const context = {
     Promise,
     Response,
     URL,
     caches: {
       keys: function keys() {
-        return Promise.resolve(["cognitive-interval-timer-old", "other-project-cache", "cognitive-interval-timer-2026.07.19-pwa.7"]);
+        return Promise.resolve(["cognitive-interval-timer-old", "other-project-cache", currentCache]);
       },
       delete: function deleteCache(key) {
         deleted.push(key);
@@ -234,6 +244,7 @@ test("service worker deletes only this app's old caches", async function () {
   await activationPromise;
   assert(deleted.includes("cognitive-interval-timer-old"), "expected old app cache to be deleted");
   assert(!deleted.includes("other-project-cache"), "unrelated origin cache should not be deleted");
+  assert(!deleted.includes(currentCache), "current app cache should not be deleted");
 });
 
 if (!process.exitCode) {
