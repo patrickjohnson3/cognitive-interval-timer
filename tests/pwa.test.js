@@ -30,8 +30,19 @@ function pngDimensions(file) {
 
 function appShellAssets() {
   const serviceWorker = readProjectFile("service-worker.js");
-  const match = serviceWorker.match(/const APP_SHELL = \[([\s\S]*?)\];/);
-  assert(match, "missing APP_SHELL asset list");
+  const matches = Array.from(serviceWorker.matchAll(/const (?:REQUIRED_APP_SHELL|OPTIONAL_APP_SHELL) = \[([\s\S]*?)\];/g));
+  assert(matches.length === 2, "missing app-shell asset lists");
+  return matches.flatMap(function toAssets(match) {
+    return Array.from(match[1].matchAll(/"([^"]+)"/g)).map(function toAsset(entry) {
+      return entry[1];
+    });
+  });
+}
+
+function shellAssetGroup(name) {
+  const serviceWorker = readProjectFile("service-worker.js");
+  const match = serviceWorker.match(new RegExp("const " + name + " = \\[([\\s\\S]*?)\\];"));
+  assert(match, "missing " + name + " asset list");
   return Array.from(match[1].matchAll(/"([^"]+)"/g)).map(function toAsset(entry) {
     return entry[1];
   });
@@ -108,6 +119,8 @@ test("manifest includes dedicated maskable icons", function () {
 
 test("service worker caches the app shell", function () {
   const serviceWorker = readProjectFile("service-worker.js");
+  const requiredAssets = shellAssetGroup("REQUIRED_APP_SHELL");
+  const optionalAssets = shellAssetGroup("OPTIONAL_APP_SHELL");
   const expectedAssets = [
     "./index.html",
     "./manifest.webmanifest",
@@ -125,6 +138,10 @@ test("service worker caches the app shell", function () {
   expectedAssets.forEach(function eachAsset(asset) {
     assert(serviceWorker.includes('"' + asset + '"'), "missing cached asset " + asset);
   });
+  assert(requiredAssets.includes("./app.js"), "runtime app code should be required");
+  assert(optionalAssets.includes("./assets/icons/icon-512.png"), "icons should be optional cache assets");
+  assert(serviceWorker.includes("cacheOptionalAsset"), "missing optional asset cache helper");
+  assert(serviceWorker.includes("cache.addAll(REQUIRED_APP_SHELL)"), "required shell should remain strict");
 });
 
 test("service worker uses a stable app-scoped cache name", function () {

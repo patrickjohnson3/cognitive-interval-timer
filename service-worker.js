@@ -1,6 +1,6 @@
 const CACHE_PREFIX = "cognitive-interval-timer-";
 const CACHE_NAME = CACHE_PREFIX + "app-shell";
-const APP_SHELL = [
+const REQUIRED_APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
@@ -23,17 +23,39 @@ const APP_SHELL = [
   "./app-controller.js",
   "./app.js",
   "./pwa.js",
+];
+const OPTIONAL_APP_SHELL = [
   "./assets/icons/apple-touch-icon.png",
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png",
   "./assets/icons/maskable-192.png",
   "./assets/icons/maskable-512.png",
 ];
+const APP_SHELL = REQUIRED_APP_SHELL.concat(OPTIONAL_APP_SHELL);
+
+function cacheOptionalAsset(cache, asset) {
+  return fetch(asset)
+    .then(function cacheOptionalResponse(response) {
+      if (!response || !response.ok) return false;
+      return cache.put(asset, response).then(function optionalCached() {
+        return true;
+      });
+    })
+    .catch(function ignoreOptionalCacheError() {
+      return false;
+    });
+}
 
 self.addEventListener("install", function installServiceWorker(event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function cacheAppShell(cache) {
-      return cache.addAll(APP_SHELL);
+      return cache.addAll(REQUIRED_APP_SHELL).then(function cacheOptionalShellAssets() {
+        return Promise.all(
+          OPTIONAL_APP_SHELL.map(function eachOptionalAsset(asset) {
+            return cacheOptionalAsset(cache, asset);
+          })
+        );
+      });
     })
   );
 });
