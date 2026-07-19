@@ -325,7 +325,8 @@ kbd {
   line-height: 1.35;
 }
 
-#pwa-install-button {
+#pwa-install-button,
+#pwa-update-button {
   flex: 0 0 auto;
   padding: var(--space-2) var(--space-3);
   color: var(--text-primary, var(--color-text));
@@ -658,17 +659,6 @@ select {
   border: 0;
 }
 
-#pwa-update {
-  position: fixed;
-  bottom: var(--space-4);
-  z-index: 90;
-  box-shadow: var(--elevation-2);
-}
-
-#pwa-update {
-  right: var(--space-4);
-}
-
 @media (max-width: 760px) {
   .app {
     overflow: visible;
@@ -691,7 +681,8 @@ select {
     flex-direction: column;
   }
 
-  #pwa-install-button {
+  #pwa-install-button,
+  #pwa-update-button {
     width: 100%;
   }
 

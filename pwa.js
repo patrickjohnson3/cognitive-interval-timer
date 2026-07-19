@@ -8,11 +8,15 @@
     return document.getElementById("pwa-install-slot");
   }
 
-  function removeInstallButton() {
+  function removeInstallCard() {
     const card = document.getElementById("pwa-install");
     const slot = getInstallSlot();
     if (card) card.remove();
-    if (slot) slot.hidden = true;
+    hideSlotIfEmpty(slot);
+  }
+
+  function hideSlotIfEmpty(slot) {
+    if (slot && slot.children.length === 0) slot.hidden = true;
   }
 
   function isInstalledDisplayMode() {
@@ -28,9 +32,9 @@
     return /iPad|iPhone|iPod/.test(userAgent) || (platform === "MacIntel" && navigator.maxTouchPoints > 1);
   }
 
-  function createInstallCard(copyText) {
+  function createPromptCard(id, copyText) {
     const card = document.createElement("div");
-    card.id = "pwa-install";
+    card.id = id;
     card.className = "pwa-install-card";
 
     const copy = document.createElement("p");
@@ -47,7 +51,7 @@
     const slot = getInstallSlot();
     if (!slot) return;
 
-    const card = createInstallCard("Install for offline use.");
+    const card = createPromptCard("pwa-install", "Install for offline use.");
 
     const button = document.createElement("button");
     button.id = "pwa-install-button";
@@ -57,7 +61,7 @@
     button.addEventListener("click", function installApp() {
       const promptEvent = deferredInstallPrompt;
       deferredInstallPrompt = null;
-      removeInstallButton();
+      removeInstallCard();
       promptEvent.prompt();
       promptEvent.userChoice.catch(function ignoreInstallChoiceError() {});
     });
@@ -74,23 +78,29 @@
     if (!slot) return;
 
     slot.hidden = false;
-    slot.appendChild(createInstallCard("To install on iOS, tap Share, then Add to Home Screen."));
+    slot.appendChild(createPromptCard("pwa-install", "To install on iOS, tap Share, then Add to Home Screen."));
   }
 
   function showUpdatePrompt(registration) {
     if (!isInstalledDisplayMode() || !registration || !registration.waiting || document.getElementById("pwa-update")) return;
 
+    const slot = getInstallSlot();
+    if (!slot) return;
+
+    const card = createPromptCard("pwa-update", "A newer version is ready.");
     const button = document.createElement("button");
-    button.id = "pwa-update";
+    button.id = "pwa-update-button";
     button.type = "button";
-    button.textContent = "Update Available";
+    button.textContent = "Update";
     button.setAttribute("aria-label", "Update app to the latest version");
     button.addEventListener("click", function updateApp() {
       registration.waiting.postMessage({ type: "SKIP_WAITING" });
       button.disabled = true;
       button.textContent = "Updating...";
     });
-    document.body.appendChild(button);
+    card.appendChild(button);
+    slot.hidden = false;
+    slot.appendChild(card);
   }
 
   navigator.serviceWorker.addEventListener("controllerchange", function reloadAfterUpdate() {
@@ -107,7 +117,7 @@
 
   window.addEventListener("appinstalled", function onAppInstalled() {
     deferredInstallPrompt = null;
-    removeInstallButton();
+    removeInstallCard();
   });
 
   window.addEventListener("load", function onWindowLoad() {

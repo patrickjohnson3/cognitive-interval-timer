@@ -167,8 +167,13 @@ test("service worker returns a response for uncached offline assets", function (
 test("PWA registration exposes a user-controlled update flow", function () {
   const pwa = readProjectFile("pwa.js");
   const serviceWorker = readProjectFile("service-worker.js");
+  const css = readProjectFile("styles.css");
 
-  assert(pwa.includes("Update Available"), "missing update prompt text");
+  assert(pwa.includes("A newer version is ready."), "missing update prompt card copy");
+  assert(pwa.includes("pwa-update-button"), "missing update prompt button");
+  assert(pwa.includes('createPromptCard("pwa-update"'), "update prompt should render as a settings card");
+  assert(!pwa.includes("document.body.appendChild(button)"), "update prompt should not append a floating body button");
+  assert(!css.includes("#pwa-update {\n  position: fixed;"), "update prompt should not use fixed floating styles");
   assert(pwa.includes("isInstalledDisplayMode"), "missing installed-mode update guard");
   assert(pwa.includes("(display-mode: standalone)"), "missing standalone display-mode check");
   assert(pwa.includes("(display-mode: fullscreen)"), "missing fullscreen display-mode check");
