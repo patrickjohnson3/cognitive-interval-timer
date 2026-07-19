@@ -1,5 +1,6 @@
 const APP_VERSION = "2026.07.19-pwa.7";
-const CACHE_NAME = "cognitive-interval-timer-" + APP_VERSION;
+const CACHE_PREFIX = "cognitive-interval-timer-";
+const CACHE_NAME = CACHE_PREFIX + APP_VERSION;
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -52,7 +53,7 @@ self.addEventListener("activate", function activateServiceWorker(event) {
         return Promise.all(
           keys
             .filter(function isOldCache(key) {
-              return key !== CACHE_NAME;
+              return key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME;
             })
             .map(function deleteCache(key) {
               return caches.delete(key);
