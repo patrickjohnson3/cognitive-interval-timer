@@ -1,6 +1,5 @@
-const APP_VERSION = "2026.07.19-pwa.7";
 const CACHE_PREFIX = "cognitive-interval-timer-";
-const CACHE_NAME = CACHE_PREFIX + APP_VERSION;
+const CACHE_NAME = CACHE_PREFIX + "app-shell";
 const APP_SHELL = [
   "./",
   "./index.html",

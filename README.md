@@ -185,12 +185,10 @@ To test service-worker updates locally:
 
 1. Serve the app from a local HTTP server.
 2. Open the app once so the service worker installs.
-3. Change `APP_VERSION` in `service-worker.js`.
+3. Make a change to `service-worker.js`.
 4. Launch or reload the installed PWA while online.
 5. Confirm the `A newer version is ready.` card appears with an `Update` button.
 6. Click it and verify the page reloads into the new version.
-
-When changing cached app-shell files, update `APP_VERSION` in `service-worker.js` so existing installs refresh their cache.
 
 ## Linting And Formatting
 

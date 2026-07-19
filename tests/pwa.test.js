@@ -127,15 +127,15 @@ test("service worker caches the app shell", function () {
   });
 });
 
-test("service worker derives cache name from one app version", function () {
+test("service worker uses a stable app-scoped cache name", function () {
   const serviceWorker = readProjectFile("service-worker.js");
 
-  assert(serviceWorker.includes("const APP_VERSION = "), "missing app version constant");
   assert(serviceWorker.includes('const CACHE_PREFIX = "cognitive-interval-timer-";'), "missing app-specific cache prefix");
   assert(
-    serviceWorker.includes("const CACHE_NAME = CACHE_PREFIX + APP_VERSION;"),
-    "cache name should derive from app version"
+    serviceWorker.includes('const CACHE_NAME = CACHE_PREFIX + "app-shell";'),
+    "cache name should be stable and app-scoped"
   );
+  assert(!serviceWorker.includes("APP_VERSION"), "service worker should not require manual version bumps");
 });
 
 test("service worker only deletes this app's old caches", function () {
