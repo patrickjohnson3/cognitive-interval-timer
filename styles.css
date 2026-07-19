@@ -307,7 +307,7 @@ kbd {
   display: none;
 }
 
-.pwa-install-card {
+.pwa-prompt-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -318,7 +318,7 @@ kbd {
   background: var(--theme-row-bg);
 }
 
-.pwa-install-copy {
+.pwa-prompt-copy {
   margin: 0;
   color: var(--text-secondary, var(--color-muted));
   font-size: 0.84rem;
@@ -676,7 +676,7 @@ select {
     padding: var(--space-5);
   }
 
-  .pwa-install-card {
+  .pwa-prompt-card {
     align-items: stretch;
     flex-direction: column;
   }

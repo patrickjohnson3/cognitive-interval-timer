@@ -181,6 +181,7 @@ test("PWA registration exposes a user-controlled update flow", function () {
   assert(pwa.includes("A newer version is ready."), "missing update prompt card copy");
   assert(pwa.includes("pwa-update-button"), "missing update prompt button");
   assert(pwa.includes('createPromptCard("pwa-update"'), "update prompt should render as a settings card");
+  assert(pwa.includes("pwa-prompt-card"), "update prompt should use neutral prompt card styles");
   assert(!pwa.includes("document.body.appendChild(button)"), "update prompt should not append a floating body button");
   assert(!css.includes("#pwa-update {\n  position: fixed;"), "update prompt should not use fixed floating styles");
   assert(pwa.includes("isInstalledDisplayMode"), "missing installed-mode update guard");
@@ -208,6 +209,7 @@ test("PWA registration handles browser install prompt", function () {
   assert(pwa.includes("navigator.standalone"), "missing iOS installed-mode detection");
   assert(pwa.includes("deferredInstallPrompt"), "missing deferred install prompt state");
   assert(pwa.includes("appinstalled"), "missing installed cleanup handler");
-  assert(css.includes(".pwa-install-card"), "missing install card styles");
+  assert(css.includes(".pwa-prompt-card"), "missing shared prompt card styles");
+  assert(!pwa.includes("pwa-install-card"), "shared PWA prompt class should not be install-specific");
   assert(!css.includes("#pwa-install,\n#pwa-update"), "install prompt should not share fixed update styling");
 });

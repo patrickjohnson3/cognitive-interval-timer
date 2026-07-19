@@ -35,10 +35,10 @@
   function createPromptCard(id, copyText) {
     const card = document.createElement("div");
     card.id = id;
-    card.className = "pwa-install-card";
+    card.className = "pwa-prompt-card";
 
     const copy = document.createElement("p");
-    copy.className = "pwa-install-copy";
+    copy.className = "pwa-prompt-copy";
     copy.textContent = copyText;
 
     card.appendChild(copy);
