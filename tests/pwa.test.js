@@ -41,7 +41,7 @@ test("index links PWA manifest and registration script", function () {
   const html = readProjectFile("index.html");
 
   assert(html.includes('<link rel="manifest" href="manifest.webmanifest" />'), "missing manifest link");
-  assert(html.includes('<meta name="theme-color"'), "missing theme-color meta");
+  assert(html.includes('<meta id="theme-color-meta" name="theme-color"'), "missing dynamic theme-color meta");
   assert(html.includes('<script src="pwa.js"></script>'), "missing PWA registration script");
 });
 

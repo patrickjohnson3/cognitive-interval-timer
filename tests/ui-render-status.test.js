@@ -3,8 +3,12 @@ const ViewModel = require("../view-model.js");
 
 global.document = {
   title: "",
+  nodes: {},
   documentElement: {
     setAttribute: function setAttribute() {},
+  },
+  getElementById: function getElementById(id) {
+    return this.nodes[id] || null;
   },
 };
 
@@ -146,6 +150,21 @@ test("primary button shows Start before timer has started", function () {
   render.render(state);
   assert(deps.dom.controls.start.textContent === "▶ Start", "expected Start label before first start");
   assert(deps.dom.controls.start.attributes["aria-label"] === "Start timer", "expected Start aria label");
+});
+
+test("hydrateTheme updates browser theme color", function () {
+  const deps = createDeps();
+  const render = UIRender.create(deps);
+  const themeColor = textNode();
+  document.nodes["theme-color-meta"] = themeColor;
+
+  render.hydrateTheme("light");
+  assert(themeColor.attributes.content === "#f5f7f9", "expected light browser theme color");
+
+  render.hydrateTheme("dark");
+  assert(themeColor.attributes.content === "#0f172a", "expected dark browser theme color");
+
+  delete document.nodes["theme-color-meta"];
 });
 
 test("stats use compact lowercase labels", function () {

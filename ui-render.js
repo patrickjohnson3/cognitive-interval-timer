@@ -8,6 +8,10 @@
   function create(deps) {
     const dom = deps.dom;
     const viewModel = deps.viewModel;
+    const themeColors = {
+      dark: "#0f172a",
+      light: "#f5f7f9",
+    };
 
     function setTagline(text) {
       dom.tagline.textContent = text;
@@ -15,6 +19,8 @@
 
     function hydrateTheme(theme) {
       document.documentElement.setAttribute("data-theme", theme);
+      const themeColor = document.getElementById("theme-color-meta");
+      if (themeColor) themeColor.setAttribute("content", themeColors[theme] || themeColors.dark);
       dom.theme.value = theme;
     }
 
