@@ -75,6 +75,7 @@ test("manifest has installable app metadata and icons", function () {
   const manifest = JSON.parse(readProjectFile("manifest.webmanifest"));
 
   assert(manifest.name === "Cognitive Interval Timer", "unexpected manifest name");
+  assert(manifest.id === "/cognitive-interval-timer/", "expected stable PWA id");
   assert(manifest.display === "standalone", "expected standalone display mode");
   assert(manifest.start_url === "./index.html", "expected local start_url");
   assert(!Object.prototype.hasOwnProperty.call(manifest, "orientation"), "manifest should not lock PWA orientation");
