@@ -137,7 +137,7 @@ PWA install/offline behavior:
 - Browsers that support install prompts can show an in-settings `Install` card.
 - On iOS, the app shows in-settings guidance to use Share, then Add to Home Screen.
 - Installed or previously opened sessions can load the cached app shell offline.
-- In installed display modes, a waiting service worker shows `Update Available`; clicking it activates the update and reloads.
+- In installed display modes, a waiting service worker shows `A newer version is ready.` with an `Update` button; clicking it activates the update and reloads.
 - Offline support covers local app assets. User settings and stats still persist in `localStorage`.
 
 Phase (minutes):
@@ -187,7 +187,7 @@ To test service-worker updates locally:
 2. Open the app once so the service worker installs.
 3. Change `APP_VERSION` in `service-worker.js`.
 4. Launch or reload the installed PWA while online.
-5. Confirm the `Update Available` button appears.
+5. Confirm the `A newer version is ready.` card appears with an `Update` button.
 6. Click it and verify the page reloads into the new version.
 
 When changing cached app-shell files, update `APP_VERSION` in `service-worker.js` so existing installs refresh their cache.
