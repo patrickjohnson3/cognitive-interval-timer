@@ -14,6 +14,10 @@
     const timer = deps.timer;
     const storage = deps.storage;
     const audio = deps.audio;
+    const haptics = deps.haptics || {
+      tap: function noopTap() {},
+      phaseChange: function noopPhaseChange() {},
+    };
     const wakeLock = deps.wakeLock;
     const DisplayMode = deps.DisplayMode;
     const a11y = deps.a11y;
@@ -49,10 +53,10 @@
 
     const controller = {
       initialize,
-      start: timer.start,
-      pause: timer.pause,
-      skip: timer.skip,
-      reset: timer.reset,
+      start: startTimer,
+      pause: pauseTimer,
+      skip: skipPhase,
+      reset: resetBlock,
       setTheme,
       saveSettings,
     };
@@ -175,10 +179,10 @@
 
     function onPrimaryAction() {
       if (appState.timer.running) {
-        timer.pause();
+        controller.pause();
         return;
       }
-      timer.start();
+      controller.start();
     }
 
     function onFullscreenChange(isFullscreen) {
@@ -326,19 +330,40 @@
 
     function handleShortcut(action) {
       if (action === "toggle") {
-        if (appState.timer.running) timer.pause();
-        else timer.start();
+        if (appState.timer.running) controller.pause();
+        else controller.start();
         return;
       }
-      if (action === "skip") timer.skip();
-      if (action === "reset") timer.reset();
+      if (action === "skip") controller.skip();
+      if (action === "reset") controller.reset();
     }
 
     function onPhaseChange(payload) {
+      haptics.phaseChange();
       if (appState.settings.sound_enabled) {
         audio.playPhaseChime();
       }
       announce.announce(a11y.formatAnnouncement("phase_started", { label: payload.label }));
+    }
+
+    function startTimer() {
+      haptics.tap();
+      timer.start();
+    }
+
+    function pauseTimer() {
+      haptics.tap();
+      timer.pause();
+    }
+
+    function skipPhase() {
+      haptics.tap();
+      timer.skip();
+    }
+
+    function resetBlock() {
+      haptics.tap();
+      timer.reset();
     }
 
     function onStateChange() {

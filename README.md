@@ -20,6 +20,7 @@ https://patrickjohnson3.github.io/cognitive-interval-timer/
 - Optional prep phase
 - Auto-start toggle for next phase
 - Audio chime on phase change
+- Best-effort mobile haptic feedback on timer actions and phase changes
 - Light and dark theme selector
 - Daily focus block tracking
 - Unsaved settings indicator

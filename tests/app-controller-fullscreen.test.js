@@ -91,6 +91,7 @@ function setup(options) {
   let boundHandlers = null;
   const wakeLockCalls = [];
   const timerCalls = [];
+  const hapticCalls = [];
 
   global.document = {
     fullscreenElement: null,
@@ -190,6 +191,14 @@ function setup(options) {
     audio: {
       playPhaseChime: function playPhaseChime() {},
     },
+    haptics: {
+      tap: function tap() {
+        hapticCalls.push("tap");
+      },
+      phaseChange: function phaseChange() {
+        hapticCalls.push("phase");
+      },
+    },
     wakeLock: {
       setEnabled: function setEnabled(enabled) {
         wakeLockCalls.push(Boolean(enabled));
@@ -206,7 +215,7 @@ function setup(options) {
   });
 
   app.controller.initialize();
-  return { app, boundHandlers, dom, fullscreenRequests, stored, timerCalls, wakeLockCalls };
+  return { app, boundHandlers, dom, fullscreenRequests, stored, timerCalls, wakeLockCalls, hapticCalls };
 }
 
 test("primary action starts before timer has started", function () {
@@ -214,6 +223,7 @@ test("primary action starts before timer has started", function () {
   ctx.boundHandlers.onPrimaryAction();
 
   assert(ctx.timerCalls.includes("start"), "expected primary action to start timer");
+  assert(ctx.hapticCalls.includes("tap"), "expected primary action haptic tap");
 });
 
 test("primary action pauses while timer is running", function () {
@@ -223,6 +233,7 @@ test("primary action pauses while timer is running", function () {
   ctx.boundHandlers.onPrimaryAction();
 
   assert(ctx.timerCalls.includes("pause"), "expected primary action to pause timer");
+  assert(ctx.hapticCalls.includes("tap"), "expected pause haptic tap");
 });
 
 test("primary action resumes while timer is paused", function () {
@@ -232,6 +243,14 @@ test("primary action resumes while timer is paused", function () {
   ctx.boundHandlers.onPrimaryAction();
 
   assert(ctx.timerCalls.includes("start"), "expected primary action to resume timer");
+  assert(ctx.hapticCalls.includes("tap"), "expected resume haptic tap");
+});
+
+test("phase changes trigger phase haptic feedback", function () {
+  const ctx = setup();
+  ctx.app.onPhaseChange({ label: "Focus" });
+
+  assert(ctx.hapticCalls.includes("phase"), "expected phase-change haptic feedback");
 });
 
 test("fullscreen toggle enables keep screen awake", function () {

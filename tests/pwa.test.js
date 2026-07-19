@@ -109,6 +109,7 @@ test("service worker caches the app shell", function () {
     "./index.html",
     "./manifest.webmanifest",
     "./styles.css",
+    "./haptics.js",
     "./app.js",
     "./pwa.js",
     "./assets/icons/apple-touch-icon.png",

@@ -1,4 +1,4 @@
-const APP_VERSION = "2026.07.19-pwa.4";
+const APP_VERSION = "2026.07.19-pwa.5";
 const CACHE_NAME = "cognitive-interval-timer-" + APP_VERSION;
 const APP_SHELL = [
   "./",
@@ -15,6 +15,7 @@ const APP_SHELL = [
   "./ui-controls.js",
   "./storage.js",
   "./audio.js",
+  "./haptics.js",
   "./wake-lock.js",
   "./display-mode.js",
   "./timer-engine.js",

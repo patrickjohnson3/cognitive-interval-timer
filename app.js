@@ -7,19 +7,21 @@
   const UIControls = window.PomodoroUIControls;
   const Storage = window.PomodoroStorage;
   const Audio = window.PomodoroAudio;
+  const Haptics = window.PomodoroHaptics;
   const WakeLock = window.PomodoroWakeLock;
   const DisplayMode = window.PomodoroDisplayMode;
   const TimerEngine = window.PomodoroTimerEngine;
   const AppController = window.PomodoroAppController;
   const A11y = window.PomodoroA11y;
 
-  if (!Core || !Content || !ViewModel || !UIAnnounce || !UIRender || !UIControls || !Storage || !Audio || !WakeLock || !DisplayMode || !TimerEngine || !AppController || !A11y) {
+  if (!Core || !Content || !ViewModel || !UIAnnounce || !UIRender || !UIControls || !Storage || !Audio || !Haptics || !WakeLock || !DisplayMode || !TimerEngine || !AppController || !A11y) {
     throw new Error("Missing required modules. Ensure all scripts load before app.js");
   }
 
   const dom = createDOM();
   const storage = Storage.createAdapter();
   const audio = Audio.createEngine();
+  const haptics = Haptics.createController();
   const wakeLock = WakeLock.createController();
   const a11y = A11y.create({ Content: Content });
   const announce = UIAnnounce.create(dom);
@@ -57,6 +59,7 @@
     timer: timer,
     storage: storage,
     audio: audio,
+    haptics: haptics,
     wakeLock: wakeLock,
     DisplayMode: DisplayMode,
     a11y: a11y,
