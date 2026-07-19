@@ -77,6 +77,7 @@ test("manifest has installable app metadata and icons", function () {
   assert(manifest.name === "Cognitive Interval Timer", "unexpected manifest name");
   assert(manifest.display === "standalone", "expected standalone display mode");
   assert(manifest.start_url === "./index.html", "expected local start_url");
+  assert(!Object.prototype.hasOwnProperty.call(manifest, "orientation"), "manifest should not lock PWA orientation");
   assert(Array.isArray(manifest.icons) && manifest.icons.length >= 2, "expected manifest icons");
   manifest.icons.forEach(function eachIcon(icon) {
     assert(fs.existsSync(path.join(__dirname, "..", icon.src)), "missing icon file " + icon.src);
