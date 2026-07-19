@@ -1,4 +1,4 @@
-const APP_VERSION = "2026.07.19-pwa.3";
+const APP_VERSION = "2026.07.19-pwa.4";
 const CACHE_NAME = "cognitive-interval-timer-" + APP_VERSION;
 const APP_SHELL = [
   "./",
@@ -76,9 +76,11 @@ self.addEventListener("fetch", function handleFetch(event) {
       fetch(request)
         .then(function useFreshNavigation(response) {
           const responseCopy = response.clone();
-          caches.open(CACHE_NAME).then(function cacheNavigation(cache) {
-            cache.put("./index.html", responseCopy);
-          });
+          event.waitUntil(
+            caches.open(CACHE_NAME).then(function cacheNavigation(cache) {
+              return cache.put("./index.html", responseCopy);
+            })
+          );
           return response;
         })
         .catch(function fallBackToCachedShell() {
@@ -96,9 +98,11 @@ self.addEventListener("fetch", function handleFetch(event) {
         }
 
         const responseCopy = response.clone();
-        caches.open(CACHE_NAME).then(function cacheResponse(cache) {
-          cache.put(request, responseCopy);
-        });
+        event.waitUntil(
+          caches.open(CACHE_NAME).then(function cacheResponse(cache) {
+            return cache.put(request, responseCopy);
+          })
+        );
         return response;
       })
       .catch(function fallBackToCachedAsset() {
