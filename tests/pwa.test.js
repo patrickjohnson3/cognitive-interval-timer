@@ -189,6 +189,9 @@ test("PWA registration handles browser install prompt", function () {
   assert(pwa.includes("pwa-install-slot"), "install prompt should render into settings slot");
   assert(pwa.includes("Install for offline use."), "missing install prompt copy");
   assert(pwa.includes("pwa-install-button"), "missing install button id");
+  assert(pwa.includes("isIOSBrowser"), "missing iOS install guidance detection");
+  assert(pwa.includes("Add to Home Screen"), "missing iOS install guidance copy");
+  assert(pwa.includes("navigator.standalone"), "missing iOS installed-mode detection");
   assert(pwa.includes("deferredInstallPrompt"), "missing deferred install prompt state");
   assert(pwa.includes("appinstalled"), "missing installed cleanup handler");
   assert(css.includes(".pwa-install-card"), "missing install card styles");

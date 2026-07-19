@@ -17,9 +17,28 @@
 
   function isInstalledDisplayMode() {
     const installedDisplayModeQueries = ["(display-mode: standalone)", "(display-mode: fullscreen)", "(display-mode: minimal-ui)"];
-    return installedDisplayModeQueries.some(function hasDisplayMode(query) {
+    return Boolean(navigator.standalone) || installedDisplayModeQueries.some(function hasDisplayMode(query) {
       return window.matchMedia(query).matches;
     });
+  }
+
+  function isIOSBrowser() {
+    const platform = navigator.platform || "";
+    const userAgent = navigator.userAgent || "";
+    return /iPad|iPhone|iPod/.test(userAgent) || (platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  }
+
+  function createInstallCard(copyText) {
+    const card = document.createElement("div");
+    card.id = "pwa-install";
+    card.className = "pwa-install-card";
+
+    const copy = document.createElement("p");
+    copy.className = "pwa-install-copy";
+    copy.textContent = copyText;
+
+    card.appendChild(copy);
+    return card;
   }
 
   function showInstallPrompt() {
@@ -28,13 +47,7 @@
     const slot = getInstallSlot();
     if (!slot) return;
 
-    const card = document.createElement("div");
-    card.id = "pwa-install";
-    card.className = "pwa-install-card";
-
-    const copy = document.createElement("p");
-    copy.className = "pwa-install-copy";
-    copy.textContent = "Install for offline use.";
+    const card = createInstallCard("Install for offline use.");
 
     const button = document.createElement("button");
     button.id = "pwa-install-button";
@@ -49,9 +62,19 @@
       promptEvent.userChoice.catch(function ignoreInstallChoiceError() {});
     });
 
-    card.append(copy, button);
+    card.appendChild(button);
     slot.hidden = false;
     slot.appendChild(card);
+  }
+
+  function showIOSInstallGuidance() {
+    if (!isIOSBrowser() || isInstalledDisplayMode() || document.getElementById("pwa-install")) return;
+
+    const slot = getInstallSlot();
+    if (!slot) return;
+
+    slot.hidden = false;
+    slot.appendChild(createInstallCard("To install on iOS, tap Share, then Add to Home Screen."));
   }
 
   function showUpdatePrompt(registration) {
@@ -88,6 +111,8 @@
   });
 
   window.addEventListener("load", function onWindowLoad() {
+    showIOSInstallGuidance();
+
     navigator.serviceWorker
       .register("./service-worker.js")
       .then(function watchForUpdates(registration) {
