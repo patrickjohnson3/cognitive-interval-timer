@@ -188,6 +188,7 @@ test("service worker avoids cache-first navigation responses", function () {
 test("service worker returns a response for uncached offline assets", function () {
   const serviceWorker = readProjectFile("service-worker.js");
 
+  assert(serviceWorker.includes("Offline app shell unavailable."), "missing uncached offline navigation fallback");
   assert(serviceWorker.includes("Offline asset unavailable."), "missing uncached offline asset fallback");
   assert(serviceWorker.includes("status: 503"), "expected explicit offline asset status");
 });

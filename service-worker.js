@@ -111,7 +111,9 @@ self.addEventListener("fetch", function handleFetch(event) {
           return response;
         })
         .catch(function fallBackToCachedShell() {
-          return caches.match("./index.html");
+          return caches.match("./index.html").then(function useCachedShell(cached) {
+            return cached || new Response("Offline app shell unavailable.", { status: 503, statusText: "Offline" });
+          });
         })
     );
     return;
