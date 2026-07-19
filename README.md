@@ -75,10 +75,19 @@ Then open:
 
 ## Tooling Setup
 
+Use Node `24.18.0`. The project includes `.node-version` for version managers that support it.
+
 Install dev tooling once:
 
 ```bash
 npm install
+```
+
+If `node`/`npm` are installed through `fnm` but not on your shell `PATH`, initialize `fnm` first:
+
+```bash
+export PATH="$HOME/.local/share/fnm:$PATH"
+eval "$(fnm env --shell bash)"
 ```
 
 ## Usage
