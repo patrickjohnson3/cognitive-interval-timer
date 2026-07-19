@@ -1,6 +1,6 @@
 {
   "name": "Cognitive Interval Timer",
-  "short_name": "Interval Timer",
+  "short_name": "CogTimer",
   "description": "A phase-based focus timer for deep work, recall, and real breaks.",
   "id": "/cognitive-interval-timer/",
   "start_url": "/cognitive-interval-timer/",

@@ -75,6 +75,7 @@ test("manifest has installable app metadata and icons", function () {
   const manifest = JSON.parse(readProjectFile("manifest.webmanifest"));
 
   assert(manifest.name === "Cognitive Interval Timer", "unexpected manifest name");
+  assert(manifest.short_name === "CogTimer", "unexpected manifest short_name");
   assert(manifest.id === "/cognitive-interval-timer/", "expected stable PWA id");
   assert(manifest.display === "standalone", "expected standalone display mode");
   assert(manifest.start_url === "/cognitive-interval-timer/", "expected absolute start_url");
