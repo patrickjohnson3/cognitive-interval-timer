@@ -270,6 +270,7 @@ test("PWA registration exposes a user-controlled update flow", function () {
   const pwa = readProjectFile("pwa.js");
   const prompts = readProjectFile("pwa-prompts.js");
   const serviceWorker = readProjectFile("service-worker.js");
+  const content = readProjectFile("content.js");
   const css = readProjectFile("styles.css");
 
   assert(prompts.includes("pwa-update-button"), "missing update prompt button");
@@ -289,7 +290,7 @@ test("PWA registration exposes a user-controlled update flow", function () {
   assert(pwa.includes("SKIP_WAITING"), "missing skip-waiting message from page");
   assert(prompts.includes("pwa-status"), "missing visible service-worker status card");
   assert(
-    pwa.includes("Offline support is unavailable right now."),
+    content.includes("Offline support is unavailable right now."),
     "missing registration failure status copy"
   );
   assert(!pwa.includes("ignoreRegistrationError"), "registration errors should not be silent");
@@ -304,15 +305,16 @@ test("PWA registration handles browser install prompt", function () {
   const html = readProjectFile("index.html");
   const pwa = readProjectFile("pwa.js");
   const prompts = readProjectFile("pwa-prompts.js");
+  const content = readProjectFile("content.js");
   const css = readProjectFile("styles.css");
 
   assert(html.includes('id="pwa-install-slot"'), "missing install prompt slot");
   assert(pwa.includes("beforeinstallprompt"), "missing install prompt event handler");
   assert(prompts.includes("pwa-install-slot"), "install prompt should render into settings slot");
-  assert(pwa.includes("Install for offline use."), "missing install prompt copy");
+  assert(content.includes("Install for offline use."), "missing install prompt copy");
   assert(prompts.includes("pwa-install-button"), "missing install button id");
   assert(pwa.includes("isIOSBrowser"), "missing iOS install guidance detection");
-  assert(pwa.includes("Add to Home Screen"), "missing iOS install guidance copy");
+  assert(content.includes("Add to Home Screen"), "missing iOS install guidance copy");
   assert(pwa.includes("navigator.standalone"), "missing iOS installed-mode detection");
   assert(pwa.includes("deferredInstallPrompt"), "missing deferred install prompt state");
   assert(pwa.includes("appinstalled"), "missing installed cleanup handler");

@@ -101,6 +101,18 @@
       settingsSaved: "Settings Saved.",
       defaultsRestored: "Defaults Restored.",
     },
+    pwa: {
+      installCopy: "Install for offline use.",
+      installButton: "Install",
+      installAriaLabel: "Install app",
+      iosInstallCopy: "To install on iOS, tap Share, then Add to Home Screen.",
+      updateCopy: "A newer version is ready.",
+      updateButton: "Update",
+      updatePending: "Updating...",
+      updateAriaLabel: "Update app to the latest version",
+      unsupportedCopy: "Offline support is unavailable in this browser.",
+      registrationErrorCopy: "Offline support is unavailable right now.",
+    },
     tooltips: {
       focusBlockDefinition: {
         triggerLabel: "What is a focus block?",

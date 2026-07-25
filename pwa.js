@@ -1,6 +1,8 @@
 (function registerPWA() {
   const supportsServiceWorker = "serviceWorker" in navigator;
   const promptFactory = window.PomodoroPWAPrompts;
+  const content = window.PomodoroContent || {};
+  const pwaCopy = (content.UI_COPY && content.UI_COPY.pwa) || {};
   const prompts = promptFactory && promptFactory.create({ documentRef: document });
   let refreshing = false;
   let deferredInstallPrompt = null;
@@ -44,9 +46,9 @@
     if (!deferredInstallPrompt) return;
 
     prompts.showInstall({
-      copyText: "Install for offline use.",
-      buttonText: "Install",
-      ariaLabel: "Install app",
+      copyText: pwaCopy.installCopy || "Install for offline use.",
+      buttonText: pwaCopy.installButton || "Install",
+      ariaLabel: pwaCopy.installAriaLabel || "Install app",
       onInstall: function installApp() {
         const promptEvent = deferredInstallPrompt;
         deferredInstallPrompt = null;
@@ -61,7 +63,7 @@
     if (!isIOSBrowser() || isInstalledDisplayMode()) return;
 
     prompts.showInstall({
-      copyText: "To install on iOS, tap Share, then Add to Home Screen.",
+      copyText: pwaCopy.iosInstallCopy || "To install on iOS, tap Share, then Add to Home Screen.",
     });
   }
 
@@ -69,10 +71,10 @@
     if (!registration || !registration.waiting) return;
 
     prompts.showUpdate({
-      copyText: "A newer version is ready.",
-      buttonText: "Update",
-      pendingText: "Updating...",
-      ariaLabel: "Update app to the latest version",
+      copyText: pwaCopy.updateCopy || "A newer version is ready.",
+      buttonText: pwaCopy.updateButton || "Update",
+      pendingText: pwaCopy.updatePending || "Updating...",
+      ariaLabel: pwaCopy.updateAriaLabel || "Update app to the latest version",
       onUpdate: function updateApp() {
         if (!registration.waiting) return false;
         registration.waiting.postMessage({ type: "SKIP_WAITING" });
@@ -104,7 +106,9 @@
     showIOSInstallGuidance();
 
     if (!supportsServiceWorker) {
-      showServiceWorkerStatus("Offline support is unavailable in this browser.");
+      showServiceWorkerStatus(
+        pwaCopy.unsupportedCopy || "Offline support is unavailable in this browser."
+      );
       return;
     }
 
@@ -128,7 +132,9 @@
         });
       })
       .catch(function showRegistrationError() {
-        showServiceWorkerStatus("Offline support is unavailable right now.");
+        showServiceWorkerStatus(
+          pwaCopy.registrationErrorCopy || "Offline support is unavailable right now."
+        );
       });
   });
 })();
