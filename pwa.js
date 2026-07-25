@@ -55,6 +55,16 @@
     return card;
   }
 
+  function showServiceWorkerStatus(message) {
+    if (document.getElementById("pwa-status")) return;
+
+    const slot = getInstallSlot();
+    if (!slot) return;
+
+    slot.hidden = false;
+    slot.appendChild(createPromptCard("pwa-status", message));
+  }
+
   function showInstallPrompt() {
     if (!deferredInstallPrompt || document.getElementById("pwa-install")) return;
 
@@ -162,6 +172,8 @@
           });
         });
       })
-      .catch(function ignoreRegistrationError() {});
+      .catch(function showRegistrationError() {
+        showServiceWorkerStatus("Offline support is unavailable right now.");
+      });
   });
 })();

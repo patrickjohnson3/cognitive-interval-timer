@@ -289,6 +289,12 @@ test("PWA registration exposes a user-controlled update flow", function () {
   assert(pwa.includes("(display-mode: minimal-ui)"), "missing minimal-ui display-mode check");
   assert(pwa.includes("controllerchange"), "missing reload-after-update handler");
   assert(pwa.includes("SKIP_WAITING"), "missing skip-waiting message from page");
+  assert(pwa.includes("pwa-status"), "missing visible service-worker status card");
+  assert(
+    pwa.includes("Offline support is unavailable right now."),
+    "missing registration failure status copy"
+  );
+  assert(!pwa.includes("ignoreRegistrationError"), "registration errors should not be silent");
   assert(serviceWorker.includes("SKIP_WAITING"), "missing skip-waiting message handler");
   assert(
     !serviceWorker.includes('self.skipWaiting();\n});\n\nself.addEventListener("activate"'),

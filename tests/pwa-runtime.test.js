@@ -123,6 +123,7 @@ function loadPWA(options) {
           listeners["serviceWorker:" + type] = handler;
         },
         register: function registerServiceWorker() {
+          if (config.registrationError) return Promise.reject(config.registrationError);
           return Promise.resolve(registration);
         },
       },
@@ -209,6 +210,23 @@ test("PWA update click tolerates a missing waiting worker", async function () {
   assert(
     runtime.nodes["pwa-update-button"].disabled === false,
     "button should not disable without a waiting worker"
+  );
+});
+
+test("PWA registration failure renders a visible status card", async function () {
+  const runtime = loadPWA({
+    registrationError: new Error("registration failed"),
+  });
+
+  runtime.listeners["window:load"]();
+  await flushPromises();
+
+  const card = runtime.nodes["pwa-status"];
+  assert(runtime.slot.hidden === false, "expected prompt slot to be visible");
+  assert(card && card.className === "pwa-prompt-card", "expected status prompt card");
+  assert(
+    card.children[0].textContent === "Offline support is unavailable right now.",
+    "expected registration failure copy"
   );
 });
 
