@@ -5,7 +5,36 @@ const os = require("os");
 const path = require("path");
 
 const ROOT = path.join(__dirname, "..");
-const CHROME_BIN = process.env.CHROME_BIN || "/usr/bin/google-chrome";
+const CHROME_CANDIDATES = [
+  "google-chrome",
+  "google-chrome-stable",
+  "chromium",
+  "chromium-browser",
+  "/usr/bin/google-chrome",
+];
+
+function findExecutableOnPath(name) {
+  const pathEntries = (process.env.PATH || "").split(path.delimiter).filter(Boolean);
+  for (const entry of pathEntries) {
+    const candidate = path.join(entry, name);
+    if (fs.existsSync(candidate)) return candidate;
+  }
+  return null;
+}
+
+function chromeBinary() {
+  if (process.env.CHROME_BIN) return process.env.CHROME_BIN;
+
+  for (const candidate of CHROME_CANDIDATES) {
+    if (path.isAbsolute(candidate) && fs.existsSync(candidate)) return candidate;
+    if (!path.isAbsolute(candidate)) {
+      const resolved = findExecutableOnPath(candidate);
+      if (resolved) return resolved;
+    }
+  }
+
+  throw new Error("Chrome not found. Set CHROME_BIN to run the PWA offline smoke test.");
+}
 
 function contentType(file) {
   if (file.endsWith(".html")) return "text/html; charset=utf-8";
@@ -118,7 +147,7 @@ function createCDP(wsUrl) {
 }
 
 async function launchChrome(url, userDataDir) {
-  const chrome = childProcess.spawn(CHROME_BIN, [
+  const chrome = childProcess.spawn(chromeBinary(), [
     "--headless=new",
     "--disable-gpu",
     "--no-sandbox",
