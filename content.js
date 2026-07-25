@@ -1,10 +1,11 @@
 (function initContent(root, factory) {
   if (typeof module === "object" && module.exports) {
-    module.exports = factory();
+    module.exports = factory(require("./app-config.js"));
   } else {
-    root.PomodoroContent = factory();
+    root.PomodoroContent = factory(root.PomodoroAppConfig);
   }
-})(typeof self !== "undefined" ? self : this, function makeContent() {
+})(typeof self !== "undefined" ? self : this, function makeContent(AppConfig) {
+  const appConfig = AppConfig || {};
   const PHASE_ORDER = ["prep", "focus", "recall", "break", "long_break"];
 
   const PHASE_CONFIG = {
@@ -78,8 +79,8 @@
       sessionChangesNone: "None",
       autoStart: "Auto-Start",
       sound: "Sound",
-      documentTitleSeparator: " - ",
-      documentTitleBase: "Cognitive Interval Timer",
+      documentTitleSeparator: appConfig.documentTitleSeparator || " - ",
+      documentTitleBase: appConfig.name || "Cognitive Interval Timer",
       primaryActionIcons: {
         idle: "▶",
         running: "⏸",

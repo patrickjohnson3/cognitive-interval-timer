@@ -1,8 +1,8 @@
 if (typeof importScripts === "function") {
-  importScripts("./app-shell-assets.js");
+  importScripts("./app-config.js", "./app-shell-assets.js");
 }
 
-const CACHE_PREFIX = "cognitive-interval-timer-";
+const CACHE_PREFIX = self.PomodoroAppConfig.cachePrefix;
 const CACHE_NAME = CACHE_PREFIX + "app-shell";
 const REQUIRED_APP_SHELL = self.PomodoroAppShell.REQUIRED_APP_SHELL;
 const OPTIONAL_APP_SHELL = self.PomodoroAppShell.OPTIONAL_APP_SHELL;

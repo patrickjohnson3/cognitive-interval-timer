@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const appConfig = require("../app-config.js");
 const appShell = require("../app-shell-assets.js");
 
 function assert(condition, message) {
@@ -49,6 +50,7 @@ test("index links PWA manifest and registration script", function () {
     "missing dynamic theme-color meta"
   );
   assert(html.includes('<script src="pwa.js"></script>'), "missing PWA registration script");
+  assert(html.includes('<script src="app-config.js"></script>'), "missing app config script");
   assert(
     html.includes('<script src="pwa-prompts.js"></script>'),
     "missing PWA prompt helper script"
@@ -95,13 +97,19 @@ test("app shell does not depend on external runtime assets", function () {
 
 test("manifest has installable app metadata and icons", function () {
   const manifest = JSON.parse(readProjectFile("manifest.webmanifest"));
+  const Content = require("../content.js");
 
-  assert(manifest.name === "Cognitive Interval Timer", "unexpected manifest name");
-  assert(manifest.short_name === "CogTimer", "unexpected manifest short_name");
-  assert(manifest.id === "./", "expected path-independent PWA id");
+  assert(manifest.name === appConfig.name, "unexpected manifest name");
+  assert(manifest.short_name === appConfig.shortName, "unexpected manifest short_name");
+  assert(manifest.description === appConfig.description, "unexpected manifest description");
+  assert(manifest.id === appConfig.manifestId, "expected path-independent PWA id");
   assert(manifest.display === "standalone", "expected standalone display mode");
-  assert(manifest.start_url === "./", "expected path-independent start_url");
-  assert(manifest.scope === "./", "expected path-independent scope");
+  assert(manifest.start_url === appConfig.manifestStartUrl, "expected path-independent start_url");
+  assert(manifest.scope === appConfig.manifestScope, "expected path-independent scope");
+  assert(
+    Content.UI_COPY.labels.documentTitleBase === appConfig.name,
+    "document title should use app config name"
+  );
   assert(
     !Object.prototype.hasOwnProperty.call(manifest, "orientation"),
     "manifest should not lock PWA orientation"
@@ -139,6 +147,7 @@ test("service worker caches the app shell", function () {
     "./index.html",
     "./manifest.webmanifest",
     "./styles.css",
+    "./app-config.js",
     "./haptics.js",
     "./display-services.js",
     "./controller-persistence.js",
@@ -174,8 +183,8 @@ test("service worker uses a stable app-scoped cache name", function () {
   const serviceWorker = readProjectFile("service-worker.js");
 
   assert(
-    serviceWorker.includes('const CACHE_PREFIX = "cognitive-interval-timer-";'),
-    "missing app-specific cache prefix"
+    serviceWorker.includes("const CACHE_PREFIX = self.PomodoroAppConfig.cachePrefix;"),
+    "cache prefix should come from app config"
   );
   assert(
     serviceWorker.includes('const CACHE_NAME = CACHE_PREFIX + "app-shell";'),

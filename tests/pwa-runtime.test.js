@@ -36,12 +36,12 @@ function readProjectFile(file) {
 }
 
 function currentServiceWorkerCacheName() {
+  const appConfig = require("../app-config.js");
   const serviceWorker = readProjectFile("service-worker.js");
-  const prefixMatch = serviceWorker.match(/const CACHE_PREFIX = "([^"]+)";/);
   const nameMatch = serviceWorker.match(/const CACHE_NAME = CACHE_PREFIX \+ "([^"]+)";/);
 
-  assert(prefixMatch && nameMatch, "expected service worker cache constants");
-  return prefixMatch[1] + nameMatch[1];
+  assert(nameMatch, "expected service worker cache name constant");
+  return appConfig.cachePrefix + nameMatch[1];
 }
 
 function loadServiceWorkerRuntime(options) {
@@ -116,6 +116,9 @@ function loadServiceWorkerRuntime(options) {
     },
   };
 
+  vm.runInNewContext(readProjectFile("app-config.js"), context, {
+    filename: "app-config.js",
+  });
   vm.runInNewContext(readProjectFile("app-shell-assets.js"), context, {
     filename: "app-shell-assets.js",
   });
@@ -393,6 +396,9 @@ test("service worker deletes only this app's old caches", async function () {
     },
   };
 
+  vm.runInNewContext(readProjectFile("app-config.js"), context, {
+    filename: "app-config.js",
+  });
   vm.runInNewContext(readProjectFile("app-shell-assets.js"), context, {
     filename: "app-shell-assets.js",
   });
