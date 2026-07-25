@@ -22,6 +22,7 @@ const REQUIRED_APP_SHELL = [
   "./a11y.js",
   "./app-controller.js",
   "./app.js",
+  "./pwa-prompts.js",
   "./pwa.js",
 ];
 const OPTIONAL_APP_SHELL = [

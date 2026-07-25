@@ -1,21 +1,16 @@
 (function registerPWA() {
   const supportsServiceWorker = "serviceWorker" in navigator;
+  const promptFactory = window.PomodoroPWAPrompts;
+  const prompts = promptFactory && promptFactory.create({ documentRef: document });
   let refreshing = false;
   let deferredInstallPrompt = null;
 
-  function getInstallSlot() {
-    return document.getElementById("pwa-install-slot");
+  if (!prompts) {
+    throw new Error("Missing PWA prompt helpers. Ensure pwa-prompts.js loads before pwa.js");
   }
 
   function removeInstallCard() {
-    const card = document.getElementById("pwa-install");
-    const slot = getInstallSlot();
-    if (card) card.remove();
-    hideSlotIfEmpty(slot);
-  }
-
-  function hideSlotIfEmpty(slot) {
-    if (slot && slot.children.length === 0) slot.hidden = true;
+    prompts.removeCard("pwa-install");
   }
 
   function isInstalledDisplayMode() {
@@ -41,89 +36,49 @@
     );
   }
 
-  function createPromptCard(id, copyText) {
-    const card = document.createElement("div");
-    card.id = id;
-    card.className = "pwa-prompt-card";
-
-    const copy = document.createElement("p");
-    copy.className = "pwa-prompt-copy";
-    copy.textContent = copyText;
-
-    card.appendChild(copy);
-    return card;
-  }
-
   function showServiceWorkerStatus(message) {
-    if (document.getElementById("pwa-status")) return;
-
-    const slot = getInstallSlot();
-    if (!slot) return;
-
-    slot.hidden = false;
-    slot.appendChild(createPromptCard("pwa-status", message));
+    prompts.showStatus(message);
   }
 
   function showInstallPrompt() {
-    if (!deferredInstallPrompt || document.getElementById("pwa-install")) return;
+    if (!deferredInstallPrompt) return;
 
-    const slot = getInstallSlot();
-    if (!slot) return;
-
-    const card = createPromptCard("pwa-install", "Install for offline use.");
-
-    const button = document.createElement("button");
-    button.id = "pwa-install-button";
-    button.type = "button";
-    button.textContent = "Install";
-    button.setAttribute("aria-label", "Install app");
-    button.addEventListener("click", function installApp() {
-      const promptEvent = deferredInstallPrompt;
-      deferredInstallPrompt = null;
-      removeInstallCard();
-      promptEvent.prompt();
-      promptEvent.userChoice.catch(function ignoreInstallChoiceError() {});
+    prompts.showInstall({
+      copyText: "Install for offline use.",
+      buttonText: "Install",
+      ariaLabel: "Install app",
+      onInstall: function installApp() {
+        const promptEvent = deferredInstallPrompt;
+        deferredInstallPrompt = null;
+        removeInstallCard();
+        promptEvent.prompt();
+        promptEvent.userChoice.catch(function ignoreInstallChoiceError() {});
+      },
     });
-
-    card.appendChild(button);
-    slot.hidden = false;
-    slot.appendChild(card);
   }
 
   function showIOSInstallGuidance() {
-    if (!isIOSBrowser() || isInstalledDisplayMode() || document.getElementById("pwa-install"))
-      return;
+    if (!isIOSBrowser() || isInstalledDisplayMode()) return;
 
-    const slot = getInstallSlot();
-    if (!slot) return;
-
-    slot.hidden = false;
-    slot.appendChild(
-      createPromptCard("pwa-install", "To install on iOS, tap Share, then Add to Home Screen.")
-    );
+    prompts.showInstall({
+      copyText: "To install on iOS, tap Share, then Add to Home Screen.",
+    });
   }
 
   function showUpdatePrompt(registration) {
-    if (!registration || !registration.waiting || document.getElementById("pwa-update")) return;
+    if (!registration || !registration.waiting) return;
 
-    const slot = getInstallSlot();
-    if (!slot) return;
-
-    const card = createPromptCard("pwa-update", "A newer version is ready.");
-    const button = document.createElement("button");
-    button.id = "pwa-update-button";
-    button.type = "button";
-    button.textContent = "Update";
-    button.setAttribute("aria-label", "Update app to the latest version");
-    button.addEventListener("click", function updateApp() {
-      if (!registration.waiting) return;
-      button.disabled = true;
-      button.textContent = "Updating...";
-      registration.waiting.postMessage({ type: "SKIP_WAITING" });
+    prompts.showUpdate({
+      copyText: "A newer version is ready.",
+      buttonText: "Update",
+      pendingText: "Updating...",
+      ariaLabel: "Update app to the latest version",
+      onUpdate: function updateApp() {
+        if (!registration.waiting) return false;
+        registration.waiting.postMessage({ type: "SKIP_WAITING" });
+        return true;
+      },
     });
-    card.appendChild(button);
-    slot.hidden = false;
-    slot.appendChild(card);
   }
 
   if (supportsServiceWorker) {

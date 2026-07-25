@@ -66,6 +66,9 @@ function createElementFactory(nodes) {
       children: [],
       attributes: {},
       listeners: {},
+      remove: function remove() {
+        delete nodes[this.id];
+      },
       setAttribute: function setAttribute(name, value) {
         this.attributes[name] = String(value);
       },
@@ -146,6 +149,8 @@ function loadPWA(options) {
   };
   context.self = context;
 
+  vm.runInNewContext(readProjectFile("pwa-prompts.js"), context, { filename: "pwa-prompts.js" });
+  context.window.PomodoroPWAPrompts = context.PomodoroPWAPrompts;
   vm.runInNewContext(readProjectFile("pwa.js"), context, { filename: "pwa.js" });
   return { bodyChildren, listeners, nodes, registration, slot };
 }

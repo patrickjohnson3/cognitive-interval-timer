@@ -62,6 +62,10 @@ test("index links PWA manifest and registration script", function () {
     "missing dynamic theme-color meta"
   );
   assert(html.includes('<script src="pwa.js"></script>'), "missing PWA registration script");
+  assert(
+    html.includes('<script src="pwa-prompts.js"></script>'),
+    "missing PWA prompt helper script"
+  );
 });
 
 test("index links a dedicated 180px Apple touch icon", function () {
@@ -150,6 +154,7 @@ test("service worker caches the app shell", function () {
     "./styles.css",
     "./haptics.js",
     "./app.js",
+    "./pwa-prompts.js",
     "./pwa.js",
     "./assets/icons/apple-touch-icon.png",
     "./assets/icons/icon-192.png",
@@ -272,12 +277,13 @@ test("service worker returns a response for uncached offline assets", function (
 
 test("PWA registration exposes a user-controlled update flow", function () {
   const pwa = readProjectFile("pwa.js");
+  const prompts = readProjectFile("pwa-prompts.js");
   const serviceWorker = readProjectFile("service-worker.js");
   const css = readProjectFile("styles.css");
 
-  assert(pwa.includes("pwa-update-button"), "missing update prompt button");
+  assert(prompts.includes("pwa-update-button"), "missing update prompt button");
   assert(
-    pwa.includes('createPromptCard("pwa-update"'),
+    prompts.includes('createPromptCard("pwa-update"'),
     "update prompt should render as a settings card"
   );
   assert(
@@ -290,7 +296,7 @@ test("PWA registration exposes a user-controlled update flow", function () {
   assert(pwa.includes("(display-mode: minimal-ui)"), "missing minimal-ui display-mode check");
   assert(pwa.includes("controllerchange"), "missing reload-after-update handler");
   assert(pwa.includes("SKIP_WAITING"), "missing skip-waiting message from page");
-  assert(pwa.includes("pwa-status"), "missing visible service-worker status card");
+  assert(prompts.includes("pwa-status"), "missing visible service-worker status card");
   assert(
     pwa.includes("Offline support is unavailable right now."),
     "missing registration failure status copy"
@@ -306,13 +312,14 @@ test("PWA registration exposes a user-controlled update flow", function () {
 test("PWA registration handles browser install prompt", function () {
   const html = readProjectFile("index.html");
   const pwa = readProjectFile("pwa.js");
+  const prompts = readProjectFile("pwa-prompts.js");
   const css = readProjectFile("styles.css");
 
   assert(html.includes('id="pwa-install-slot"'), "missing install prompt slot");
   assert(pwa.includes("beforeinstallprompt"), "missing install prompt event handler");
-  assert(pwa.includes("pwa-install-slot"), "install prompt should render into settings slot");
+  assert(prompts.includes("pwa-install-slot"), "install prompt should render into settings slot");
   assert(pwa.includes("Install for offline use."), "missing install prompt copy");
-  assert(pwa.includes("pwa-install-button"), "missing install button id");
+  assert(prompts.includes("pwa-install-button"), "missing install button id");
   assert(pwa.includes("isIOSBrowser"), "missing iOS install guidance detection");
   assert(pwa.includes("Add to Home Screen"), "missing iOS install guidance copy");
   assert(pwa.includes("navigator.standalone"), "missing iOS installed-mode detection");
