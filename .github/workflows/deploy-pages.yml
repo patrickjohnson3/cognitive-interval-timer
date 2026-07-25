@@ -45,10 +45,7 @@ jobs:
         run: npm run test:pwa:offline
 
       - name: Prepare static site artifact
-        run: |
-          mkdir _site
-          cp index.html manifest.webmanifest service-worker.js styles.css *.js _site/
-          cp -R assets themes _site/
+        run: node scripts/prepare-pages-artifact.js _site
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
