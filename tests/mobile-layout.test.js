@@ -22,16 +22,20 @@ function read(file) {
 
 test("mobile layout prevents document-level horizontal scroll", function () {
   const css = read("styles.css");
+  const html = read("index.html");
   const requiredSnippets = [
     "html {",
     "overflow-x: hidden;",
     "body {",
     "width: 100%;",
     "max-width: 100%;",
+    "min-height: 100svh;",
+    "env(safe-area-inset-top, 0px)",
     ".app {",
     "max-width: 100%;",
   ];
 
+  assert(html.includes("viewport-fit=cover"), "missing viewport safe-area opt-in");
   requiredSnippets.forEach((snippet) => {
     assert(css.includes(snippet), "missing mobile overflow guard: " + snippet);
   });
@@ -48,6 +52,22 @@ test("timer controls shrink inside narrow mobile panels", function () {
 
   requiredSnippets.forEach((snippet) => {
     assert(css.includes(snippet), "missing responsive control rule: " + snippet);
+  });
+});
+
+test("short mobile landscape gets a compact two-column layout", function () {
+  const css = read("styles.css");
+  const requiredSnippets = [
+    "@media (orientation: landscape) and (max-height: 520px)",
+    "--density-scale: 0.82;",
+    "align-items: start;",
+    "width: min(960px, 100%);",
+    "grid-template-columns: minmax(16rem, 1.05fr) minmax(14rem, 0.95fr);",
+    "@media (orientation: landscape) and (max-height: 520px) and (max-width: 640px)",
+  ];
+
+  requiredSnippets.forEach((snippet) => {
+    assert(css.includes(snippet), "missing landscape layout rule: " + snippet);
   });
 });
 

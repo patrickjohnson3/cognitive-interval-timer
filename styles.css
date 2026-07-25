@@ -52,13 +52,22 @@ body {
   width: 100%;
   max-width: 100%;
   min-height: 100vh;
+  min-height: 100svh;
   font-family: var(--font-main);
   background: var(--bg-gradient);
   color: var(--text-primary, var(--color-text));
   display: grid;
-  place-items: center;
-  padding: var(--space-4);
+  align-items: start;
+  justify-items: center;
+  padding: max(var(--space-4), env(safe-area-inset-top, 0px)) max(var(--space-4), env(safe-area-inset-right, 0px))
+    max(var(--space-4), env(safe-area-inset-bottom, 0px)) max(var(--space-4), env(safe-area-inset-left, 0px));
   overflow-x: hidden;
+}
+
+@media (min-height: 720px) {
+  body {
+    align-items: center;
+  }
 }
 
 .app {
@@ -719,6 +728,56 @@ select {
     --tip-shift-x: 0;
     width: min(260px, calc(100vw - (var(--space-4) * 2)));
     max-width: calc(100vw - (var(--space-4) * 2));
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  :root {
+    --density-scale: 0.82;
+  }
+
+  body {
+    align-items: start;
+    padding: max(var(--space-2), env(safe-area-inset-top, 0px)) max(var(--space-3), env(safe-area-inset-right, 0px))
+      max(var(--space-2), env(safe-area-inset-bottom, 0px)) max(var(--space-3), env(safe-area-inset-left, 0px));
+  }
+
+  .app {
+    width: min(960px, 100%);
+  }
+
+  .header {
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .main {
+    grid-template-columns: minmax(16rem, 1.05fr) minmax(14rem, 0.95fr);
+    gap: var(--space-3);
+    padding: var(--space-4);
+    align-items: start;
+  }
+
+  .panel,
+  .settings {
+    padding: var(--space-4);
+  }
+
+  .time {
+    font-size: clamp(2.25rem, 9vh, 3.2rem);
+  }
+
+  .hint {
+    margin-bottom: var(--space-3);
+  }
+
+  .long-hint {
+    line-height: 1.42;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) and (max-width: 640px) {
+  .main {
+    grid-template-columns: 1fr;
   }
 }
 
