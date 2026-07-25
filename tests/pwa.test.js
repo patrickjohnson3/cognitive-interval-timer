@@ -107,10 +107,10 @@ test("manifest has installable app metadata and icons", function () {
 
   assert(manifest.name === "Cognitive Interval Timer", "unexpected manifest name");
   assert(manifest.short_name === "CogTimer", "unexpected manifest short_name");
-  assert(manifest.id === "/cognitive-interval-timer/", "expected stable PWA id");
+  assert(manifest.id === "./", "expected path-independent PWA id");
   assert(manifest.display === "standalone", "expected standalone display mode");
-  assert(manifest.start_url === "/cognitive-interval-timer/", "expected absolute start_url");
-  assert(manifest.scope === "/cognitive-interval-timer/", "expected absolute scope");
+  assert(manifest.start_url === "./", "expected path-independent start_url");
+  assert(manifest.scope === "./", "expected path-independent scope");
   assert(
     !Object.prototype.hasOwnProperty.call(manifest, "orientation"),
     "manifest should not lock PWA orientation"
