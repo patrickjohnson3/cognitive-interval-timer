@@ -39,6 +39,20 @@ test("Node version metadata stays aligned", function () {
   );
 });
 
+test("Pages deployment stays gated by validation", function () {
+  const workflow = read(".github/workflows/deploy-pages.yml");
+
+  assert(workflow.includes("needs: validate"), "Pages deploy job should require validation");
+  assert(
+    workflow.includes("npm run test:pwa:offline"),
+    "Pages validation should include the PWA offline smoke test"
+  );
+  assert(
+    workflow.includes("actions/deploy-pages@v4"),
+    "Pages workflow should use the official deploy action"
+  );
+});
+
 if (!process.exitCode) {
   console.log("All tests passed.");
 }
