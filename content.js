@@ -73,6 +73,7 @@
       focusBlockReady: "Focus Block\nReady",
       unsavedChanges: "Unsaved Changes",
       allSettingsSaved: "All Settings Saved",
+      storageUnavailable: "Settings are not being saved in this browser.",
       sessionChangesPrefix: "Session Changes: ",
       sessionChangesNone: "None",
       autoStart: "Auto-Start",

@@ -182,11 +182,23 @@ function setup(options) {
       },
       setJSON: function setJSON(key, value) {
         stored[key] = value;
+        if (Object.prototype.hasOwnProperty.call(config, "storageWriteResult")) {
+          return config.storageWriteResult;
+        }
+        return true;
       },
       getText: function getText(key, fallback) {
         return fallback;
       },
-      setText: function setText() {},
+      setText: function setText() {
+        if (Object.prototype.hasOwnProperty.call(config, "storageWriteResult")) {
+          return config.storageWriteResult;
+        }
+        return true;
+      },
+      mode: function mode() {
+        return config.storageMode || "local";
+      },
     },
     audio: {
       playPhaseChime: function playPhaseChime() {},
@@ -264,6 +276,32 @@ test("phase changes trigger phase haptic feedback", function () {
   ctx.app.onPhaseChange({ label: "Focus" });
 
   assert(ctx.hapticCalls.includes("phase"), "expected phase-change haptic feedback");
+});
+
+test("memory-only storage shows a persistence warning", function () {
+  const ctx = setup({ storageMode: "memory" });
+
+  assert(ctx.app.state.ui.storageWarning === true, "expected memory storage warning");
+});
+
+test("failed storage write shows a persistence warning", function () {
+  const ctx = setup({ storageWriteResult: false });
+  ctx.app.controller.saveSettings({
+    prep: 2,
+    focus: 45,
+    recall: 3,
+    break: 15,
+    long_break: 25,
+    blocks_per_ultradian: 2,
+    prep_enabled: true,
+    auto_start: true,
+    sound_enabled: true,
+    fullscreen_enabled: false,
+    minimal_mode_enabled: false,
+    wake_lock_enabled: false,
+  });
+
+  assert(ctx.app.state.ui.storageWarning === true, "expected failed storage warning");
 });
 
 test("fullscreen toggle enables keep screen awake", function () {

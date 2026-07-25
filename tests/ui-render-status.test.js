@@ -152,6 +152,7 @@ function baseState() {
     },
     ui: {
       settingsDirty: false,
+      storageWarning: false,
       sessionFlags: {
         changedAutoStart: false,
         changedSound: false,
@@ -198,6 +199,18 @@ test("stats use compact lowercase labels", function () {
   render.render(state);
   assert(deps.dom.today.textContent === "today: 0 focus blocks", "expected compact today stats");
   assert(deps.dom.long.textContent === "long break: 0 / 2", "expected compact long break stats");
+});
+
+test("storage warning overrides saved settings text", function () {
+  const deps = createDeps();
+  const render = UIRender.create(deps);
+  const state = baseState();
+  state.ui.storageWarning = true;
+  render.render(state);
+  assert(
+    deps.dom.dirtyIndicator.textContent === "Settings are not being saved in this browser.",
+    "expected persistent storage warning"
+  );
 });
 
 test("focus block badge shows Ready before timer has started", function () {

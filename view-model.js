@@ -46,9 +46,11 @@
         focusBlockAriaLabel: state.timer.hasStartedOnce
           ? (labels.focusBlockPrefix || "Focus Block ") + (state.stats.focusBlocksToday + 1)
           : (labels.focusBlockReady || "Focus Block Ready").replace(/\s+/g, " "),
-        dirtyText: state.ui.settingsDirty
-          ? labels.unsavedChanges || "Unsaved Changes"
-          : labels.allSettingsSaved || "All Settings Saved",
+        dirtyText: state.ui.storageWarning
+          ? labels.storageUnavailable || "Settings are not being saved in this browser."
+          : state.ui.settingsDirty
+            ? labels.unsavedChanges || "Unsaved Changes"
+            : labels.allSettingsSaved || "All Settings Saved",
         sessionChangesText:
           changed.length > 0
             ? (labels.sessionChangesPrefix || "Session Changes: ") + changed.join(", ")

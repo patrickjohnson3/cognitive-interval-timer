@@ -43,6 +43,7 @@
       },
       ui: {
         settingsDirty: false,
+        storageWarning: false,
         sessionFlags: {
           changedAutoStart: false,
           changedSound: false,
@@ -74,6 +75,7 @@
 
     function initialize() {
       hydrateFromStorage();
+      syncStorageWarning();
       applyStaticCopy();
       a11y.applyAriaDefaults(document);
       render.setTagline(randomFrom(Content.SITE_TAGLINES));
@@ -238,7 +240,7 @@
       }
 
       appState.settings = next;
-      storage.setJSON(Core.STORAGE_KEYS.settings, appState.settings);
+      syncStorageWarning(storage.setJSON(Core.STORAGE_KEYS.settings, appState.settings));
 
       if (!appState.timer.running) {
         const nextPhaseDuration = Core.phaseDurationSec(appState.timer.phase, appState.settings);
@@ -256,7 +258,7 @@
 
     function restoreDefaults() {
       appState.settings = Core.normalizeSettings(Core.DEFAULT_SETTINGS);
-      storage.setJSON(Core.STORAGE_KEYS.settings, appState.settings);
+      syncStorageWarning(storage.setJSON(Core.STORAGE_KEYS.settings, appState.settings));
 
       appState.ui.settingsDirty = false;
       appState.ui.sessionFlags.changedAutoStart = false;
@@ -288,7 +290,7 @@
 
     function setTheme(nextTheme) {
       appState.theme = nextTheme === "dark" ? "dark" : "light";
-      storage.setText(Core.STORAGE_KEYS.theme, appState.theme);
+      syncStorageWarning(storage.setText(Core.STORAGE_KEYS.theme, appState.theme));
       render.hydrateTheme(appState.theme);
       onStateChange();
     }
@@ -306,7 +308,7 @@
         appState.settings = Core.normalizeSettings(
           Object.assign({}, appState.settings, { fullscreen_enabled: false })
         );
-        storage.setJSON(Core.STORAGE_KEYS.settings, appState.settings);
+        syncStorageWarning(storage.setJSON(Core.STORAGE_KEYS.settings, appState.settings));
         render.hydrateSettingsForm(appState.settings);
       }
 
@@ -322,7 +324,7 @@
         appState.settings = Core.normalizeSettings(
           Object.assign({}, appState.settings, { wake_lock_enabled: false })
         );
-        storage.setJSON(Core.STORAGE_KEYS.settings, appState.settings);
+        syncStorageWarning(storage.setJSON(Core.STORAGE_KEYS.settings, appState.settings));
         render.hydrateSettingsForm(appState.settings);
       }
 
@@ -404,8 +406,16 @@
 
     function persistStatsIfChanged() {
       if (sameStats(lastSavedStats, appState.stats)) return;
-      storage.setJSON(Core.STORAGE_KEYS.stats, appState.stats);
+      syncStorageWarning(storage.setJSON(Core.STORAGE_KEYS.stats, appState.stats));
       lastSavedStats = cloneStats(appState.stats);
+    }
+
+    function storageIsMemoryOnly() {
+      return typeof storage.mode === "function" && storage.mode() === "memory";
+    }
+
+    function syncStorageWarning(writeResult) {
+      appState.ui.storageWarning = writeResult === false || storageIsMemoryOnly();
     }
   }
 
