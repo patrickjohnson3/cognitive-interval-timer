@@ -1,6 +1,7 @@
 const childProcess = require("child_process");
 const fs = require("fs");
 const path = require("path");
+const appShell = require("../app-shell-assets.js");
 
 const ROOT = path.join(__dirname, "..");
 const outputArg = process.argv[2] || "_site";
@@ -49,3 +50,11 @@ trackedFiles()
     fs.mkdirSync(path.dirname(destination), { recursive: true });
     fs.copyFileSync(source, destination);
   });
+
+const missingAppShellAssets = appShell.APP_SHELL.filter((asset) => asset !== "./").filter(
+  (asset) => !fs.existsSync(path.join(OUTPUT_DIR, asset.replace(/^\.\//, "")))
+);
+
+if (missingAppShellAssets.length > 0) {
+  throw new Error("Missing app shell assets in Pages artifact: " + missingAppShellAssets.join(", "));
+}

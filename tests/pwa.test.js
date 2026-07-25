@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const appShell = require("../app-shell-assets.js");
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -29,25 +30,11 @@ function pngDimensions(file) {
 }
 
 function appShellAssets() {
-  const serviceWorker = readProjectFile("service-worker.js");
-  const matches = Array.from(
-    serviceWorker.matchAll(/const (?:REQUIRED_APP_SHELL|OPTIONAL_APP_SHELL) = \[([\s\S]*?)\];/g)
-  );
-  assert(matches.length === 2, "missing app-shell asset lists");
-  return matches.flatMap(function toAssets(match) {
-    return Array.from(match[1].matchAll(/"([^"]+)"/g)).map(function toAsset(entry) {
-      return entry[1];
-    });
-  });
+  return appShell.APP_SHELL;
 }
 
 function shellAssetGroup(name) {
-  const serviceWorker = readProjectFile("service-worker.js");
-  const match = serviceWorker.match(new RegExp("const " + name + " = \\[([\\s\\S]*?)\\];"));
-  assert(match, "missing " + name + " asset list");
-  return Array.from(match[1].matchAll(/"([^"]+)"/g)).map(function toAsset(entry) {
-    return entry[1];
-  });
+  return appShell[name];
 }
 
 test("index links PWA manifest and registration script", function () {
@@ -164,7 +151,7 @@ test("service worker caches the app shell", function () {
   ];
 
   expectedAssets.forEach(function eachAsset(asset) {
-    assert(serviceWorker.includes('"' + asset + '"'), "missing cached asset " + asset);
+    assert(appShellAssets().includes(asset), "missing cached asset " + asset);
   });
   assert(requiredAssets.includes("./app.js"), "runtime app code should be required");
   assert(

@@ -1,38 +1,12 @@
+if (typeof importScripts === "function") {
+  importScripts("./app-shell-assets.js");
+}
+
 const CACHE_PREFIX = "cognitive-interval-timer-";
 const CACHE_NAME = CACHE_PREFIX + "app-shell";
-const REQUIRED_APP_SHELL = [
-  "./",
-  "./index.html",
-  "./manifest.webmanifest",
-  "./themes/light.css",
-  "./themes/dark.css",
-  "./styles.css",
-  "./content.js",
-  "./core.js",
-  "./view-model.js",
-  "./ui-announce.js",
-  "./ui-render.js",
-  "./ui-controls.js",
-  "./storage.js",
-  "./audio.js",
-  "./haptics.js",
-  "./wake-lock.js",
-  "./display-mode.js",
-  "./timer-engine.js",
-  "./a11y.js",
-  "./app-controller.js",
-  "./app.js",
-  "./pwa-prompts.js",
-  "./pwa.js",
-];
-const OPTIONAL_APP_SHELL = [
-  "./assets/icons/apple-touch-icon.png",
-  "./assets/icons/icon-192.png",
-  "./assets/icons/icon-512.png",
-  "./assets/icons/maskable-192.png",
-  "./assets/icons/maskable-512.png",
-];
-const APP_SHELL = REQUIRED_APP_SHELL.concat(OPTIONAL_APP_SHELL);
+const REQUIRED_APP_SHELL = self.PomodoroAppShell.REQUIRED_APP_SHELL;
+const OPTIONAL_APP_SHELL = self.PomodoroAppShell.OPTIONAL_APP_SHELL;
+const APP_SHELL = self.PomodoroAppShell.APP_SHELL;
 
 function serviceWorkerBaseUrl() {
   if (self.registration && self.registration.scope) return self.registration.scope;

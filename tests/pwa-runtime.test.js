@@ -325,6 +325,9 @@ test("service worker deletes only this app's old caches", async function () {
     },
   };
 
+  vm.runInNewContext(readProjectFile("app-shell-assets.js"), context, {
+    filename: "app-shell-assets.js",
+  });
   vm.runInNewContext(readProjectFile("service-worker.js"), context, {
     filename: "service-worker.js",
   });
