@@ -44,6 +44,107 @@ function currentServiceWorkerCacheName() {
   return prefixMatch[1] + nameMatch[1];
 }
 
+function loadServiceWorkerRuntime(options) {
+  const config = options || {};
+  const listeners = {};
+  const cached = new Map(config.cached || []);
+  const cacheWrites = [];
+  const fetchCalls = [];
+  const context = {
+    Promise,
+    Response,
+    URL,
+    fetch: function fetch(request) {
+      fetchCalls.push(request.url || request);
+      if (config.fetchError) return Promise.reject(config.fetchError);
+      if (typeof config.fetchResponse === "function")
+        return Promise.resolve(config.fetchResponse(request));
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        type: "basic",
+        clone: function clone() {
+          return this;
+        },
+      });
+    },
+    caches: {
+      keys: function keys() {
+        return Promise.resolve([]);
+      },
+      delete: function deleteCache() {
+        return Promise.resolve(true);
+      },
+      match: function match(request) {
+        return Promise.resolve(cached.get(request.url || request) || null);
+      },
+      open: function openCache() {
+        return Promise.resolve({
+          addAll: function addAll() {
+            return Promise.resolve();
+          },
+          keys: function keys() {
+            return Promise.resolve([]);
+          },
+          put: function put(request, response) {
+            cacheWrites.push(request.url || request);
+            cached.set(request.url || request, response);
+            return Promise.resolve();
+          },
+          delete: function deleteRequest() {
+            return Promise.resolve(true);
+          },
+        });
+      },
+    },
+    self: {
+      clients: {
+        claim: function claim() {
+          return Promise.resolve();
+        },
+      },
+      addEventListener: function addEventListener(type, handler) {
+        listeners[type] = handler;
+      },
+      location: {
+        href: "https://example.test/service-worker.js",
+        origin: "https://example.test",
+      },
+      registration: {
+        scope: "https://example.test/",
+      },
+    },
+  };
+
+  vm.runInNewContext(readProjectFile("app-shell-assets.js"), context, {
+    filename: "app-shell-assets.js",
+  });
+  vm.runInNewContext(readProjectFile("service-worker.js"), context, {
+    filename: "service-worker.js",
+  });
+
+  return { cacheWrites, cached, fetchCalls, listeners };
+}
+
+function runFetch(runtime, request) {
+  let responsePromise = null;
+  const waitUntilPromises = [];
+  runtime.listeners.fetch({
+    request: Object.assign({ method: "GET", mode: "same-origin" }, request),
+    respondWith: function respondWith(promise) {
+      responsePromise = promise;
+    },
+    waitUntil: function waitUntil(promise) {
+      waitUntilPromises.push(promise);
+    },
+  });
+  return responsePromise.then(function waitForResponse(response) {
+    return Promise.all(waitUntilPromises).then(function returnResponse() {
+      return response;
+    });
+  });
+}
+
 function flushPromises() {
   return new Promise(function resolveSoon(resolve) {
     setTimeout(resolve, 0);
@@ -318,6 +419,50 @@ test("service worker deletes only this app's old caches", async function () {
   assert(!deletedCaches.includes(currentCache), "current app cache should not be deleted");
   assert(!deletedRequests.includes(expectedRequest.url), "expected app-shell request to be kept");
   assert(deletedRequests.includes(staleRequest.url), "expected stale current-cache entry to prune");
+});
+
+test("service worker runtime-caches only app-shell assets", async function () {
+  const runtime = loadServiceWorkerRuntime();
+
+  await runFetch(runtime, {
+    url: "https://example.test/app.js",
+  });
+  await runFetch(runtime, {
+    url: "https://example.test/notes.json",
+  });
+
+  assert(runtime.cacheWrites.includes("https://example.test/app.js"), "expected app shell cache");
+  assert(
+    !runtime.cacheWrites.includes("https://example.test/notes.json"),
+    "expected non-shell request to skip cache"
+  );
+});
+
+test("service worker falls back to cached shell for offline navigation", async function () {
+  const cachedShell = new Response("cached shell", { status: 200 });
+  const runtime = loadServiceWorkerRuntime({
+    fetchError: new Error("offline"),
+    cached: [[new URL("./index.html", "https://example.test/").href, cachedShell]],
+  });
+
+  const response = await runFetch(runtime, {
+    mode: "navigate",
+    url: "https://example.test/",
+  });
+
+  assert(response === cachedShell, "expected cached shell fallback");
+});
+
+test("service worker returns 503 for uncached offline assets", async function () {
+  const runtime = loadServiceWorkerRuntime({
+    fetchError: new Error("offline"),
+  });
+
+  const response = await runFetch(runtime, {
+    url: "https://example.test/app.js",
+  });
+
+  assert(response.status === 503, "expected offline asset 503 response");
 });
 
 if (!process.exitCode) {

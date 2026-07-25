@@ -212,60 +212,6 @@ test("every service worker app-shell asset exists locally", function () {
   assert(missing.length === 0, "missing app-shell assets: " + missing.join(", "));
 });
 
-test("service worker avoids cache-first navigation responses", function () {
-  const serviceWorker = readProjectFile("service-worker.js");
-
-  assert(
-    serviceWorker.includes('request.mode === "navigate"'),
-    "expected explicit navigation handling"
-  );
-  assert(
-    serviceWorker.includes("useFreshNavigation"),
-    "expected network-first navigation strategy"
-  );
-  assert(
-    serviceWorker.includes("!response.ok"),
-    "navigation caching should reject failed responses"
-  );
-  assert(
-    serviceWorker.includes("event.waitUntil("),
-    "fresh response cache writes should use event.waitUntil"
-  );
-  assert(
-    !serviceWorker.includes("cacheFirstForAppShell"),
-    "unexpected cache-first fetch handler name"
-  );
-  assert(serviceWorker.includes("useFreshAsset"), "expected network-first asset strategy");
-  assert(
-    !serviceWorker.includes("return cached || networkFetch"),
-    "unexpected stale-first asset strategy"
-  );
-});
-
-test("service worker only runtime-caches app-shell assets", function () {
-  const serviceWorker = readProjectFile("service-worker.js");
-
-  assert(serviceWorker.includes("function isAppShellRequest"), "missing app-shell request guard");
-  assert(
-    serviceWorker.includes("if (!isAppShellRequest(requestUrl))"),
-    "runtime asset caching should skip non-app-shell requests"
-  );
-});
-
-test("service worker returns a response for uncached offline assets", function () {
-  const serviceWorker = readProjectFile("service-worker.js");
-
-  assert(
-    serviceWorker.includes("Offline app shell unavailable."),
-    "missing uncached offline navigation fallback"
-  );
-  assert(
-    serviceWorker.includes("Offline asset unavailable."),
-    "missing uncached offline asset fallback"
-  );
-  assert(serviceWorker.includes("status: 503"), "expected explicit offline asset status");
-});
-
 test("PWA registration exposes a user-controlled update flow", function () {
   const pwa = readProjectFile("pwa.js");
   const prompts = readProjectFile("pwa-prompts.js");
