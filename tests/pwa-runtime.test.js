@@ -217,6 +217,21 @@ test("PWA update click tolerates a missing waiting worker", async function () {
   );
 });
 
+test("PWA update prompt renders in regular browser mode", async function () {
+  const registration = {
+    waiting: {
+      postMessage: function postMessage() {},
+    },
+    addEventListener: function addEventListener() {},
+  };
+  const runtime = loadPWA({ registration });
+
+  runtime.listeners["window:load"]();
+  await flushPromises();
+
+  assert(runtime.nodes["pwa-update"], "expected update prompt outside installed display mode");
+});
+
 test("PWA registration failure renders a visible status card", async function () {
   const runtime = loadPWA({
     registrationError: new Error("registration failed"),

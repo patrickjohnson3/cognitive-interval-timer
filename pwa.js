@@ -105,7 +105,6 @@
 
   function showUpdatePrompt(registration) {
     if (
-      !isInstalledDisplayMode() ||
       !registration ||
       !registration.waiting ||
       document.getElementById("pwa-update")
