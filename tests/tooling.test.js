@@ -75,6 +75,12 @@ test("Pages deployment stays gated by validation", function () {
     "CI validation should include the PWA offline smoke test"
   );
   assert(
+    ciSteps.some(function runsPagesArtifactSmoke(step) {
+      return step.run === "npm run test:pages:artifact";
+    }),
+    "CI validation should include the Pages artifact smoke test"
+  );
+  assert(
     deploySteps.some(function deploysPages(step) {
       return step.uses === "actions/deploy-pages@v4";
     }),
@@ -94,6 +100,10 @@ test("Validation wrapper runs project checks without npm", function () {
   assert(
     validate.includes("tests/pwa-offline-smoke.js"),
     "validate should run the PWA offline smoke test"
+  );
+  assert(
+    validate.includes("tests/pages-artifact-smoke.js"),
+    "validate should run the Pages artifact smoke test"
   );
 });
 

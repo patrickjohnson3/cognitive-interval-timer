@@ -30,6 +30,11 @@ const checks = [
     command: NODE,
     args: ["tests/pwa-offline-smoke.js"],
   },
+  {
+    name: "Pages artifact smoke",
+    command: NODE,
+    args: ["tests/pages-artifact-smoke.js"],
+  },
 ];
 
 function runCheck(check) {

@@ -4,7 +4,7 @@ const http = require("http");
 const os = require("os");
 const path = require("path");
 
-const ROOT = path.join(__dirname, "..");
+const ROOT = process.env.APP_ROOT || path.join(__dirname, "..");
 const CHROME_CANDIDATES = [
   "google-chrome",
   "google-chrome-stable",

@@ -32,3 +32,6 @@ jobs:
 
       - name: Test PWA offline behavior
         run: npm run test:pwa:offline
+
+      - name: Test Pages artifact offline behavior
+        run: npm run test:pages:artifact
