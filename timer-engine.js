@@ -6,7 +6,12 @@
   }
 })(typeof self !== "undefined" ? self : this, function makeTimerEngine() {
   function create(config) {
-    const resolveState = typeof config.state === "function" ? config.state : function getState() { return config.state; };
+    const resolveState =
+      typeof config.state === "function"
+        ? config.state
+        : function getState() {
+            return config.state;
+          };
     const Core = config.Core;
     const hooks = config.hooks;
     let intervalId = null;

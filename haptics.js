@@ -11,7 +11,8 @@
   };
 
   function createController(deps) {
-    const nav = (deps && deps.navigatorRef) || (typeof navigator !== "undefined" ? navigator : null);
+    const nav =
+      (deps && deps.navigatorRef) || (typeof navigator !== "undefined" ? navigator : null);
 
     function vibrate(pattern) {
       if (!nav || typeof nav.vibrate !== "function") return false;

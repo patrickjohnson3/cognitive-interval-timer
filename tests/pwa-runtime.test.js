@@ -167,15 +167,24 @@ test("PWA update prompt renders in settings slot and posts skip-waiting", async 
 
   const card = runtime.nodes["pwa-update"];
   const button = runtime.nodes["pwa-update-button"];
-  assert(runtime.bodyChildren.length === 0, "update prompt should not append a floating body button");
+  assert(
+    runtime.bodyChildren.length === 0,
+    "update prompt should not append a floating body button"
+  );
   assert(runtime.slot.hidden === false, "expected prompt slot to be visible");
   assert(card && card.className === "pwa-prompt-card", "expected update prompt card");
-  assert(card.children[0].textContent === "A newer version is ready.", "expected update prompt copy");
+  assert(
+    card.children[0].textContent === "A newer version is ready.",
+    "expected update prompt copy"
+  );
   assert(button && button.textContent === "Update", "expected update button");
 
   button.listeners.click();
   assert(button.disabled === true, "expected update button to disable after click");
-  assert(messages.length === 1 && messages[0].type === "SKIP_WAITING", "expected skip-waiting message");
+  assert(
+    messages.length === 1 && messages[0].type === "SKIP_WAITING",
+    "expected skip-waiting message"
+  );
 });
 
 test("PWA update click tolerates a missing waiting worker", async function () {
@@ -197,7 +206,10 @@ test("PWA update click tolerates a missing waiting worker", async function () {
   registration.waiting = null;
 
   runtime.nodes["pwa-update-button"].listeners.click();
-  assert(runtime.nodes["pwa-update-button"].disabled === false, "button should not disable without a waiting worker");
+  assert(
+    runtime.nodes["pwa-update-button"].disabled === false,
+    "button should not disable without a waiting worker"
+  );
 });
 
 test("service worker deletes only this app's old caches", async function () {
@@ -210,7 +222,11 @@ test("service worker deletes only this app's old caches", async function () {
     URL,
     caches: {
       keys: function keys() {
-        return Promise.resolve(["cognitive-interval-timer-old", "other-project-cache", currentCache]);
+        return Promise.resolve([
+          "cognitive-interval-timer-old",
+          "other-project-cache",
+          currentCache,
+        ]);
       },
       delete: function deleteCache(key) {
         deleted.push(key);
@@ -232,7 +248,9 @@ test("service worker deletes only this app's old caches", async function () {
     },
   };
 
-  vm.runInNewContext(readProjectFile("service-worker.js"), context, { filename: "service-worker.js" });
+  vm.runInNewContext(readProjectFile("service-worker.js"), context, {
+    filename: "service-worker.js",
+  });
 
   let activationPromise = null;
   listeners.activate({

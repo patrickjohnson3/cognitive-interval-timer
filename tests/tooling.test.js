@@ -26,8 +26,14 @@ test("Node version metadata stays aligned", function () {
   const lock = JSON.parse(read("package-lock.json"));
 
   assert(nodeVersion === "24.18.0", "unexpected .node-version");
-  assert(pkg.engines && pkg.engines.node === nodeVersion, "package engines.node should match .node-version");
-  assert(lock.packages[""].engines.node === nodeVersion, "lockfile root engines.node should match .node-version");
+  assert(
+    pkg.engines && pkg.engines.node === nodeVersion,
+    "package engines.node should match .node-version"
+  );
+  assert(
+    lock.packages[""].engines.node === nodeVersion,
+    "lockfile root engines.node should match .node-version"
+  );
 });
 
 if (!process.exitCode) {

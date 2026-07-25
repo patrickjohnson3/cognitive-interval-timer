@@ -282,7 +282,11 @@
       applyWakeLockSetting(appState.settings.wake_lock_enabled);
       applyMinimalMode(appState.settings.minimal_mode_enabled);
 
-      if (config.correctPrepPhase && !appState.settings.prep_enabled && appState.timer.phase === Core.PHASE.PREP) {
+      if (
+        config.correctPrepPhase &&
+        !appState.settings.prep_enabled &&
+        appState.timer.phase === Core.PHASE.PREP
+      ) {
         timer.resetToPhase(Core.PHASE.FOCUS);
         return true;
       }

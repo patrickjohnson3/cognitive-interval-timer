@@ -148,8 +148,14 @@ test("primary button shows Start before timer has started", function () {
   const render = UIRender.create(deps);
   const state = baseState();
   render.render(state);
-  assert(deps.dom.controls.start.textContent === "▶ Start", "expected Start label before first start");
-  assert(deps.dom.controls.start.attributes["aria-label"] === "Start timer", "expected Start aria label");
+  assert(
+    deps.dom.controls.start.textContent === "▶ Start",
+    "expected Start label before first start"
+  );
+  assert(
+    deps.dom.controls.start.attributes["aria-label"] === "Start timer",
+    "expected Start aria label"
+  );
 });
 
 test("hydrateTheme updates browser theme color", function () {
@@ -181,8 +187,14 @@ test("focus block badge shows Ready before timer has started", function () {
   const render = UIRender.create(deps);
   const state = baseState();
   render.render(state);
-  assert(deps.dom.focusBlockBadge.textContent === "Focus Block\nReady", "expected ready focus block label");
-  assert(deps.dom.focusBlockBadge.attributes["aria-label"] === "Focus Block Ready", "expected ready aria label");
+  assert(
+    deps.dom.focusBlockBadge.textContent === "Focus Block\nReady",
+    "expected ready focus block label"
+  );
+  assert(
+    deps.dom.focusBlockBadge.attributes["aria-label"] === "Focus Block Ready",
+    "expected ready aria label"
+  );
 });
 
 test("document title stays static before timer has started", function () {
@@ -190,7 +202,10 @@ test("document title stays static before timer has started", function () {
   const render = UIRender.create(deps);
   const state = baseState();
   render.render(state);
-  assert(document.title === "Cognitive Interval Timer", "expected static document title before first start");
+  assert(
+    document.title === "Cognitive Interval Timer",
+    "expected static document title before first start"
+  );
 });
 
 test("primary button shows Resume after timer is paused", function () {
@@ -200,7 +215,10 @@ test("primary button shows Resume after timer is paused", function () {
   state.timer.hasStartedOnce = true;
   render.render(state);
   assert(deps.dom.controls.start.textContent === "▶ Resume", "expected Resume label while paused");
-  assert(deps.dom.controls.start.attributes["aria-label"] === "Resume timer", "expected Resume aria label");
+  assert(
+    deps.dom.controls.start.attributes["aria-label"] === "Resume timer",
+    "expected Resume aria label"
+  );
 });
 
 test("focus block badge uses one-based display after timer has started", function () {
@@ -209,8 +227,14 @@ test("focus block badge uses one-based display after timer has started", functio
   const state = baseState();
   state.timer.hasStartedOnce = true;
   render.render(state);
-  assert(deps.dom.focusBlockBadge.textContent === "Focus Block 1", "expected first focus block label");
-  assert(deps.dom.focusBlockBadge.attributes["aria-label"] === "Focus Block 1", "expected first focus block aria label");
+  assert(
+    deps.dom.focusBlockBadge.textContent === "Focus Block 1",
+    "expected first focus block label"
+  );
+  assert(
+    deps.dom.focusBlockBadge.attributes["aria-label"] === "Focus Block 1",
+    "expected first focus block aria label"
+  );
 });
 
 test("primary button shows Pause while timer is running", function () {
@@ -221,7 +245,10 @@ test("primary button shows Pause while timer is running", function () {
   state.timer.hasStartedOnce = true;
   render.render(state);
   assert(deps.dom.controls.start.textContent === "⏸ Pause", "expected Pause label while running");
-  assert(deps.dom.controls.start.attributes["aria-label"] === "Pause timer", "expected Pause aria label");
+  assert(
+    deps.dom.controls.start.attributes["aria-label"] === "Pause timer",
+    "expected Pause aria label"
+  );
 });
 
 test("document title includes timer after timer has started", function () {

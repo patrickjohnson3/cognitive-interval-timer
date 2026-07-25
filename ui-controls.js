@@ -97,12 +97,14 @@
       window.addEventListener("click", function onWindowClick(event) {
         if (!document.documentElement.hasAttribute("data-minimal-mode")) return;
         if (event.button != null && event.button !== 0) return;
-        if (event.target && event.target.closest && event.target.closest("#minimal-exit-wrap")) return;
+        if (event.target && event.target.closest && event.target.closest("#minimal-exit-wrap"))
+          return;
         handlers.onShortcut("toggle");
       });
 
       document.addEventListener("fullscreenchange", function onFullscreenChange() {
-        if (handlers.onFullscreenChange) handlers.onFullscreenChange(Boolean(document.fullscreenElement));
+        if (handlers.onFullscreenChange)
+          handlers.onFullscreenChange(Boolean(document.fullscreenElement));
       });
     }
 

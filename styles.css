@@ -59,8 +59,10 @@ body {
   display: grid;
   align-items: start;
   justify-items: center;
-  padding: max(var(--space-4), env(safe-area-inset-top, 0px)) max(var(--space-4), env(safe-area-inset-right, 0px))
-    max(var(--space-4), env(safe-area-inset-bottom, 0px)) max(var(--space-4), env(safe-area-inset-left, 0px));
+  padding: max(var(--space-4), env(safe-area-inset-top, 0px))
+    max(var(--space-4), env(safe-area-inset-right, 0px))
+    max(var(--space-4), env(safe-area-inset-bottom, 0px))
+    max(var(--space-4), env(safe-area-inset-left, 0px));
   overflow-x: hidden;
 }
 
@@ -223,7 +225,10 @@ button {
   cursor: pointer;
   color: var(--color-text);
   background: var(--color-button);
-  transition: transform 120ms ease, background 160ms ease, box-shadow 160ms ease;
+  transition:
+    transform 120ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease;
 }
 
 button:hover {
@@ -439,7 +444,9 @@ label {
   box-shadow: var(--elevation-2);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 120ms ease, transform 120ms ease;
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
 }
 
 .tip-bubble--below {
@@ -627,7 +634,9 @@ select {
   font-size: 0.68rem;
   color: var(--text-tertiary, var(--sidebar-label-color));
   opacity: 0;
-  transition: opacity 140ms ease, color 140ms ease;
+  transition:
+    opacity 140ms ease,
+    color 140ms ease;
 }
 
 :root[data-minimal-mode="true"] .minimal-exit-wrap {
@@ -738,8 +747,10 @@ select {
 
   body {
     align-items: start;
-    padding: max(var(--space-2), env(safe-area-inset-top, 0px)) max(var(--space-3), env(safe-area-inset-right, 0px))
-      max(var(--space-2), env(safe-area-inset-bottom, 0px)) max(var(--space-3), env(safe-area-inset-left, 0px));
+    padding: max(var(--space-2), env(safe-area-inset-top, 0px))
+      max(var(--space-3), env(safe-area-inset-right, 0px))
+      max(var(--space-2), env(safe-area-inset-bottom, 0px))
+      max(var(--space-3), env(safe-area-inset-left, 0px));
   }
 
   .app {

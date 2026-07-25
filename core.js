@@ -5,16 +5,22 @@
     root.PomodoroCore = factory(root.PomodoroContent || {});
   }
 })(typeof self !== "undefined" ? self : this, function makeCore(Content) {
-  const phaseOrder = Array.isArray(Content.PHASE_ORDER) && Content.PHASE_ORDER.length > 0
-    ? Content.PHASE_ORDER.slice()
-    : ["prep", "focus", "recall", "break", "long_break"];
+  const phaseOrder =
+    Array.isArray(Content.PHASE_ORDER) && Content.PHASE_ORDER.length > 0
+      ? Content.PHASE_ORDER.slice()
+      : ["prep", "focus", "recall", "break", "long_break"];
 
   const PHASE_CONFIG = Content.PHASE_CONFIG || {
     prep: { displayName: "Prep", shortHint: "Prepare", longHint: "", durationKey: "prep" },
     focus: { displayName: "Focus", shortHint: "Focus", longHint: "", durationKey: "focus" },
     recall: { displayName: "Recall", shortHint: "Recall", longHint: "", durationKey: "recall" },
     break: { displayName: "Short Break", shortHint: "Break", longHint: "", durationKey: "break" },
-    long_break: { displayName: "Long Break", shortHint: "Long Break", longHint: "", durationKey: "long_break" },
+    long_break: {
+      displayName: "Long Break",
+      shortHint: "Long Break",
+      longHint: "",
+      durationKey: "long_break",
+    },
   };
 
   const PHASES = phaseOrder.filter(function keepPhase(key) {
@@ -81,7 +87,10 @@
   function normalizeSettings(source) {
     const input = source || {};
     const legacyAliases = {};
-    if (Object.prototype.hasOwnProperty.call(input, "prime") && !Object.prototype.hasOwnProperty.call(input, "prep")) {
+    if (
+      Object.prototype.hasOwnProperty.call(input, "prime") &&
+      !Object.prototype.hasOwnProperty.call(input, "prep")
+    ) {
       legacyAliases.prep = input.prime;
     }
     if (
@@ -97,16 +106,34 @@
       recall: clampInt(merged.recall, DEFAULT_SETTINGS.recall, 0, 30),
       break: clampInt(merged.break, DEFAULT_SETTINGS.break, 1, 60),
       long_break: clampInt(merged.long_break, DEFAULT_SETTINGS.long_break, 1, 90),
-      blocks_per_ultradian: clampInt(merged.blocks_per_ultradian, DEFAULT_SETTINGS.blocks_per_ultradian, 1, 8),
-      prep_enabled: typeof merged.prep_enabled === "boolean" ? merged.prep_enabled : DEFAULT_SETTINGS.prep_enabled,
-      auto_start: typeof merged.auto_start === "boolean" ? merged.auto_start : DEFAULT_SETTINGS.auto_start,
-      sound_enabled: typeof merged.sound_enabled === "boolean" ? merged.sound_enabled : DEFAULT_SETTINGS.sound_enabled,
+      blocks_per_ultradian: clampInt(
+        merged.blocks_per_ultradian,
+        DEFAULT_SETTINGS.blocks_per_ultradian,
+        1,
+        8
+      ),
+      prep_enabled:
+        typeof merged.prep_enabled === "boolean"
+          ? merged.prep_enabled
+          : DEFAULT_SETTINGS.prep_enabled,
+      auto_start:
+        typeof merged.auto_start === "boolean" ? merged.auto_start : DEFAULT_SETTINGS.auto_start,
+      sound_enabled:
+        typeof merged.sound_enabled === "boolean"
+          ? merged.sound_enabled
+          : DEFAULT_SETTINGS.sound_enabled,
       fullscreen_enabled:
-        typeof merged.fullscreen_enabled === "boolean" ? merged.fullscreen_enabled : DEFAULT_SETTINGS.fullscreen_enabled,
+        typeof merged.fullscreen_enabled === "boolean"
+          ? merged.fullscreen_enabled
+          : DEFAULT_SETTINGS.fullscreen_enabled,
       minimal_mode_enabled:
-        typeof merged.minimal_mode_enabled === "boolean" ? merged.minimal_mode_enabled : DEFAULT_SETTINGS.minimal_mode_enabled,
+        typeof merged.minimal_mode_enabled === "boolean"
+          ? merged.minimal_mode_enabled
+          : DEFAULT_SETTINGS.minimal_mode_enabled,
       wake_lock_enabled:
-        typeof merged.wake_lock_enabled === "boolean" ? merged.wake_lock_enabled : DEFAULT_SETTINGS.wake_lock_enabled,
+        typeof merged.wake_lock_enabled === "boolean"
+          ? merged.wake_lock_enabled
+          : DEFAULT_SETTINGS.wake_lock_enabled,
     };
   }
 
@@ -116,7 +143,10 @@
 
   function rolloverStats(stats, nowKey) {
     const today = nowKey || dateKey();
-    const next = Object.assign({ dateKey: today, focusBlocksToday: 0, focusBlocksSinceLong: 0 }, stats || {});
+    const next = Object.assign(
+      { dateKey: today, focusBlocksToday: 0, focusBlocksSinceLong: 0 },
+      stats || {}
+    );
     if (next.dateKey !== today) {
       next.dateKey = today;
       next.focusBlocksToday = 0;
@@ -150,7 +180,9 @@
     if (from === PHASE.PREP) return PHASE.FOCUS;
     if (from === PHASE.FOCUS) return PHASE.RECALL;
     if (from === PHASE.RECALL) {
-      return stats.focusBlocksSinceLong >= settings.blocks_per_ultradian ? PHASE.LONG_BREAK : PHASE.SHORT_BREAK;
+      return stats.focusBlocksSinceLong >= settings.blocks_per_ultradian
+        ? PHASE.LONG_BREAK
+        : PHASE.SHORT_BREAK;
     }
     if (from === PHASE.SHORT_BREAK || from === PHASE.LONG_BREAK) return PHASE.FOCUS;
     return initialPhase(settings);
@@ -170,7 +202,9 @@
 
   function stateLabel(phase) {
     const cfg = PHASE_CONFIG[phase];
-    return cfg && cfg.displayName ? cfg.displayName : phase.charAt(0).toUpperCase() + phase.slice(1);
+    return cfg && cfg.displayName
+      ? cfg.displayName
+      : phase.charAt(0).toUpperCase() + phase.slice(1);
   }
 
   function formatTime(seconds) {

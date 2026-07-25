@@ -1,248 +1,294 @@
 <!doctype html>
 <html lang="en" data-theme="dark">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Cognitive Interval Timer</title>
-  <meta id="theme-color-meta" name="theme-color" content="#0f172a" />
-  <meta name="description" content="A phase-based focus timer for deep work, recall, and real breaks." />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="CogTimer" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png" />
-  <link rel="stylesheet" href="themes/light.css" />
-  <link rel="stylesheet" href="themes/dark.css" />
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <main class="app" aria-label="Cognitive Interval Timer">
-    <header class="header">
-      <div>
-        <h1>Cognitive Interval Timer</h1>
-        <p class="subtitle" id="tagline"></p>
-      </div>
-      <div class="focus-block-wrap">
-        <span class="badge" id="focus-block-badge" aria-label="Focus Block Ready">Focus Block
-Ready</span>
-        <span class="tip-wrap" data-tooltip-key="focusBlockDefinition">
-          <button
-            type="button"
-            class="tip-trigger"
-            aria-describedby="focus-block-definition-tip"
-          >?</button>
-          <span class="tip-bubble tip-bubble--below tip-bubble--align-right" id="focus-block-definition-tip" role="tooltip">
-            <strong></strong>
-            <span></span>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Cognitive Interval Timer</title>
+    <meta id="theme-color-meta" name="theme-color" content="#0f172a" />
+    <meta
+      name="description"
+      content="A phase-based focus timer for deep work, recall, and real breaks."
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="CogTimer" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png" />
+    <link rel="stylesheet" href="themes/light.css" />
+    <link rel="stylesheet" href="themes/dark.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app" aria-label="Cognitive Interval Timer">
+      <header class="header">
+        <div>
+          <h1>Cognitive Interval Timer</h1>
+          <p class="subtitle" id="tagline"></p>
+        </div>
+        <div class="focus-block-wrap">
+          <span class="badge" id="focus-block-badge" aria-label="Focus Block Ready"
+            >Focus Block Ready</span
+          >
+          <span class="tip-wrap" data-tooltip-key="focusBlockDefinition">
+            <button type="button" class="tip-trigger" aria-describedby="focus-block-definition-tip">
+              ?
+            </button>
+            <span
+              class="tip-bubble tip-bubble--below tip-bubble--align-right"
+              id="focus-block-definition-tip"
+              role="tooltip"
+            >
+              <strong></strong>
+              <span></span>
+            </span>
           </span>
-        </span>
-      </div>
-    </header>
-
-    <section class="main">
-      <article class="panel" aria-label="Timer panel">
-        <p class="state" id="state">State</p>
-        <p class="time" id="time" role="timer" aria-live="off">00:00</p>
-        <p class="hint" id="hint"></p>
-        <p class="long-hint" id="long-hint"></p>
-
-        <div class="controls" aria-label="Timer controls">
-          <button id="start" type="button" class="primary" aria-label="Start timer">▶ Start</button>
-          <button id="skip" type="button">⏭ Next Phase</button>
-          <button id="reset" type="button">↺ Restart Block</button>
         </div>
+      </header>
 
-        <p class="shortcut-hint">Shortcuts: <kbd>Space</kbd> Start/Pause/Resume, <kbd>S</kbd> Next Phase, <kbd>R</kbd> Restart Block.</p>
+      <section class="main">
+        <article class="panel" aria-label="Timer panel">
+          <p class="state" id="state">State</p>
+          <p class="time" id="time" role="timer" aria-live="off">00:00</p>
+          <p class="hint" id="hint"></p>
+          <p class="long-hint" id="long-hint"></p>
 
-        <div class="stats" aria-label="Stats">
-          <div id="today">today: 0 focus blocks</div>
-          <div id="long">long break: 0 / 2</div>
-        </div>
-      </article>
-
-      <aside class="panel settings" aria-label="Settings panel">
-        <section class="settings-section" aria-label="Appearance section">
-          <h3>Appearance</h3>
-          <div class="settings-theme">
-            <label for="theme">Theme</label>
-            <select id="theme" aria-label="Theme selector">
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-            </select>
+          <div class="controls" aria-label="Timer controls">
+            <button id="start" type="button" class="primary" aria-label="Start timer">
+              ▶ Start
+            </button>
+            <button id="skip" type="button">⏭ Next Phase</button>
+            <button id="reset" type="button">↺ Restart Block</button>
           </div>
-        </section>
 
-        <div class="settings-divider" aria-hidden="true"></div>
+          <p class="shortcut-hint">
+            Shortcuts: <kbd>Space</kbd> Start/Pause/Resume, <kbd>S</kbd> Next Phase,
+            <kbd>R</kbd> Restart Block.
+          </p>
 
-        <section class="settings-section" aria-label="Behavior section">
-          <h3>Behavior</h3>
-          <div class="checks">
-            <label><input id="prep_enabled" type="checkbox" /> <span id="label-prep-enabled">Start With Prep Phase</span></label>
-            <label><input id="auto_start" type="checkbox" /> <span id="label-auto-start">Auto-Start Next Phase</span></label>
-            <label><input id="sound_enabled" type="checkbox" /> <span id="label-sound-enabled">Play Sound On Phase Change</span></label>
-            <label><input id="fullscreen_enabled" type="checkbox" /> <span id="label-fullscreen-enabled">Fullscreen</span></label>
-            <label><input id="minimal_mode_enabled" type="checkbox" /> <span id="label-minimal-mode-enabled">Minimal Mode</span></label>
-            <label><input id="wake_lock_enabled" type="checkbox" /> <span id="label-wake-lock-enabled">Keep Screen Awake</span></label>
+          <div class="stats" aria-label="Stats">
+            <div id="today">today: 0 focus blocks</div>
+            <div id="long">long break: 0 / 2</div>
           </div>
-        </section>
-        <div id="pwa-install-slot" class="pwa-install-slot" hidden></div>
+        </article>
 
-        <div class="settings-divider" aria-hidden="true"></div>
-
-        <section class="settings-section" aria-labelledby="label-phase-settings-heading">
-          <h3 id="label-phase-settings-heading">Cycle Structure</h3>
-          <div class="cycle-paired-grid">
-            <div class="cycle-col">
-              <h4 class="cycle-col-heading">Work</h4>
-
-              <label>
-                <span class="field-label">
-                  <span id="label-prep">Prep</span>
-                  <span class="tip-wrap" data-tooltip-key="prepDefault">
-                    <button
-                      type="button"
-                      class="tip-trigger"
-                      aria-describedby="prep-default-tip"
-                    >?</button>
-                    <span class="tip-bubble" id="prep-default-tip" role="tooltip">
-                      <strong></strong>
-                      <span></span>
-                    </span>
-                  </span>
-                </span>
-                <input id="prep" type="number" min="0" max="60" />
-              </label>
-              <label>
-                <span class="field-label">
-                  <span id="label-focus">Focus</span>
-                  <span class="tip-wrap" data-tooltip-key="focusDefault">
-                    <button
-                      type="button"
-                      class="tip-trigger"
-                      aria-describedby="focus-default-tip"
-                    >?</button>
-                    <span class="tip-bubble" id="focus-default-tip" role="tooltip">
-                      <strong></strong>
-                      <span></span>
-                    </span>
-                  </span>
-                </span>
-                <input id="focus" type="number" min="1" max="180" />
-              </label>
-              <label>
-                <span class="field-label">
-                  <span id="label-recall">Recall</span>
-                  <span class="tip-wrap" data-tooltip-key="recallDefault">
-                    <button
-                      type="button"
-                      class="tip-trigger"
-                      aria-describedby="recall-default-tip"
-                    >?</button>
-                    <span class="tip-bubble" id="recall-default-tip" role="tooltip">
-                      <strong></strong>
-                      <span></span>
-                    </span>
-                  </span>
-                </span>
-                <input id="recall" type="number" min="0" max="30" />
-              </label>
+        <aside class="panel settings" aria-label="Settings panel">
+          <section class="settings-section" aria-label="Appearance section">
+            <h3>Appearance</h3>
+            <div class="settings-theme">
+              <label for="theme">Theme</label>
+              <select id="theme" aria-label="Theme selector">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+              </select>
             </div>
+          </section>
 
-            <div class="cycle-col">
-              <h4 class="cycle-col-heading">Breaks</h4>
-
-              <label>
-                <span class="field-label">
-                  <span id="label-break">Short Break</span>
-                  <span class="tip-wrap" data-tooltip-key="shortBreakDefault">
-                    <button
-                      type="button"
-                      class="tip-trigger"
-                      aria-describedby="short-break-default-tip"
-                    >?</button>
-                    <span class="tip-bubble" id="short-break-default-tip" role="tooltip">
-                      <strong></strong>
-                      <span></span>
-                    </span>
-                  </span>
-                </span>
-                <input id="break" type="number" min="1" max="60" />
-              </label>
-              <label class="long-break-row">
-                <span class="field-label">
-                  <span id="label-long_break">Long Break</span>
-                  <span class="tip-wrap" data-tooltip-key="longBreakDefault">
-                    <button
-                      type="button"
-                      class="tip-trigger"
-                      aria-describedby="long-break-default-tip"
-                    >?</button>
-                    <span class="tip-bubble" id="long-break-default-tip" role="tooltip">
-                      <strong></strong>
-                      <span></span>
-                    </span>
-                  </span>
-                </span>
-                <input id="long_break" type="number" min="1" max="90" />
-              </label>
-              <label>
-                <span class="field-label">
-                  <span id="label-blocks">Focus Blocks Before Long Break</span>
-                  <span class="tip-wrap" data-tooltip-key="blocksDefault">
-                    <button
-                      type="button"
-                      class="tip-trigger"
-                      aria-describedby="blocks-default-tip"
-                    >?</button>
-                    <span class="tip-bubble" id="blocks-default-tip" role="tooltip">
-                      <strong></strong>
-                      <span></span>
-                    </span>
-                  </span>
-                </span>
-                <input id="blocks_per_ultradian" type="number" min="1" max="8" />
-              </label>
-            </div>
-          </div>
-        </section>
-
-        <div class="settings-actions-wrap">
           <div class="settings-divider" aria-hidden="true"></div>
-          <div class="actions">
-            <button id="save" type="button" class="primary">Save settings</button>
-            <button id="defaults" type="button">Restore defaults</button>
+
+          <section class="settings-section" aria-label="Behavior section">
+            <h3>Behavior</h3>
+            <div class="checks">
+              <label
+                ><input id="prep_enabled" type="checkbox" />
+                <span id="label-prep-enabled">Start With Prep Phase</span></label
+              >
+              <label
+                ><input id="auto_start" type="checkbox" />
+                <span id="label-auto-start">Auto-Start Next Phase</span></label
+              >
+              <label
+                ><input id="sound_enabled" type="checkbox" />
+                <span id="label-sound-enabled">Play Sound On Phase Change</span></label
+              >
+              <label
+                ><input id="fullscreen_enabled" type="checkbox" />
+                <span id="label-fullscreen-enabled">Fullscreen</span></label
+              >
+              <label
+                ><input id="minimal_mode_enabled" type="checkbox" />
+                <span id="label-minimal-mode-enabled">Minimal Mode</span></label
+              >
+              <label
+                ><input id="wake_lock_enabled" type="checkbox" />
+                <span id="label-wake-lock-enabled">Keep Screen Awake</span></label
+              >
+            </div>
+          </section>
+          <div id="pwa-install-slot" class="pwa-install-slot" hidden></div>
+
+          <div class="settings-divider" aria-hidden="true"></div>
+
+          <section class="settings-section" aria-labelledby="label-phase-settings-heading">
+            <h3 id="label-phase-settings-heading">Cycle Structure</h3>
+            <div class="cycle-paired-grid">
+              <div class="cycle-col">
+                <h4 class="cycle-col-heading">Work</h4>
+
+                <label>
+                  <span class="field-label">
+                    <span id="label-prep">Prep</span>
+                    <span class="tip-wrap" data-tooltip-key="prepDefault">
+                      <button type="button" class="tip-trigger" aria-describedby="prep-default-tip">
+                        ?
+                      </button>
+                      <span class="tip-bubble" id="prep-default-tip" role="tooltip">
+                        <strong></strong>
+                        <span></span>
+                      </span>
+                    </span>
+                  </span>
+                  <input id="prep" type="number" min="0" max="60" />
+                </label>
+                <label>
+                  <span class="field-label">
+                    <span id="label-focus">Focus</span>
+                    <span class="tip-wrap" data-tooltip-key="focusDefault">
+                      <button
+                        type="button"
+                        class="tip-trigger"
+                        aria-describedby="focus-default-tip"
+                      >
+                        ?
+                      </button>
+                      <span class="tip-bubble" id="focus-default-tip" role="tooltip">
+                        <strong></strong>
+                        <span></span>
+                      </span>
+                    </span>
+                  </span>
+                  <input id="focus" type="number" min="1" max="180" />
+                </label>
+                <label>
+                  <span class="field-label">
+                    <span id="label-recall">Recall</span>
+                    <span class="tip-wrap" data-tooltip-key="recallDefault">
+                      <button
+                        type="button"
+                        class="tip-trigger"
+                        aria-describedby="recall-default-tip"
+                      >
+                        ?
+                      </button>
+                      <span class="tip-bubble" id="recall-default-tip" role="tooltip">
+                        <strong></strong>
+                        <span></span>
+                      </span>
+                    </span>
+                  </span>
+                  <input id="recall" type="number" min="0" max="30" />
+                </label>
+              </div>
+
+              <div class="cycle-col">
+                <h4 class="cycle-col-heading">Breaks</h4>
+
+                <label>
+                  <span class="field-label">
+                    <span id="label-break">Short Break</span>
+                    <span class="tip-wrap" data-tooltip-key="shortBreakDefault">
+                      <button
+                        type="button"
+                        class="tip-trigger"
+                        aria-describedby="short-break-default-tip"
+                      >
+                        ?
+                      </button>
+                      <span class="tip-bubble" id="short-break-default-tip" role="tooltip">
+                        <strong></strong>
+                        <span></span>
+                      </span>
+                    </span>
+                  </span>
+                  <input id="break" type="number" min="1" max="60" />
+                </label>
+                <label class="long-break-row">
+                  <span class="field-label">
+                    <span id="label-long_break">Long Break</span>
+                    <span class="tip-wrap" data-tooltip-key="longBreakDefault">
+                      <button
+                        type="button"
+                        class="tip-trigger"
+                        aria-describedby="long-break-default-tip"
+                      >
+                        ?
+                      </button>
+                      <span class="tip-bubble" id="long-break-default-tip" role="tooltip">
+                        <strong></strong>
+                        <span></span>
+                      </span>
+                    </span>
+                  </span>
+                  <input id="long_break" type="number" min="1" max="90" />
+                </label>
+                <label>
+                  <span class="field-label">
+                    <span id="label-blocks">Focus Blocks Before Long Break</span>
+                    <span class="tip-wrap" data-tooltip-key="blocksDefault">
+                      <button
+                        type="button"
+                        class="tip-trigger"
+                        aria-describedby="blocks-default-tip"
+                      >
+                        ?
+                      </button>
+                      <span class="tip-bubble" id="blocks-default-tip" role="tooltip">
+                        <strong></strong>
+                        <span></span>
+                      </span>
+                    </span>
+                  </span>
+                  <input id="blocks_per_ultradian" type="number" min="1" max="8" />
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <div class="settings-actions-wrap">
+            <div class="settings-divider" aria-hidden="true"></div>
+            <div class="actions">
+              <button id="save" type="button" class="primary">Save settings</button>
+              <button id="defaults" type="button">Restore defaults</button>
+            </div>
           </div>
-        </div>
-        <div class="settings-state" id="dirty-indicator" aria-live="polite"></div>
-        <div class="session-note" id="session-note" aria-live="polite"></div>
-        <div class="ok" id="save-msg" aria-live="polite"></div>
-      </aside>
-    </section>
-  </main>
+          <div class="settings-state" id="dirty-indicator" aria-live="polite"></div>
+          <div class="session-note" id="session-note" aria-live="polite"></div>
+          <div class="ok" id="save-msg" aria-live="polite"></div>
+        </aside>
+      </section>
+    </main>
 
-  <div id="live-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
-  <div id="minimal-exit-wrap" class="minimal-exit-wrap">
-    <button id="minimal-exit-reveal" type="button" class="minimal-exit-reveal" aria-label="Show minimal mode controls">•</button>
-    <div class="minimal-exit-panel">
-      <button id="exit-minimal-mode" type="button" class="minimal-exit-btn">Exit Minimal Mode</button>
+    <div id="live-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+    <div id="minimal-exit-wrap" class="minimal-exit-wrap">
+      <button
+        id="minimal-exit-reveal"
+        type="button"
+        class="minimal-exit-reveal"
+        aria-label="Show minimal mode controls"
+      >
+        •
+      </button>
+      <div class="minimal-exit-panel">
+        <button id="exit-minimal-mode" type="button" class="minimal-exit-btn">
+          Exit Minimal Mode
+        </button>
+      </div>
     </div>
-  </div>
 
-  <script src="content.js"></script>
-  <script src="core.js"></script>
-  <script src="view-model.js"></script>
-  <script src="ui-announce.js"></script>
-  <script src="ui-render.js"></script>
-  <script src="ui-controls.js"></script>
-  <script src="storage.js"></script>
-  <script src="audio.js"></script>
-  <script src="haptics.js"></script>
-  <script src="wake-lock.js"></script>
-  <script src="display-mode.js"></script>
-  <script src="timer-engine.js"></script>
-  <script src="a11y.js"></script>
-  <script src="app-controller.js"></script>
-  <script src="app.js"></script>
-  <script src="pwa.js"></script>
-</body>
+    <script src="content.js"></script>
+    <script src="core.js"></script>
+    <script src="view-model.js"></script>
+    <script src="ui-announce.js"></script>
+    <script src="ui-render.js"></script>
+    <script src="ui-controls.js"></script>
+    <script src="storage.js"></script>
+    <script src="audio.js"></script>
+    <script src="haptics.js"></script>
+    <script src="wake-lock.js"></script>
+    <script src="display-mode.js"></script>
+    <script src="timer-engine.js"></script>
+    <script src="a11y.js"></script>
+    <script src="app-controller.js"></script>
+    <script src="app.js"></script>
+    <script src="pwa.js"></script>
+  </body>
 </html>

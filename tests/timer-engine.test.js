@@ -21,7 +21,11 @@ function createTimerContext() {
   const phaseChanges = [];
   const state = {
     settings: Core.normalizeSettings({ prep_enabled: true }),
-    stats: Core.normalizeStats({ dateKey: Core.dateKey(), focusBlocksToday: 0, focusBlocksSinceLong: 0 }),
+    stats: Core.normalizeStats({
+      dateKey: Core.dateKey(),
+      focusBlocksToday: 0,
+      focusBlocksSinceLong: 0,
+    }),
     timer: {
       running: true,
       phase: Core.PHASE.FOCUS,

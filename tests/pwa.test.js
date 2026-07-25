@@ -30,7 +30,9 @@ function pngDimensions(file) {
 
 function appShellAssets() {
   const serviceWorker = readProjectFile("service-worker.js");
-  const matches = Array.from(serviceWorker.matchAll(/const (?:REQUIRED_APP_SHELL|OPTIONAL_APP_SHELL) = \[([\s\S]*?)\];/g));
+  const matches = Array.from(
+    serviceWorker.matchAll(/const (?:REQUIRED_APP_SHELL|OPTIONAL_APP_SHELL) = \[([\s\S]*?)\];/g)
+  );
   assert(matches.length === 2, "missing app-shell asset lists");
   return matches.flatMap(function toAssets(match) {
     return Array.from(match[1].matchAll(/"([^"]+)"/g)).map(function toAsset(entry) {
@@ -51,8 +53,14 @@ function shellAssetGroup(name) {
 test("index links PWA manifest and registration script", function () {
   const html = readProjectFile("index.html");
 
-  assert(html.includes('<link rel="manifest" href="manifest.webmanifest" />'), "missing manifest link");
-  assert(html.includes('<meta id="theme-color-meta" name="theme-color"'), "missing dynamic theme-color meta");
+  assert(
+    html.includes('<link rel="manifest" href="manifest.webmanifest" />'),
+    "missing manifest link"
+  );
+  assert(
+    html.includes('<meta id="theme-color-meta" name="theme-color"'),
+    "missing dynamic theme-color meta"
+  );
   assert(html.includes('<script src="pwa.js"></script>'), "missing PWA registration script");
 });
 
@@ -65,18 +73,27 @@ test("index links a dedicated 180px Apple touch icon", function () {
     html.includes('<link rel="apple-touch-icon" sizes="180x180" href="' + iconPath + '" />'),
     "missing dedicated Apple touch icon link"
   );
-  assert(dimensions.width === 180 && dimensions.height === 180, "expected 180x180 Apple touch icon");
+  assert(
+    dimensions.width === 180 && dimensions.height === 180,
+    "expected 180x180 Apple touch icon"
+  );
 });
 
 test("index includes iOS standalone PWA metadata", function () {
   const html = readProjectFile("index.html");
 
-  assert(html.includes('<meta name="apple-mobile-web-app-capable" content="yes" />'), "missing iOS capable meta");
+  assert(
+    html.includes('<meta name="apple-mobile-web-app-capable" content="yes" />'),
+    "missing iOS capable meta"
+  );
   assert(
     html.includes('<meta name="apple-mobile-web-app-title" content="CogTimer" />'),
     "iOS app title should match manifest short_name"
   );
-  assert(html.includes('<meta name="apple-mobile-web-app-status-bar-style"'), "missing iOS status bar meta");
+  assert(
+    html.includes('<meta name="apple-mobile-web-app-status-bar-style"'),
+    "missing iOS status bar meta"
+  );
 });
 
 test("app shell does not depend on external runtime assets", function () {
@@ -94,14 +111,20 @@ test("manifest has installable app metadata and icons", function () {
   assert(manifest.display === "standalone", "expected standalone display mode");
   assert(manifest.start_url === "/cognitive-interval-timer/", "expected absolute start_url");
   assert(manifest.scope === "/cognitive-interval-timer/", "expected absolute scope");
-  assert(!Object.prototype.hasOwnProperty.call(manifest, "orientation"), "manifest should not lock PWA orientation");
+  assert(
+    !Object.prototype.hasOwnProperty.call(manifest, "orientation"),
+    "manifest should not lock PWA orientation"
+  );
   assert(Array.isArray(manifest.icons) && manifest.icons.length >= 2, "expected manifest icons");
   manifest.icons.forEach(function eachIcon(icon) {
     assert(fs.existsSync(path.join(__dirname, "..", icon.src)), "missing icon file " + icon.src);
     assert(icon.type === "image/png", "expected png icon " + icon.src);
     const dimensions = pngDimensions(icon.src);
     const declaredSize = Number(icon.sizes.split("x")[0]);
-    assert(dimensions.width === declaredSize && dimensions.height === declaredSize, "icon size mismatch " + icon.src);
+    assert(
+      dimensions.width === declaredSize && dimensions.height === declaredSize,
+      "icon size mismatch " + icon.src
+    );
   });
 });
 
@@ -139,26 +162,41 @@ test("service worker caches the app shell", function () {
     assert(serviceWorker.includes('"' + asset + '"'), "missing cached asset " + asset);
   });
   assert(requiredAssets.includes("./app.js"), "runtime app code should be required");
-  assert(optionalAssets.includes("./assets/icons/icon-512.png"), "icons should be optional cache assets");
+  assert(
+    optionalAssets.includes("./assets/icons/icon-512.png"),
+    "icons should be optional cache assets"
+  );
   assert(serviceWorker.includes("cacheOptionalAsset"), "missing optional asset cache helper");
-  assert(serviceWorker.includes("cache.addAll(REQUIRED_APP_SHELL)"), "required shell should remain strict");
+  assert(
+    serviceWorker.includes("cache.addAll(REQUIRED_APP_SHELL)"),
+    "required shell should remain strict"
+  );
 });
 
 test("service worker uses a stable app-scoped cache name", function () {
   const serviceWorker = readProjectFile("service-worker.js");
 
-  assert(serviceWorker.includes('const CACHE_PREFIX = "cognitive-interval-timer-";'), "missing app-specific cache prefix");
+  assert(
+    serviceWorker.includes('const CACHE_PREFIX = "cognitive-interval-timer-";'),
+    "missing app-specific cache prefix"
+  );
   assert(
     serviceWorker.includes('const CACHE_NAME = CACHE_PREFIX + "app-shell";'),
     "cache name should be stable and app-scoped"
   );
-  assert(!serviceWorker.includes("APP_VERSION"), "service worker should not require manual version bumps");
+  assert(
+    !serviceWorker.includes("APP_VERSION"),
+    "service worker should not require manual version bumps"
+  );
 });
 
 test("service worker only deletes this app's old caches", function () {
   const serviceWorker = readProjectFile("service-worker.js");
 
-  assert(serviceWorker.includes("key.startsWith(CACHE_PREFIX)"), "old-cache cleanup should be scoped to app prefix");
+  assert(
+    serviceWorker.includes("key.startsWith(CACHE_PREFIX)"),
+    "old-cache cleanup should be scoped to app prefix"
+  );
 });
 
 test("every service worker app-shell asset exists locally", function () {
@@ -176,20 +214,44 @@ test("every service worker app-shell asset exists locally", function () {
 test("service worker avoids cache-first navigation responses", function () {
   const serviceWorker = readProjectFile("service-worker.js");
 
-  assert(serviceWorker.includes('request.mode === "navigate"'), "expected explicit navigation handling");
-  assert(serviceWorker.includes("useFreshNavigation"), "expected network-first navigation strategy");
-  assert(serviceWorker.includes("!response.ok"), "navigation caching should reject failed responses");
-  assert(serviceWorker.includes("event.waitUntil("), "fresh response cache writes should use event.waitUntil");
-  assert(!serviceWorker.includes("cacheFirstForAppShell"), "unexpected cache-first fetch handler name");
+  assert(
+    serviceWorker.includes('request.mode === "navigate"'),
+    "expected explicit navigation handling"
+  );
+  assert(
+    serviceWorker.includes("useFreshNavigation"),
+    "expected network-first navigation strategy"
+  );
+  assert(
+    serviceWorker.includes("!response.ok"),
+    "navigation caching should reject failed responses"
+  );
+  assert(
+    serviceWorker.includes("event.waitUntil("),
+    "fresh response cache writes should use event.waitUntil"
+  );
+  assert(
+    !serviceWorker.includes("cacheFirstForAppShell"),
+    "unexpected cache-first fetch handler name"
+  );
   assert(serviceWorker.includes("useFreshAsset"), "expected network-first asset strategy");
-  assert(!serviceWorker.includes("return cached || networkFetch"), "unexpected stale-first asset strategy");
+  assert(
+    !serviceWorker.includes("return cached || networkFetch"),
+    "unexpected stale-first asset strategy"
+  );
 });
 
 test("service worker returns a response for uncached offline assets", function () {
   const serviceWorker = readProjectFile("service-worker.js");
 
-  assert(serviceWorker.includes("Offline app shell unavailable."), "missing uncached offline navigation fallback");
-  assert(serviceWorker.includes("Offline asset unavailable."), "missing uncached offline asset fallback");
+  assert(
+    serviceWorker.includes("Offline app shell unavailable."),
+    "missing uncached offline navigation fallback"
+  );
+  assert(
+    serviceWorker.includes("Offline asset unavailable."),
+    "missing uncached offline asset fallback"
+  );
   assert(serviceWorker.includes("status: 503"), "expected explicit offline asset status");
 });
 
@@ -199,8 +261,14 @@ test("PWA registration exposes a user-controlled update flow", function () {
   const css = readProjectFile("styles.css");
 
   assert(pwa.includes("pwa-update-button"), "missing update prompt button");
-  assert(pwa.includes('createPromptCard("pwa-update"'), "update prompt should render as a settings card");
-  assert(!css.includes("#pwa-update {\n  position: fixed;"), "update prompt should not use fixed floating styles");
+  assert(
+    pwa.includes('createPromptCard("pwa-update"'),
+    "update prompt should render as a settings card"
+  );
+  assert(
+    !css.includes("#pwa-update {\n  position: fixed;"),
+    "update prompt should not use fixed floating styles"
+  );
   assert(pwa.includes("isInstalledDisplayMode"), "missing installed-mode update guard");
   assert(pwa.includes("(display-mode: standalone)"), "missing standalone display-mode check");
   assert(pwa.includes("(display-mode: fullscreen)"), "missing fullscreen display-mode check");
@@ -208,7 +276,10 @@ test("PWA registration exposes a user-controlled update flow", function () {
   assert(pwa.includes("controllerchange"), "missing reload-after-update handler");
   assert(pwa.includes("SKIP_WAITING"), "missing skip-waiting message from page");
   assert(serviceWorker.includes("SKIP_WAITING"), "missing skip-waiting message handler");
-  assert(!serviceWorker.includes("self.skipWaiting();\n});\n\nself.addEventListener(\"activate\""), "install should not force skipWaiting");
+  assert(
+    !serviceWorker.includes('self.skipWaiting();\n});\n\nself.addEventListener("activate"'),
+    "install should not force skipWaiting"
+  );
 });
 
 test("PWA registration handles browser install prompt", function () {
@@ -227,6 +298,12 @@ test("PWA registration handles browser install prompt", function () {
   assert(pwa.includes("deferredInstallPrompt"), "missing deferred install prompt state");
   assert(pwa.includes("appinstalled"), "missing installed cleanup handler");
   assert(css.includes(".pwa-prompt-card"), "missing shared prompt card styles");
-  assert(!pwa.includes("pwa-install-card"), "shared PWA prompt class should not be install-specific");
-  assert(!css.includes("#pwa-install,\n#pwa-update"), "install prompt should not share fixed update styling");
+  assert(
+    !pwa.includes("pwa-install-card"),
+    "shared PWA prompt class should not be install-specific"
+  );
+  assert(
+    !css.includes("#pwa-install,\n#pwa-update"),
+    "install prompt should not share fixed update styling"
+  );
 });

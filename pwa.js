@@ -20,16 +20,26 @@
   }
 
   function isInstalledDisplayMode() {
-    const installedDisplayModeQueries = ["(display-mode: standalone)", "(display-mode: fullscreen)", "(display-mode: minimal-ui)"];
-    return Boolean(navigator.standalone) || installedDisplayModeQueries.some(function hasDisplayMode(query) {
-      return window.matchMedia(query).matches;
-    });
+    const installedDisplayModeQueries = [
+      "(display-mode: standalone)",
+      "(display-mode: fullscreen)",
+      "(display-mode: minimal-ui)",
+    ];
+    return (
+      Boolean(navigator.standalone) ||
+      installedDisplayModeQueries.some(function hasDisplayMode(query) {
+        return window.matchMedia(query).matches;
+      })
+    );
   }
 
   function isIOSBrowser() {
     const platform = navigator.platform || "";
     const userAgent = navigator.userAgent || "";
-    return /iPad|iPhone|iPod/.test(userAgent) || (platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    return (
+      /iPad|iPhone|iPod/.test(userAgent) ||
+      (platform === "MacIntel" && navigator.maxTouchPoints > 1)
+    );
   }
 
   function createPromptCard(id, copyText) {
@@ -72,17 +82,26 @@
   }
 
   function showIOSInstallGuidance() {
-    if (!isIOSBrowser() || isInstalledDisplayMode() || document.getElementById("pwa-install")) return;
+    if (!isIOSBrowser() || isInstalledDisplayMode() || document.getElementById("pwa-install"))
+      return;
 
     const slot = getInstallSlot();
     if (!slot) return;
 
     slot.hidden = false;
-    slot.appendChild(createPromptCard("pwa-install", "To install on iOS, tap Share, then Add to Home Screen."));
+    slot.appendChild(
+      createPromptCard("pwa-install", "To install on iOS, tap Share, then Add to Home Screen.")
+    );
   }
 
   function showUpdatePrompt(registration) {
-    if (!isInstalledDisplayMode() || !registration || !registration.waiting || document.getElementById("pwa-update")) return;
+    if (
+      !isInstalledDisplayMode() ||
+      !registration ||
+      !registration.waiting ||
+      document.getElementById("pwa-update")
+    )
+      return;
 
     const slot = getInstallSlot();
     if (!slot) return;

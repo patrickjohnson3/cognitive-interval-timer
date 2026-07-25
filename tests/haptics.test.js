@@ -29,7 +29,10 @@ test("haptic controller uses short mobile vibration patterns", function () {
   assert(haptics.tap() === true, "expected tap vibration to report success");
   assert(haptics.phaseChange() === true, "expected phase vibration to report success");
   assert(calls[0] === Haptics.PATTERNS.tap, "expected tap pattern");
-  assert(JSON.stringify(calls[1]) === JSON.stringify(Haptics.PATTERNS.phase), "expected phase pattern");
+  assert(
+    JSON.stringify(calls[1]) === JSON.stringify(Haptics.PATTERNS.phase),
+    "expected phase pattern"
+  );
 });
 
 test("haptic controller no-ops when vibration is unsupported", function () {

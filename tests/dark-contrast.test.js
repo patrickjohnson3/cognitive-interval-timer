@@ -28,7 +28,10 @@ test("dark contrast ratios meet minimum thresholds for key pairs", function () {
   pairs.forEach((pair) => {
     const ratio = contrastRatio(dark[pair.fg], dark[pair.bg]);
     assert(ratio != null, `unable to calculate contrast for ${pair.fg}/${pair.bg}`);
-    assert(ratio >= pair.min, `${pair.fg} vs ${pair.bg} contrast ${ratio.toFixed(2)} < ${pair.min}`);
+    assert(
+      ratio >= pair.min,
+      `${pair.fg} vs ${pair.bg} contrast ${ratio.toFixed(2)} < ${pair.min}`
+    );
   });
 });
 

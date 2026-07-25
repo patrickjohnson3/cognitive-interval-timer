@@ -24,7 +24,10 @@ test("theme base text/background colors match expected values", function () {
   assert(themes.light["--color-border"] === "#e4e7eb", "light border must be #e4e7eb");
   assert(themes.light["--color-accent"] === "#2563eb", "light focus accent must be #2563eb");
   assert(themes.light["--color-break-accent"] === "#16a34a", "light break accent must be #16a34a");
-  assert(themes.light["--color-recall-accent"] === "#7c3aed", "light recall accent must be #7c3aed");
+  assert(
+    themes.light["--color-recall-accent"] === "#7c3aed",
+    "light recall accent must be #7c3aed"
+  );
   assert(themes.dark["--color-bg"] === "#0f172a", "dark background must be #0f172a");
   assert(themes.dark["--color-surface"] === "#1e293b", "dark surface must be #1e293b");
   assert(themes.dark["--color-text"] === "#e5e7eb", "dark text must be #e5e7eb");
@@ -32,8 +35,14 @@ test("theme base text/background colors match expected values", function () {
   assert(themes.dark["--color-border"] === "#334155", "dark border must be #334155");
   assert(themes.dark["--color-accent"] === "#3b82f6", "dark focus accent must be #3b82f6");
   assert(themes.dark["--color-recall-accent"] === "#8b5cf6", "dark recall accent must be #8b5cf6");
-  assert(themes.dark["--color-break-accent"] === "#22c55e", "dark short break accent must be #22c55e");
-  assert(themes.dark["--color-long-break-accent"] === "#d97706", "dark long break accent must be #d97706");
+  assert(
+    themes.dark["--color-break-accent"] === "#22c55e",
+    "dark short break accent must be #22c55e"
+  );
+  assert(
+    themes.dark["--color-long-break-accent"] === "#d97706",
+    "dark long break accent must be #d97706"
+  );
 });
 
 if (!process.exitCode) {

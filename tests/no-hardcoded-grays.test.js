@@ -28,7 +28,12 @@ test("no hardcoded hex grays outside theme token declarations", function () {
   const light = fs.readFileSync(path.join(__dirname, "..", "themes", "light.css"), "utf8");
   const dark = fs.readFileSync(path.join(__dirname, "..", "themes", "dark.css"), "utf8");
 
-  const merged = stripThemeTokenBlocks(styles) + "\n" + stripThemeTokenBlocks(light) + "\n" + stripThemeTokenBlocks(dark);
+  const merged =
+    stripThemeTokenBlocks(styles) +
+    "\n" +
+    stripThemeTokenBlocks(light) +
+    "\n" +
+    stripThemeTokenBlocks(dark);
   const matches = merged.match(/#[0-9a-fA-F]{6}/g) || [];
   assert(matches.length === 0, "found hardcoded hex colors: " + matches.join(", "));
 });

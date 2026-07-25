@@ -111,7 +111,10 @@ self.addEventListener("fetch", function handleFetch(event) {
         })
         .catch(function fallBackToCachedShell() {
           return caches.match("./index.html").then(function useCachedShell(cached) {
-            return cached || new Response("Offline app shell unavailable.", { status: 503, statusText: "Offline" });
+            return (
+              cached ||
+              new Response("Offline app shell unavailable.", { status: 503, statusText: "Offline" })
+            );
           });
         })
     );
@@ -135,7 +138,10 @@ self.addEventListener("fetch", function handleFetch(event) {
       })
       .catch(function fallBackToCachedAsset() {
         return caches.match(request).then(function useCachedAsset(cached) {
-          return cached || new Response("Offline asset unavailable.", { status: 503, statusText: "Offline" });
+          return (
+            cached ||
+            new Response("Offline asset unavailable.", { status: 503, statusText: "Offline" })
+          );
         });
       })
   );

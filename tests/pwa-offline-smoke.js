@@ -104,7 +104,12 @@ function createCDP(wsUrl) {
 
   return new Promise(function waitForOpen(resolve, reject) {
     socket.addEventListener("open", function onOpen() {
-      resolve({ send, close: function close() { socket.close(); } });
+      resolve({
+        send,
+        close: function close() {
+          socket.close();
+        },
+      });
     });
     socket.addEventListener("error", function onError() {
       reject(new Error("Failed to connect to Chrome DevTools"));
@@ -135,7 +140,9 @@ async function main() {
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), "pwa-smoke-"));
   const launched = await launchChrome(appUrl, userDataDir);
   const chrome = launched.chrome;
-  const debugBaseUrl = launched.devToolsUrl.replace(/^ws:/, "http:").replace(/\/devtools\/browser\/.*$/, "");
+  const debugBaseUrl = launched.devToolsUrl
+    .replace(/^ws:/, "http:")
+    .replace(/\/devtools\/browser\/.*$/, "");
   const targets = await httpJSON(debugBaseUrl + "/json/list");
   const page = targets.find(function isPage(target) {
     return target.type === "page";
@@ -169,7 +176,8 @@ async function main() {
       setTimeout(resolve, 1000);
     });
     const result = await client.send("Runtime.evaluate", {
-      expression: "Boolean(document.querySelector('.app')) && document.title === 'Cognitive Interval Timer'",
+      expression:
+        "Boolean(document.querySelector('.app')) && document.title === 'Cognitive Interval Timer'",
       returnByValue: true,
     });
 

@@ -215,7 +215,16 @@ function setup(options) {
   });
 
   app.controller.initialize();
-  return { app, boundHandlers, dom, fullscreenRequests, stored, timerCalls, wakeLockCalls, hapticCalls };
+  return {
+    app,
+    boundHandlers,
+    dom,
+    fullscreenRequests,
+    stored,
+    timerCalls,
+    wakeLockCalls,
+    hapticCalls,
+  };
 }
 
 test("primary action starts before timer has started", function () {
@@ -257,7 +266,10 @@ test("fullscreen toggle enables keep screen awake", function () {
   const ctx = setup();
   ctx.boundHandlers.onFullscreenToggle(true);
 
-  assert(ctx.dom.fields.wake_lock_enabled.checked === true, "expected wake lock checkbox to be checked");
+  assert(
+    ctx.dom.fields.wake_lock_enabled.checked === true,
+    "expected wake lock checkbox to be checked"
+  );
   assert(ctx.wakeLockCalls.includes(true), "expected wake lock to be requested");
 });
 
@@ -288,8 +300,14 @@ test("fullscreen rejection clears fullscreen field", async function () {
   ctx.dom.fields.fullscreen_enabled.checked = true;
   await ctx.boundHandlers.onFullscreenToggle(true);
 
-  assert(ctx.dom.fields.fullscreen_enabled.checked === false, "expected fullscreen checkbox to clear");
-  assert(ctx.app.state.ui.settingsDirty === true, "expected auto-enabled wake lock to remain unsaved");
+  assert(
+    ctx.dom.fields.fullscreen_enabled.checked === false,
+    "expected fullscreen checkbox to clear"
+  );
+  assert(
+    ctx.app.state.ui.settingsDirty === true,
+    "expected auto-enabled wake lock to remain unsaved"
+  );
 });
 
 test("saved fullscreen is cleared when fullscreen request fails on startup", async function () {
@@ -300,15 +318,24 @@ test("saved fullscreen is cleared when fullscreen request fails on startup", asy
 
   await flushPromises();
   assert(ctx.fullscreenRequests.includes(true), "expected saved fullscreen to request fullscreen");
-  assert(ctx.dom.fields.fullscreen_enabled.checked === false, "expected fullscreen checkbox to clear");
-  assert(ctx.stored[Core.STORAGE_KEYS.settings].fullscreen_enabled === false, "expected saved fullscreen to clear");
+  assert(
+    ctx.dom.fields.fullscreen_enabled.checked === false,
+    "expected fullscreen checkbox to clear"
+  );
+  assert(
+    ctx.stored[Core.STORAGE_KEYS.settings].fullscreen_enabled === false,
+    "expected saved fullscreen to clear"
+  );
 });
 
 test("minimal mode toggle enables keep screen awake", function () {
   const ctx = setup();
   ctx.boundHandlers.onMinimalModeToggle(true);
 
-  assert(ctx.dom.fields.wake_lock_enabled.checked === true, "expected wake lock checkbox to be checked");
+  assert(
+    ctx.dom.fields.wake_lock_enabled.checked === true,
+    "expected wake lock checkbox to be checked"
+  );
   assert(ctx.wakeLockCalls.includes(true), "expected wake lock to be requested");
 });
 

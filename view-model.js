@@ -51,7 +51,8 @@
         sessionChangesText:
           changed.length > 0
             ? (labels.sessionChangesPrefix || "Session Changes: ") + changed.join(", ")
-            : (labels.sessionChangesPrefix || "Session Changes: ") + (labels.sessionChangesNone || "None"),
+            : (labels.sessionChangesPrefix || "Session Changes: ") +
+              (labels.sessionChangesNone || "None"),
         primaryButtonText:
           primaryActionLabels[statusKey] ||
           (statusKey === Core.STATUS.RUNNING

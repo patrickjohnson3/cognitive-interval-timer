@@ -19,7 +19,11 @@ function test(name, fn) {
 
 test("nextPhase chooses long_break after ultradian threshold", function () {
   const settings = Core.normalizeSettings({ blocks_per_ultradian: 2 });
-  const stats = Core.normalizeStats({ dateKey: Core.dateKey(), focusBlocksToday: 1, focusBlocksSinceLong: 2 });
+  const stats = Core.normalizeStats({
+    dateKey: Core.dateKey(),
+    focusBlocksToday: 1,
+    focusBlocksSinceLong: 2,
+  });
   const next = Core.nextPhase("recall", stats, settings);
   assert(next === "long_break", "expected long_break, got " + next);
 });
@@ -32,9 +36,20 @@ test("rolloverStats resets daily count but preserves long-break counter", functi
 });
 
 test("consumeElapsed transitions and credits focus completion", function () {
-  const settings = Core.normalizeSettings({ focus: 1, recall: 1, break: 1, long_break: 1, prep: 1, blocks_per_ultradian: 2 });
+  const settings = Core.normalizeSettings({
+    focus: 1,
+    recall: 1,
+    break: 1,
+    long_break: 1,
+    prep: 1,
+    blocks_per_ultradian: 2,
+  });
   const timer = { running: true, phase: "focus", remainingSec: 10 };
-  const stats = Core.normalizeStats({ dateKey: Core.dateKey(), focusBlocksToday: 0, focusBlocksSinceLong: 0 });
+  const stats = Core.normalizeStats({
+    dateKey: Core.dateKey(),
+    focusBlocksToday: 0,
+    focusBlocksSinceLong: 0,
+  });
 
   const out = Core.consumeElapsed(timer, 12, settings, stats, { autoStart: true });
   assert(out.timer.phase === "recall", "expected recall after 12s from focus with 10s remaining");
@@ -53,9 +68,16 @@ test("consumeElapsed handles large elapsed time without dropping transitions", f
   });
 
   const timer = { running: true, phase: "focus", remainingSec: 1 };
-  const stats = Core.normalizeStats({ dateKey: Core.dateKey(), focusBlocksToday: 0, focusBlocksSinceLong: 0 });
+  const stats = Core.normalizeStats({
+    dateKey: Core.dateKey(),
+    focusBlocksToday: 0,
+    focusBlocksSinceLong: 0,
+  });
 
-  const out = Core.consumeElapsed(timer, 700, settings, stats, { autoStart: true, maxTransitions: 1000 });
+  const out = Core.consumeElapsed(timer, 700, settings, stats, {
+    autoStart: true,
+    maxTransitions: 1000,
+  });
   assert(out.events.length > 10, "expected many transitions for large elapsed time");
   assert(out.transitionLimitHit === false, "transition limit should not be hit here");
   assert(out.remainingElapsed === 0, "elapsed time should be fully consumed");
@@ -68,7 +90,11 @@ test("consumeElapsed follows a full two-block cycle into long break", function (
     auto_start: true,
   });
   let timer = { running: true, phase: "prep", remainingSec: 1 };
-  let stats = Core.normalizeStats({ dateKey: Core.dateKey(), focusBlocksToday: 0, focusBlocksSinceLong: 0 });
+  let stats = Core.normalizeStats({
+    dateKey: Core.dateKey(),
+    focusBlocksToday: 0,
+    focusBlocksSinceLong: 0,
+  });
   const phases = [timer.phase];
 
   while (timer.phase !== "long_break") {
@@ -103,8 +129,14 @@ test("all phases have short and long guidance text", function () {
   Core.PHASES.forEach(function eachPhase(phase) {
     const shortHint = Core.STATE_HINTS[phase];
     const longHint = Core.STATE_LONG_HINTS[phase];
-    assert(typeof shortHint === "string" && shortHint.trim().length > 0, "missing short hint for " + phase);
-    assert(typeof longHint === "string" && longHint.trim().length > 0, "missing long hint for " + phase);
+    assert(
+      typeof shortHint === "string" && shortHint.trim().length > 0,
+      "missing short hint for " + phase
+    );
+    assert(
+      typeof longHint === "string" && longHint.trim().length > 0,
+      "missing long hint for " + phase
+    );
   });
 });
 

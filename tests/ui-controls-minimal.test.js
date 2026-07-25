@@ -62,13 +62,45 @@ function createDom() {
       recall: createNode({ id: "recall", tagName: "INPUT", type: "number", value: "3" }),
       break: createNode({ id: "break", tagName: "INPUT", type: "number", value: "15" }),
       long_break: createNode({ id: "long_break", tagName: "INPUT", type: "number", value: "25" }),
-      blocks_per_ultradian: createNode({ id: "blocks_per_ultradian", tagName: "INPUT", type: "number", value: "2" }),
-      prep_enabled: createNode({ id: "prep_enabled", tagName: "INPUT", type: "checkbox", checked: true }),
-      auto_start: createNode({ id: "auto_start", tagName: "INPUT", type: "checkbox", checked: true }),
-      sound_enabled: createNode({ id: "sound_enabled", tagName: "INPUT", type: "checkbox", checked: true }),
-      fullscreen_enabled: createNode({ id: "fullscreen_enabled", tagName: "INPUT", type: "checkbox" }),
-      minimal_mode_enabled: createNode({ id: "minimal_mode_enabled", tagName: "INPUT", type: "checkbox" }),
-      wake_lock_enabled: createNode({ id: "wake_lock_enabled", tagName: "INPUT", type: "checkbox" }),
+      blocks_per_ultradian: createNode({
+        id: "blocks_per_ultradian",
+        tagName: "INPUT",
+        type: "number",
+        value: "2",
+      }),
+      prep_enabled: createNode({
+        id: "prep_enabled",
+        tagName: "INPUT",
+        type: "checkbox",
+        checked: true,
+      }),
+      auto_start: createNode({
+        id: "auto_start",
+        tagName: "INPUT",
+        type: "checkbox",
+        checked: true,
+      }),
+      sound_enabled: createNode({
+        id: "sound_enabled",
+        tagName: "INPUT",
+        type: "checkbox",
+        checked: true,
+      }),
+      fullscreen_enabled: createNode({
+        id: "fullscreen_enabled",
+        tagName: "INPUT",
+        type: "checkbox",
+      }),
+      minimal_mode_enabled: createNode({
+        id: "minimal_mode_enabled",
+        tagName: "INPUT",
+        type: "checkbox",
+      }),
+      wake_lock_enabled: createNode({
+        id: "wake_lock_enabled",
+        tagName: "INPUT",
+        type: "checkbox",
+      }),
     },
   };
 }

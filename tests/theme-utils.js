@@ -17,17 +17,18 @@ function extractThemeBlock(css, theme) {
 
 function parseTokens(block) {
   const out = {};
-  block
-    .split("\n")
-    .map((line) => line.trim())
-    .forEach((line) => {
-      if (!line.startsWith("--")) return;
-      const idx = line.indexOf(":");
-      if (idx === -1) return;
-      const key = line.slice(0, idx).trim();
-      const value = line.slice(idx + 1).replace(/;$/, "").trim();
-      out[key] = value;
-    });
+  const declarations = block.match(/--[^:]+:[\s\S]*?;/g) || [];
+  declarations.forEach((declaration) => {
+    const idx = declaration.indexOf(":");
+    if (idx === -1) return;
+    const key = declaration.slice(0, idx).trim();
+    const value = declaration
+      .slice(idx + 1)
+      .replace(/;$/, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    out[key] = value;
+  });
   return out;
 }
 

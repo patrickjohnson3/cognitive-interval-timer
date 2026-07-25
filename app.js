@@ -14,7 +14,22 @@
   const AppController = window.PomodoroAppController;
   const A11y = window.PomodoroA11y;
 
-  if (!Core || !Content || !ViewModel || !UIAnnounce || !UIRender || !UIControls || !Storage || !Audio || !Haptics || !WakeLock || !DisplayMode || !TimerEngine || !AppController || !A11y) {
+  if (
+    !Core ||
+    !Content ||
+    !ViewModel ||
+    !UIAnnounce ||
+    !UIRender ||
+    !UIControls ||
+    !Storage ||
+    !Audio ||
+    !Haptics ||
+    !WakeLock ||
+    !DisplayMode ||
+    !TimerEngine ||
+    !AppController ||
+    !A11y
+  ) {
     throw new Error("Missing required modules. Ensure all scripts load before app.js");
   }
 
