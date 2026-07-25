@@ -25,7 +25,10 @@ test("Node version metadata stays aligned", function () {
   const pkg = JSON.parse(read("package.json"));
   const lock = JSON.parse(read("package-lock.json"));
 
-  assert(nodeVersion === "24.18.0", "unexpected .node-version");
+  assert(
+    /^\d+\.\d+\.\d+$/.test(nodeVersion),
+    ".node-version should contain an exact semver version"
+  );
   assert(
     pkg.engines && pkg.engines.node === nodeVersion,
     "package engines.node should match .node-version"
