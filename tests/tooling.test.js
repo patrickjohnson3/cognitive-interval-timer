@@ -86,12 +86,22 @@ test("Pages deployment stays gated by validation", function () {
     }),
     "Pages workflow should use the official deploy action"
   );
+  assert(
+    deploySteps.some(function buildsPages(step) {
+      return step.run === "npm run build:pages";
+    }),
+    "Pages workflow should build the static artifact through the build script"
+  );
 });
 
 test("Validation wrapper runs project checks without npm", function () {
   const validate = read("scripts/validate.js");
   const pkg = JSON.parse(read("package.json"));
 
+  assert(
+    pkg.scripts["build:pages"] === "node scripts/build-pages.js _site",
+    "missing build script"
+  );
   assert(pkg.scripts.validate === "node scripts/validate.js", "missing validate script");
   assert(validate.includes("process.execPath"), "validate should use the current Node binary");
   assert(validate.includes("prettier.cjs"), "validate should run Prettier directly");

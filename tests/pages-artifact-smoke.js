@@ -19,7 +19,7 @@ function run(command, args, options) {
 }
 
 try {
-  run(NODE, ["scripts/prepare-pages-artifact.js", "_site"]);
+  run(NODE, ["scripts/build-pages.js", "_site"]);
   run(NODE, ["tests/pwa-offline-smoke.js"], { env: { APP_ROOT: SITE_ROOT } });
   console.log("Pages artifact smoke passed.");
 } catch (err) {

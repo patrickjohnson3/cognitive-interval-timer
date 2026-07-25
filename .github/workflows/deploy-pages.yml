@@ -43,7 +43,7 @@ jobs:
           node-version-file: .node-version
 
       - name: Prepare static site artifact
-        run: node scripts/prepare-pages-artifact.js _site
+        run: npm run build:pages
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
