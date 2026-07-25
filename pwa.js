@@ -104,12 +104,7 @@
   }
 
   function showUpdatePrompt(registration) {
-    if (
-      !registration ||
-      !registration.waiting ||
-      document.getElementById("pwa-update")
-    )
-      return;
+    if (!registration || !registration.waiting || document.getElementById("pwa-update")) return;
 
     const slot = getInstallSlot();
     if (!slot) return;
