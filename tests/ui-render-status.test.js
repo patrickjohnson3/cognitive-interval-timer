@@ -37,6 +37,18 @@ function textNode() {
   };
 }
 
+function controlButtonNode() {
+  const node = textNode();
+  node.icon = textNode();
+  node.label = textNode();
+  node.querySelector = function querySelector(selector) {
+    if (selector === ".control-icon") return node.icon;
+    if (selector === ".control-label") return node.label;
+    return null;
+  };
+  return node;
+}
+
 function createDeps() {
   const dom = {
     state: textNode(),
@@ -49,7 +61,7 @@ function createDeps() {
     dirtyIndicator: textNode(),
     sessionNote: textNode(),
     controls: {
-      start: textNode(),
+      start: controlButtonNode(),
     },
     theme: { value: "dark" },
     tagline: textNode(),
@@ -153,8 +165,9 @@ test("primary button shows Start before timer has started", function () {
   const render = UIRender.create(deps);
   const state = baseState();
   render.render(state);
+  assert(deps.dom.controls.start.icon.textContent === "▶", "expected Start icon");
   assert(
-    deps.dom.controls.start.textContent === "▶ Start",
+    deps.dom.controls.start.label.textContent === "Start",
     "expected Start label before first start"
   );
   assert(
@@ -219,7 +232,11 @@ test("primary button shows Resume after timer is paused", function () {
   const state = baseState();
   state.timer.hasStartedOnce = true;
   render.render(state);
-  assert(deps.dom.controls.start.textContent === "▶ Resume", "expected Resume label while paused");
+  assert(deps.dom.controls.start.icon.textContent === "▶", "expected Resume icon");
+  assert(
+    deps.dom.controls.start.label.textContent === "Resume",
+    "expected Resume label while paused"
+  );
   assert(
     deps.dom.controls.start.attributes["aria-label"] === "Resume timer",
     "expected Resume aria label"
@@ -249,7 +266,11 @@ test("primary button shows Pause while timer is running", function () {
   state.timer.running = true;
   state.timer.hasStartedOnce = true;
   render.render(state);
-  assert(deps.dom.controls.start.textContent === "⏸ Pause", "expected Pause label while running");
+  assert(deps.dom.controls.start.icon.textContent === "⏸", "expected Pause icon");
+  assert(
+    deps.dom.controls.start.label.textContent === "Pause",
+    "expected Pause label while running"
+  );
   assert(
     deps.dom.controls.start.attributes["aria-label"] === "Pause timer",
     "expected Pause aria label"
