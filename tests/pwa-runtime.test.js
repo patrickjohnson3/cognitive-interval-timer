@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const { createElementFactory } = require("./helpers/dom.js");
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -47,40 +48,6 @@ function flushPromises() {
   return new Promise(function resolveSoon(resolve) {
     setTimeout(resolve, 0);
   });
-}
-
-function createElementFactory(nodes) {
-  function registerTree(node) {
-    if (node.id) nodes[node.id] = node;
-    node.children.forEach(registerTree);
-  }
-
-  return function createElement(tagName) {
-    return {
-      tagName: tagName.toUpperCase(),
-      id: "",
-      className: "",
-      textContent: "",
-      hidden: false,
-      disabled: false,
-      children: [],
-      attributes: {},
-      listeners: {},
-      remove: function remove() {
-        delete nodes[this.id];
-      },
-      setAttribute: function setAttribute(name, value) {
-        this.attributes[name] = String(value);
-      },
-      addEventListener: function addEventListener(type, handler) {
-        this.listeners[type] = handler;
-      },
-      appendChild: function appendChild(child) {
-        this.children.push(child);
-        registerTree(child);
-      },
-    };
-  };
 }
 
 function loadPWA(options) {

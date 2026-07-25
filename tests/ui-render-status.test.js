@@ -1,5 +1,6 @@
 const UIRender = require("../ui-render.js");
 const ViewModel = require("../view-model.js");
+const { controlButtonNode, textNode } = require("./helpers/dom.js");
 
 global.document = {
   title: "",
@@ -25,28 +26,6 @@ function test(name, fn) {
     console.error("  " + err.message);
     process.exitCode = 1;
   }
-}
-
-function textNode() {
-  return {
-    textContent: "",
-    attributes: {},
-    setAttribute: function setAttribute(name, value) {
-      this.attributes[name] = String(value);
-    },
-  };
-}
-
-function controlButtonNode() {
-  const node = textNode();
-  node.icon = textNode();
-  node.label = textNode();
-  node.querySelector = function querySelector(selector) {
-    if (selector === ".control-icon") return node.icon;
-    if (selector === ".control-label") return node.label;
-    return null;
-  };
-  return node;
 }
 
 function createDeps() {
