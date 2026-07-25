@@ -27,6 +27,7 @@
       wakeLock: wakeLock,
       documentRef: document,
       onFullscreenUnavailable: reconcileFullscreenUnavailable,
+      onWakeLockUnavailable: reconcileWakeLockUnavailable,
     });
 
     const appState = {
@@ -320,8 +321,24 @@
       onSettingsInput(controls.readSettingsForm());
     }
 
+    function reconcileWakeLockUnavailable() {
+      if (dom.fields.wake_lock_enabled.checked) {
+        dom.fields.wake_lock_enabled.checked = false;
+      }
+
+      if (appState.settings.wake_lock_enabled) {
+        appState.settings = Core.normalizeSettings(
+          Object.assign({}, appState.settings, { wake_lock_enabled: false })
+        );
+        storage.setJSON(Core.STORAGE_KEYS.settings, appState.settings);
+        render.hydrateSettingsForm(appState.settings);
+      }
+
+      onSettingsInput(controls.readSettingsForm());
+    }
+
     function applyWakeLockSetting(enabled) {
-      displayMode.applyWakeLock(enabled);
+      return displayMode.applyWakeLock(enabled);
     }
 
     function enableWakeLockField() {

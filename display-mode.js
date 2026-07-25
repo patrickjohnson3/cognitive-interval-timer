@@ -11,6 +11,7 @@
     const wakeLock = deps.wakeLock;
     const doc = deps.documentRef || document;
     const onFullscreenUnavailable = deps.onFullscreenUnavailable || function noop() {};
+    const onWakeLockUnavailable = deps.onWakeLockUnavailable || function noop() {};
 
     function applyFullscreen(enabled) {
       const root = doc.documentElement;
@@ -48,13 +49,21 @@
     }
 
     function applyWakeLock(enabled) {
-      if (!wakeLock || typeof wakeLock.setEnabled !== "function") return;
-      wakeLock.setEnabled(enabled);
+      if (!wakeLock || typeof wakeLock.setEnabled !== "function") {
+        if (enabled) onWakeLockUnavailable();
+        return Promise.resolve(false);
+      }
+      return Promise.resolve(wakeLock.setEnabled(enabled)).then(
+        function handleWakeLockResult(result) {
+          if (enabled && result === false) onWakeLockUnavailable();
+          return result;
+        }
+      );
     }
 
     function enableWakeLockField() {
       dom.fields.wake_lock_enabled.checked = true;
-      applyWakeLock(true);
+      return applyWakeLock(true);
     }
 
     function applyMinimalMode(enabled, settings) {
