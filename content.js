@@ -79,10 +79,15 @@
       sound: "Sound",
       documentTitleSeparator: " - ",
       documentTitleBase: "Cognitive Interval Timer",
+      primaryActionIcons: {
+        idle: "▶",
+        running: "⏸",
+        paused: "▶",
+      },
       primaryActionLabels: {
-        idle: "▶ Start",
-        running: "⏸ Pause",
-        paused: "▶ Resume",
+        idle: "Start",
+        running: "Pause",
+        paused: "Resume",
       },
       primaryActionAriaLabels: {
         idle: "Start timer",

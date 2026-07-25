@@ -42,3 +42,19 @@ test("aria-hidden containers do not include focusable elements", function () {
 
   assert(offenders.length === 0, "found focusable content inside aria-hidden containers");
 });
+
+test("timer control icons are hidden from accessible names", function () {
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  ["start", "skip", "reset"].forEach(function eachControl(id) {
+    const buttonMatch = html.match(new RegExp('<button id="' + id + '"[\\s\\S]*?</button>'));
+    assert(buttonMatch, "missing timer control #" + id);
+    assert(
+      buttonMatch[0].includes('class="control-icon" aria-hidden="true"'),
+      "missing aria-hidden control icon for #" + id
+    );
+    assert(
+      buttonMatch[0].includes('class="control-label"'),
+      "missing separate control label for #" + id
+    );
+  });
+});

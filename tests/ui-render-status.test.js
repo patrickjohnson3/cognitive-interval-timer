@@ -101,10 +101,15 @@ function createDeps() {
         sinceLongBreakPrefix: "long break: ",
         focusBlockPrefix: "Focus Block ",
         focusBlockReady: "Focus Block\nReady",
+        primaryActionIcons: {
+          idle: "▶",
+          running: "⏸",
+          paused: "▶",
+        },
         primaryActionLabels: {
-          idle: "▶ Start",
-          running: "⏸ Pause",
-          paused: "▶ Resume",
+          idle: "Start",
+          running: "Pause",
+          paused: "Resume",
         },
         primaryActionAriaLabels: {
           idle: "Start timer",

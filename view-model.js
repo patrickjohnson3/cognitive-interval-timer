@@ -20,6 +20,7 @@
           : Core.STATUS.IDLE;
 
       const primaryActionLabels = labels.primaryActionLabels || {};
+      const primaryActionIcons = labels.primaryActionIcons || {};
       const primaryActionAriaLabels = labels.primaryActionAriaLabels || {};
       const changed = [];
       if (state.ui.sessionFlags.changedAutoStart) changed.push(labels.autoStart || "Auto-Start");
@@ -53,13 +54,15 @@
             ? (labels.sessionChangesPrefix || "Session Changes: ") + changed.join(", ")
             : (labels.sessionChangesPrefix || "Session Changes: ") +
               (labels.sessionChangesNone || "None"),
+        primaryButtonIcon:
+          primaryActionIcons[statusKey] || (statusKey === Core.STATUS.RUNNING ? "⏸" : "▶"),
         primaryButtonText:
           primaryActionLabels[statusKey] ||
           (statusKey === Core.STATUS.RUNNING
-            ? "⏸ Pause"
+            ? "Pause"
             : statusKey === Core.STATUS.PAUSED
-              ? "▶ Resume"
-              : "▶ Start"),
+              ? "Resume"
+              : "Start"),
         primaryButtonAriaLabel:
           primaryActionAriaLabels[statusKey] ||
           (statusKey === Core.STATUS.RUNNING
