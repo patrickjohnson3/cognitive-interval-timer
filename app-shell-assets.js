@@ -22,6 +22,7 @@
     "./audio.js",
     "./haptics.js",
     "./wake-lock.js",
+    "./display-services.js",
     "./display-mode.js",
     "./controller-persistence.js",
     "./controller-settings-effects.js",

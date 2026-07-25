@@ -140,6 +140,7 @@ test("service worker caches the app shell", function () {
     "./manifest.webmanifest",
     "./styles.css",
     "./haptics.js",
+    "./display-services.js",
     "./controller-persistence.js",
     "./controller-settings-effects.js",
     "./controller-timer-actions.js",
