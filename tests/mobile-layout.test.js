@@ -71,6 +71,14 @@ test("short mobile landscape gets a compact two-column layout", function () {
   });
 });
 
+test("minimal mode uses small viewport height on mobile", function () {
+  const css = read("styles.css");
+  const minimalSection = css.slice(css.indexOf(':root[data-minimal-mode="true"] .app'));
+
+  assert(minimalSection.includes("min-height: 100vh;"), "missing minimal mode vh fallback");
+  assert(minimalSection.includes("min-height: 100svh;"), "missing minimal mode svh height");
+});
+
 if (!process.exitCode) {
   console.log("All tests passed.");
 }
