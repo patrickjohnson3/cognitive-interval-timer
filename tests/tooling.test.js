@@ -41,11 +41,21 @@ test("Node version metadata stays aligned", function () {
 
 test("Pages deployment stays gated by validation", function () {
   const workflow = read(".github/workflows/deploy-pages.yml");
+  const ciWorkflow = read(".github/workflows/ci.yml");
 
-  assert(workflow.includes("needs: validate"), "Pages deploy job should require validation");
+  assert(workflow.includes("workflow_run:"), "Pages deploy should run from the CI workflow result");
+  assert(workflow.includes("- CI"), "Pages deploy should listen for the CI workflow");
   assert(
-    workflow.includes("npm run test:pwa:offline"),
-    "Pages validation should include the PWA offline smoke test"
+    workflow.includes("github.event.workflow_run.conclusion == 'success'"),
+    "Pages deploy should require successful CI"
+  );
+  assert(
+    workflow.includes("github.event.workflow_run.head_branch == 'pwa'"),
+    "Pages deploy should be limited to the pwa branch"
+  );
+  assert(
+    ciWorkflow.includes("npm run test:pwa:offline"),
+    "CI validation should include the PWA offline smoke test"
   );
   assert(
     workflow.includes("actions/deploy-pages@v4"),
