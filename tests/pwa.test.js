@@ -245,6 +245,16 @@ test("service worker avoids cache-first navigation responses", function () {
   );
 });
 
+test("service worker only runtime-caches app-shell assets", function () {
+  const serviceWorker = readProjectFile("service-worker.js");
+
+  assert(serviceWorker.includes("function isAppShellRequest"), "missing app-shell request guard");
+  assert(
+    serviceWorker.includes("if (!isAppShellRequest(requestUrl))"),
+    "runtime asset caching should skip non-app-shell requests"
+  );
+});
+
 test("service worker returns a response for uncached offline assets", function () {
   const serviceWorker = readProjectFile("service-worker.js");
 

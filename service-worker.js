@@ -45,6 +45,10 @@ function appShellAssetUrls() {
   });
 }
 
+function isAppShellRequest(requestUrl) {
+  return appShellAssetUrls().includes(requestUrl.href);
+}
+
 function cacheOptionalAsset(cache, asset) {
   return fetch(asset)
     .then(function cacheOptionalResponse(response) {
@@ -158,6 +162,9 @@ self.addEventListener("fetch", function handleFetch(event) {
     fetch(request)
       .then(function useFreshAsset(response) {
         if (!response || response.status !== 200 || response.type !== "basic") {
+          return response;
+        }
+        if (!isAppShellRequest(requestUrl)) {
           return response;
         }
 
