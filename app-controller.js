@@ -228,7 +228,7 @@
       const previousSettings = appState.settings;
       const oldPhaseDuration = Core.phaseDurationSec(appState.timer.phase, previousSettings);
       const elapsedInPhase = Math.max(0, oldPhaseDuration - appState.timer.remainingSec);
-      const next = normalizeSettingsForPersistence(rawSettings);
+      const next = Core.normalizeSettings(rawSettings);
 
       if (next.auto_start !== appState.settings.auto_start) {
         appState.ui.sessionFlags.changedAutoStart = true;
@@ -265,14 +265,6 @@
       applySettingsSideEffects();
       timer.reset();
       announce.flashMessage(a11y.formatAnnouncement("defaults_restored"));
-    }
-
-    function normalizeSettingsForPersistence(rawSettings) {
-      const next = Core.normalizeSettings(rawSettings);
-      if (next.fullscreen_enabled || next.minimal_mode_enabled) {
-        next.wake_lock_enabled = true;
-      }
-      return next;
     }
 
     function applySettingsSideEffects(options) {

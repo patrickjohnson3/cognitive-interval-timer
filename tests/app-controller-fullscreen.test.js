@@ -277,7 +277,7 @@ test("fullscreen toggle enables keep screen awake", function () {
   assert(ctx.wakeLockCalls.includes(true), "expected wake lock to be requested");
 });
 
-test("saving fullscreen normalizes keep screen awake on", function () {
+test("saving fullscreen preserves keep screen awake field state", function () {
   const ctx = setup();
   ctx.app.controller.saveSettings({
     prep: 2,
@@ -296,7 +296,7 @@ test("saving fullscreen normalizes keep screen awake on", function () {
 
   const saved = ctx.stored[Core.STORAGE_KEYS.settings];
   assert(saved.fullscreen_enabled === true, "expected fullscreen setting to save");
-  assert(saved.wake_lock_enabled === true, "expected wake lock setting to be forced on");
+  assert(saved.wake_lock_enabled === false, "expected wake lock setting to match the form");
 });
 
 test("fullscreen rejection clears fullscreen field", async function () {
@@ -373,7 +373,7 @@ test("saved wake lock is cleared when request fails on startup", async function 
   );
 });
 
-test("saving minimal mode normalizes keep screen awake on", function () {
+test("saving minimal mode preserves keep screen awake field state", function () {
   const ctx = setup();
   ctx.app.controller.saveSettings({
     prep: 2,
@@ -392,5 +392,5 @@ test("saving minimal mode normalizes keep screen awake on", function () {
 
   const saved = ctx.stored[Core.STORAGE_KEYS.settings];
   assert(saved.minimal_mode_enabled === true, "expected minimal mode setting to save");
-  assert(saved.wake_lock_enabled === true, "expected wake lock setting to be forced on");
+  assert(saved.wake_lock_enabled === false, "expected wake lock setting to match the form");
 });
