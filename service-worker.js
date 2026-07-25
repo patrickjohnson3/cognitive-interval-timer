@@ -38,10 +38,13 @@ function serviceWorkerBaseUrl() {
   return new URL("./", self.location.href || self.location.origin + "/").href;
 }
 
+function appShellAssetUrl(asset) {
+  return new URL(asset, serviceWorkerBaseUrl()).href;
+}
+
 function appShellAssetUrls() {
-  const baseUrl = serviceWorkerBaseUrl();
   return APP_SHELL.map(function toAbsoluteAssetUrl(asset) {
-    return new URL(asset, baseUrl).href;
+    return appShellAssetUrl(asset);
   });
 }
 
@@ -50,10 +53,11 @@ function isAppShellRequest(requestUrl) {
 }
 
 function cacheOptionalAsset(cache, asset) {
-  return fetch(asset)
+  const assetUrl = appShellAssetUrl(asset);
+  return fetch(assetUrl)
     .then(function cacheOptionalResponse(response) {
       if (!response || !response.ok) return false;
-      return cache.put(asset, response).then(function optionalCached() {
+      return cache.put(assetUrl, response).then(function optionalCached() {
         return true;
       });
     })
@@ -82,13 +86,15 @@ function pruneCurrentAppShellCache() {
 self.addEventListener("install", function installServiceWorker(event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function cacheAppShell(cache) {
-      return cache.addAll(REQUIRED_APP_SHELL).then(function cacheOptionalShellAssets() {
-        return Promise.all(
-          OPTIONAL_APP_SHELL.map(function eachOptionalAsset(asset) {
-            return cacheOptionalAsset(cache, asset);
-          })
-        );
-      });
+      return cache
+        .addAll(REQUIRED_APP_SHELL.map(appShellAssetUrl))
+        .then(function cacheOptionalShellAssets() {
+          return Promise.all(
+            OPTIONAL_APP_SHELL.map(function eachOptionalAsset(asset) {
+              return cacheOptionalAsset(cache, asset);
+            })
+          );
+        });
     })
   );
 });
@@ -131,6 +137,7 @@ self.addEventListener("fetch", function handleFetch(event) {
   if (requestUrl.origin !== self.location.origin) return;
 
   if (request.mode === "navigate") {
+    const shellUrl = appShellAssetUrl("./index.html");
     event.respondWith(
       fetch(request)
         .then(function useFreshNavigation(response) {
@@ -141,13 +148,13 @@ self.addEventListener("fetch", function handleFetch(event) {
           const responseCopy = response.clone();
           event.waitUntil(
             caches.open(CACHE_NAME).then(function cacheNavigation(cache) {
-              return cache.put("./index.html", responseCopy);
+              return cache.put(shellUrl, responseCopy);
             })
           );
           return response;
         })
         .catch(function fallBackToCachedShell() {
-          return caches.match("./index.html").then(function useCachedShell(cached) {
+          return caches.match(shellUrl).then(function useCachedShell(cached) {
             return (
               cached ||
               new Response("Offline app shell unavailable.", { status: 503, statusText: "Offline" })

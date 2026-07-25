@@ -167,9 +167,10 @@ test("service worker caches the app shell", function () {
     "icons should be optional cache assets"
   );
   assert(serviceWorker.includes("cacheOptionalAsset"), "missing optional asset cache helper");
+  assert(serviceWorker.includes("function appShellAssetUrl"), "missing scope-aware asset helper");
   assert(
-    serviceWorker.includes("cache.addAll(REQUIRED_APP_SHELL)"),
-    "required shell should remain strict"
+    serviceWorker.includes(".addAll(REQUIRED_APP_SHELL.map(appShellAssetUrl))"),
+    "required shell should remain strict and scope-aware"
   );
 });
 
