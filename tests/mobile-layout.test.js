@@ -58,12 +58,12 @@ test("timer controls shrink inside narrow mobile panels", function () {
 test("short mobile landscape gets a compact two-column layout", function () {
   const css = read("styles.css");
   const requiredSnippets = [
-    "@media (orientation: landscape) and (max-height: 520px)",
+    "@media (orientation: landscape) and (max-height: 600px)",
     "--density-scale: 0.82;",
     "align-items: start;",
     "width: min(960px, 100%);",
     "grid-template-columns: minmax(16rem, 1.05fr) minmax(14rem, 0.95fr);",
-    "@media (orientation: landscape) and (max-height: 520px) and (max-width: 640px)",
+    "@media (orientation: landscape) and (max-height: 600px) and (max-width: 640px)",
   ];
 
   requiredSnippets.forEach((snippet) => {

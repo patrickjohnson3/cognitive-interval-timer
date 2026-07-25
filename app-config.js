@@ -14,5 +14,6 @@
     manifestId: "./",
     manifestStartUrl: "./",
     manifestScope: "./",
+    manifestOrientation: "any",
   };
 });

@@ -111,8 +111,8 @@ test("manifest has installable app metadata and icons", function () {
     "document title should use app config name"
   );
   assert(
-    !Object.prototype.hasOwnProperty.call(manifest, "orientation"),
-    "manifest should not lock PWA orientation"
+    manifest.orientation === appConfig.manifestOrientation,
+    "manifest should explicitly allow all orientations"
   );
   assert(Array.isArray(manifest.icons) && manifest.icons.length >= 2, "expected manifest icons");
   manifest.icons.forEach(function eachIcon(icon) {

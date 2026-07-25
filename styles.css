@@ -744,7 +744,7 @@ select {
   }
 }
 
-@media (orientation: landscape) and (max-height: 520px) {
+@media (orientation: landscape) and (max-height: 600px) {
   :root {
     --density-scale: 0.82;
   }
@@ -790,7 +790,7 @@ select {
   }
 }
 
-@media (orientation: landscape) and (max-height: 520px) and (max-width: 640px) {
+@media (orientation: landscape) and (max-height: 600px) and (max-width: 640px) {
   .main {
     grid-template-columns: 1fr;
   }
