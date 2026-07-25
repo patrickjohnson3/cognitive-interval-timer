@@ -100,6 +100,24 @@ function loadPWA(options) {
   nodes[slot.id] = slot;
 
   const registration = config.registration || {};
+  const navigatorRef = {
+    platform: config.platform || "",
+    userAgent: config.userAgent || "",
+    maxTouchPoints: config.maxTouchPoints || 0,
+    standalone: Boolean(config.standalone),
+  };
+  if (config.serviceWorkerSupported !== false) {
+    navigatorRef.serviceWorker = {
+      addEventListener: function addServiceWorkerListener(type, handler) {
+        listeners["serviceWorker:" + type] = handler;
+      },
+      register: function registerServiceWorker() {
+        if (config.registrationError) return Promise.reject(config.registrationError);
+        return Promise.resolve(registration);
+      },
+    };
+  }
+
   const context = {
     console,
     document: {
@@ -113,21 +131,7 @@ function loadPWA(options) {
         return nodes[id] || null;
       },
     },
-    navigator: {
-      platform: config.platform || "",
-      userAgent: config.userAgent || "",
-      maxTouchPoints: config.maxTouchPoints || 0,
-      standalone: Boolean(config.standalone),
-      serviceWorker: {
-        addEventListener: function addServiceWorkerListener(type, handler) {
-          listeners["serviceWorker:" + type] = handler;
-        },
-        register: function registerServiceWorker() {
-          if (config.registrationError) return Promise.reject(config.registrationError);
-          return Promise.resolve(registration);
-        },
-      },
-    },
+    navigator: navigatorRef,
     window: {
       addEventListener: function addWindowListener(type, handler) {
         listeners["window:" + type] = handler;
@@ -227,6 +231,23 @@ test("PWA registration failure renders a visible status card", async function ()
   assert(
     card.children[0].textContent === "Offline support is unavailable right now.",
     "expected registration failure copy"
+  );
+});
+
+test("PWA unsupported browser renders a visible status card", async function () {
+  const runtime = loadPWA({
+    serviceWorkerSupported: false,
+  });
+
+  runtime.listeners["window:load"]();
+  await flushPromises();
+
+  const card = runtime.nodes["pwa-status"];
+  assert(runtime.slot.hidden === false, "expected prompt slot to be visible");
+  assert(card && card.className === "pwa-prompt-card", "expected status prompt card");
+  assert(
+    card.children[0].textContent === "Offline support is unavailable in this browser.",
+    "expected unsupported browser copy"
   );
 });
 

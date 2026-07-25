@@ -1,6 +1,5 @@
 (function registerPWA() {
-  if (!("serviceWorker" in navigator)) return;
-
+  const supportsServiceWorker = "serviceWorker" in navigator;
   let refreshing = false;
   let deferredInstallPrompt = null;
 
@@ -133,11 +132,13 @@
     slot.appendChild(card);
   }
 
-  navigator.serviceWorker.addEventListener("controllerchange", function reloadAfterUpdate() {
-    if (refreshing) return;
-    refreshing = true;
-    window.location.reload();
-  });
+  if (supportsServiceWorker) {
+    navigator.serviceWorker.addEventListener("controllerchange", function reloadAfterUpdate() {
+      if (refreshing) return;
+      refreshing = true;
+      window.location.reload();
+    });
+  }
 
   window.addEventListener("beforeinstallprompt", function onBeforeInstallPrompt(event) {
     event.preventDefault();
@@ -152,6 +153,11 @@
 
   window.addEventListener("load", function onWindowLoad() {
     showIOSInstallGuidance();
+
+    if (!supportsServiceWorker) {
+      showServiceWorkerStatus("Offline support is unavailable in this browser.");
+      return;
+    }
 
     navigator.serviceWorker
       .register("./service-worker.js")
