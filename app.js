@@ -10,6 +10,9 @@
   const Haptics = window.PomodoroHaptics;
   const WakeLock = window.PomodoroWakeLock;
   const DisplayMode = window.PomodoroDisplayMode;
+  const Persistence = window.PomodoroControllerPersistence;
+  const SettingsEffects = window.PomodoroControllerSettingsEffects;
+  const TimerActions = window.PomodoroControllerTimerActions;
   const TimerEngine = window.PomodoroTimerEngine;
   const AppController = window.PomodoroAppController;
   const A11y = window.PomodoroA11y;
@@ -26,6 +29,9 @@
     !Haptics ||
     !WakeLock ||
     !DisplayMode ||
+    !Persistence ||
+    !SettingsEffects ||
+    !TimerActions ||
     !TimerEngine ||
     !AppController ||
     !A11y
@@ -77,6 +83,9 @@
     haptics: haptics,
     wakeLock: wakeLock,
     DisplayMode: DisplayMode,
+    Persistence: Persistence,
+    SettingsEffects: SettingsEffects,
+    TimerActions: TimerActions,
     a11y: a11y,
     dom: dom,
   });
