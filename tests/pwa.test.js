@@ -197,6 +197,10 @@ test("service worker only deletes this app's old caches", function () {
     serviceWorker.includes("key.startsWith(CACHE_PREFIX)"),
     "old-cache cleanup should be scoped to app prefix"
   );
+  assert(
+    serviceWorker.includes("pruneCurrentAppShellCache"),
+    "current app-shell cache should prune removed assets"
+  );
 });
 
 test("every service worker app-shell asset exists locally", function () {

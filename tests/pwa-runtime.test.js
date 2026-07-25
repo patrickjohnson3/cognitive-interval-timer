@@ -213,9 +213,12 @@ test("PWA update click tolerates a missing waiting worker", async function () {
 });
 
 test("service worker deletes only this app's old caches", async function () {
-  const deleted = [];
+  const deletedCaches = [];
+  const deletedRequests = [];
   const listeners = {};
   const currentCache = currentServiceWorkerCacheName();
+  const expectedRequest = { url: "https://example.test/index.html" };
+  const staleRequest = { url: "https://example.test/removed.js" };
   const context = {
     Promise,
     Response,
@@ -229,8 +232,20 @@ test("service worker deletes only this app's old caches", async function () {
         ]);
       },
       delete: function deleteCache(key) {
-        deleted.push(key);
+        deletedCaches.push(key);
         return Promise.resolve(true);
+      },
+      open: function openCache(key) {
+        assert(key === currentCache, "expected current cache to be opened for pruning");
+        return Promise.resolve({
+          keys: function keys() {
+            return Promise.resolve([expectedRequest, staleRequest]);
+          },
+          delete: function deleteRequest(request) {
+            deletedRequests.push(request.url);
+            return Promise.resolve(true);
+          },
+        });
       },
     },
     self: {
@@ -244,6 +259,9 @@ test("service worker deletes only this app's old caches", async function () {
       },
       location: {
         origin: "https://example.test",
+      },
+      registration: {
+        scope: "https://example.test/",
       },
     },
   };
@@ -260,9 +278,17 @@ test("service worker deletes only this app's old caches", async function () {
   });
 
   await activationPromise;
-  assert(deleted.includes("cognitive-interval-timer-old"), "expected old app cache to be deleted");
-  assert(!deleted.includes("other-project-cache"), "unrelated origin cache should not be deleted");
-  assert(!deleted.includes(currentCache), "current app cache should not be deleted");
+  assert(
+    deletedCaches.includes("cognitive-interval-timer-old"),
+    "expected old app cache to be deleted"
+  );
+  assert(
+    !deletedCaches.includes("other-project-cache"),
+    "unrelated origin cache should not be deleted"
+  );
+  assert(!deletedCaches.includes(currentCache), "current app cache should not be deleted");
+  assert(!deletedRequests.includes(expectedRequest.url), "expected app-shell request to be kept");
+  assert(deletedRequests.includes(staleRequest.url), "expected stale current-cache entry to prune");
 });
 
 if (!process.exitCode) {

@@ -31,6 +31,19 @@ const OPTIONAL_APP_SHELL = [
   "./assets/icons/maskable-192.png",
   "./assets/icons/maskable-512.png",
 ];
+const APP_SHELL = REQUIRED_APP_SHELL.concat(OPTIONAL_APP_SHELL);
+
+function serviceWorkerBaseUrl() {
+  if (self.registration && self.registration.scope) return self.registration.scope;
+  return new URL("./", self.location.href || self.location.origin + "/").href;
+}
+
+function appShellAssetUrls() {
+  const baseUrl = serviceWorkerBaseUrl();
+  return APP_SHELL.map(function toAbsoluteAssetUrl(asset) {
+    return new URL(asset, baseUrl).href;
+  });
+}
 
 function cacheOptionalAsset(cache, asset) {
   return fetch(asset)
@@ -43,6 +56,23 @@ function cacheOptionalAsset(cache, asset) {
     .catch(function ignoreOptionalCacheError() {
       return false;
     });
+}
+
+function pruneCurrentAppShellCache() {
+  const expectedUrls = new Set(appShellAssetUrls());
+  return caches.open(CACHE_NAME).then(function pruneCache(cache) {
+    return cache.keys().then(function deleteUnexpectedRequests(requests) {
+      return Promise.all(
+        requests
+          .filter(function isUnexpectedRequest(request) {
+            return !expectedUrls.has(request.url);
+          })
+          .map(function deleteUnexpectedRequest(request) {
+            return cache.delete(request);
+          })
+      );
+    });
+  });
 }
 
 self.addEventListener("install", function installServiceWorker(event) {
@@ -79,6 +109,9 @@ self.addEventListener("activate", function activateServiceWorker(event) {
               return caches.delete(key);
             })
         );
+      })
+      .then(function pruneCurrentCache() {
+        return pruneCurrentAppShellCache();
       })
       .then(function claimClients() {
         return self.clients.claim();
