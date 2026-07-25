@@ -35,6 +35,12 @@ test("rolloverStats resets daily count but preserves long-break counter", functi
   assert(rolled.focusBlocksSinceLong === 3, "focusBlocksSinceLong should remain");
 });
 
+test("dateKey uses stable local ISO date format", function () {
+  const key = Core.dateKey(new Date(2026, 6, 5, 23, 30, 0));
+
+  assert(key === "2026-07-05", "expected local YYYY-MM-DD key, got " + key);
+});
+
 test("consumeElapsed transitions and credits focus completion", function () {
   const settings = Core.normalizeSettings({
     focus: 1,
