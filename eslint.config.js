@@ -1,7 +1,7 @@
 module.exports = [
   {
     files: ["**/*.js"],
-    ignores: ["tests/__snapshots__/**"],
+    ignores: ["_site/**", "tests/__snapshots__/**"],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "script",
@@ -30,6 +30,7 @@ module.exports = [
         Promise: "readonly",
         caches: "readonly",
         fetch: "readonly",
+        importScripts: "readonly",
         Response: "readonly",
         HTMLElement: "readonly",
         WebSocket: "readonly",

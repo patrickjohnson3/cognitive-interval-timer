@@ -82,6 +82,21 @@ test("Pages deployment stays gated by validation", function () {
   );
 });
 
+test("Validation wrapper runs project checks without npm", function () {
+  const validate = read("scripts/validate.js");
+  const pkg = JSON.parse(read("package.json"));
+
+  assert(pkg.scripts.validate === "node scripts/validate.js", "missing validate script");
+  assert(validate.includes("process.execPath"), "validate should use the current Node binary");
+  assert(validate.includes("prettier.cjs"), "validate should run Prettier directly");
+  assert(validate.includes("eslint.js"), "validate should run ESLint directly");
+  assert(validate.includes("--test"), "validate should run the Node test runner");
+  assert(
+    validate.includes("tests/pwa-offline-smoke.js"),
+    "validate should run the PWA offline smoke test"
+  );
+});
+
 if (!process.exitCode) {
   console.log("All tests passed.");
 }

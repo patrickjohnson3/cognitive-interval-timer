@@ -56,5 +56,7 @@ const missingAppShellAssets = appShell.APP_SHELL.filter((asset) => asset !== "./
 );
 
 if (missingAppShellAssets.length > 0) {
-  throw new Error("Missing app shell assets in Pages artifact: " + missingAppShellAssets.join(", "));
+  throw new Error(
+    "Missing app shell assets in Pages artifact: " + missingAppShellAssets.join(", ")
+  );
 }
