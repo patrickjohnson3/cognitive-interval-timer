@@ -38,6 +38,8 @@
     "./assets/icons/icon-512.png",
     "./assets/icons/maskable-192.png",
     "./assets/icons/maskable-512.png",
+    "./assets/screenshots/timer-wide.svg",
+    "./assets/screenshots/timer-narrow.svg",
   ];
   const APP_SHELL = REQUIRED_APP_SHELL.concat(OPTIONAL_APP_SHELL);
 

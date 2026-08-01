@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="844" viewBox="0 0 390 844" role="img" aria-labelledby="title desc">
+  <title id="title">Cognitive Interval Timer mobile screenshot</title>
+  <desc id="desc">A narrow mobile view of the dark focus timer interface.</desc>
+  <rect width="390" height="844" fill="#0f172a" />
+  <rect x="12" y="28" width="366" height="788" rx="22" fill="#182338" stroke="#31415f" />
+  <text x="28" y="78" fill="#f8fafc" font-family="Georgia, serif" font-size="22" font-weight="700">Cognitive Interval Timer</text>
+  <text x="28" y="110" fill="#b6c3d8" font-family="Arial, sans-serif" font-size="14">Intensity. Recovery. Repeat.</text>
+  <rect x="28" y="140" width="166" height="62" rx="18" fill="#1d2b44" stroke="#375072" />
+  <text x="50" y="166" fill="#ff8a00" font-family="Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="1">FOCUS BLOCK</text>
+  <text x="72" y="184" fill="#ff8a00" font-family="Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="1">READY</text>
+  <rect x="28" y="234" width="334" height="486" rx="18" fill="#142039" stroke="#31415f" />
+  <text x="46" y="272" fill="#9fb0ca" font-family="Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="1">PREP</text>
+  <text x="44" y="326" fill="#f8fafc" font-family="Arial, sans-serif" font-size="48" font-weight="800">02:00</text>
+  <rect x="44" y="352" width="302" height="72" rx="10" fill="#1d2b44" stroke="#2e4569" />
+  <text x="58" y="382" fill="#f8fafc" font-family="Arial, sans-serif" font-size="16" font-weight="700">Prepare your mind.</text>
+  <text x="58" y="406" fill="#f8fafc" font-family="Arial, sans-serif" font-size="16" font-weight="700">Choose one clear goal.</text>
+  <rect x="44" y="452" width="154" height="42" rx="12" fill="#2f6fed" />
+  <text x="86" y="480" fill="#ffffff" font-family="Arial, sans-serif" font-size="16" font-weight="700">Start</text>
+  <rect x="208" y="452" width="138" height="42" rx="12" fill="#25344c" />
+  <text x="238" y="480" fill="#ffffff" font-family="Arial, sans-serif" font-size="16" font-weight="700">Next</text>
+</svg>

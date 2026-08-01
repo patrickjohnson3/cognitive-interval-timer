@@ -168,6 +168,47 @@ test("manifest includes dedicated maskable icons", function () {
   });
 });
 
+test("manifest includes app store discovery metadata", function () {
+  const manifest = JSON.parse(readProjectFile("manifest.webmanifest"));
+
+  assert(
+    Array.isArray(manifest.categories) && manifest.categories.includes("productivity"),
+    "manifest should include productivity category"
+  );
+  assert(
+    Array.isArray(manifest.screenshots) && manifest.screenshots.length >= 2,
+    "manifest should include screenshots"
+  );
+  assert(
+    manifest.screenshots.some(function hasWideScreenshot(screenshot) {
+      return screenshot.form_factor === "wide";
+    }),
+    "manifest should include a wide screenshot"
+  );
+  assert(
+    manifest.screenshots.some(function hasNarrowScreenshot(screenshot) {
+      return screenshot.form_factor === "narrow";
+    }),
+    "manifest should include a narrow screenshot"
+  );
+  manifest.screenshots.forEach(function eachScreenshot(screenshot) {
+    assert(fs.existsSync(path.join(__dirname, "..", screenshot.src)), "missing screenshot file");
+    assert(screenshot.type === "image/svg+xml", "expected local SVG screenshot");
+    assert(/\d+x\d+/.test(screenshot.sizes), "screenshot should declare dimensions");
+    assert(screenshot.label, "screenshot should include accessible label");
+  });
+  assert(
+    Array.isArray(manifest.shortcuts) && manifest.shortcuts.length > 0,
+    "manifest should include app shortcut"
+  );
+  manifest.shortcuts.forEach(function eachShortcut(shortcut) {
+    assert(shortcut.name, "shortcut should include a name");
+    assert(shortcut.short_name, "shortcut should include a short_name");
+    assert(shortcut.description, "shortcut should include a description");
+    assert(shortcut.url === "./", "shortcut should open the timer root");
+  });
+});
+
 test("index exposes visible app version metadata", function () {
   const html = readProjectFile("index.html");
 
@@ -195,6 +236,8 @@ test("service worker caches the app shell", function () {
     "./assets/icons/icon-512.png",
     "./assets/icons/maskable-192.png",
     "./assets/icons/maskable-512.png",
+    "./assets/screenshots/timer-wide.svg",
+    "./assets/screenshots/timer-narrow.svg",
   ];
 
   expectedAssets.forEach(function eachAsset(asset) {
