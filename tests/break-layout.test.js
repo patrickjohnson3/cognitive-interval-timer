@@ -44,6 +44,16 @@ test("cycle structure uses paired two-column input rows", function () {
   });
 });
 
+test("behavior settings are grouped for scanning", function () {
+  const html = read("index.html");
+  const css = read("styles.css");
+
+  assert(html.includes('id="label-timer-flow-settings"'), "missing timer flow subgroup");
+  assert(html.includes('id="label-display-settings"'), "missing display subgroup");
+  assert(css.includes(".settings-subgroup"), "missing settings subgroup style");
+  assert(css.includes(".setting-help"), "missing settings helper style");
+});
+
 if (!process.exitCode) {
   console.log("All tests passed.");
 }

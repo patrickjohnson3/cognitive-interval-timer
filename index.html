@@ -117,30 +117,64 @@
           <section class="settings-section" aria-label="Behavior section">
             <h3>Behavior</h3>
             <div class="checks">
-              <label
-                ><input id="prep_enabled" type="checkbox" />
-                <span id="label-prep-enabled">Start With Prep Phase</span></label
-              >
-              <label
-                ><input id="auto_start" type="checkbox" />
-                <span id="label-auto-start">Auto-Start Next Phase</span></label
-              >
-              <label
-                ><input id="sound_enabled" type="checkbox" />
-                <span id="label-sound-enabled">Play Sound On Phase Change</span></label
-              >
-              <label
-                ><input id="fullscreen_enabled" type="checkbox" />
-                <span id="label-fullscreen-enabled">Fullscreen</span></label
-              >
-              <label
-                ><input id="minimal_mode_enabled" type="checkbox" />
-                <span id="label-minimal-mode-enabled">Minimal Mode</span></label
-              >
-              <label
-                ><input id="wake_lock_enabled" type="checkbox" />
-                <span id="label-wake-lock-enabled">Keep Screen Awake</span></label
-              >
+              <div class="settings-subgroup" aria-labelledby="label-timer-flow-settings">
+                <h4 id="label-timer-flow-settings">Timer Flow</h4>
+                <label
+                  ><input id="prep_enabled" type="checkbox" />
+                  <span id="label-prep-enabled">Start With Prep Phase</span></label
+                >
+                <label
+                  ><input id="auto_start" type="checkbox" />
+                  <span id="label-auto-start">Auto-Start Next Phase</span></label
+                >
+                <label
+                  ><input id="sound_enabled" type="checkbox" />
+                  <span id="label-sound-enabled">Play Sound On Phase Change</span></label
+                >
+              </div>
+
+              <div class="settings-subgroup" aria-labelledby="label-display-settings">
+                <h4 id="label-display-settings">Display</h4>
+                <div class="setting-option">
+                  <label
+                    ><input
+                      id="fullscreen_enabled"
+                      type="checkbox"
+                      aria-describedby="help-fullscreen-enabled"
+                    />
+                    <span id="label-fullscreen-enabled">Fullscreen</span></label
+                  >
+                  <p id="help-fullscreen-enabled" class="setting-help">
+                    Expands the timer to the whole screen and keeps the screen awake.
+                  </p>
+                </div>
+                <div class="setting-option">
+                  <label
+                    ><input
+                      id="minimal_mode_enabled"
+                      type="checkbox"
+                      aria-describedby="help-minimal-mode-enabled"
+                    />
+                    <span id="label-minimal-mode-enabled">Minimal Mode</span></label
+                  >
+                  <p id="help-minimal-mode-enabled" class="setting-help">
+                    Hides settings and controls; tap the screen to start or pause.
+                  </p>
+                </div>
+                <div class="setting-option">
+                  <label
+                    ><input
+                      id="wake_lock_enabled"
+                      type="checkbox"
+                      aria-describedby="help-wake-lock-enabled"
+                    />
+                    <span id="label-wake-lock-enabled">Keep Screen Awake</span></label
+                  >
+                  <p id="help-wake-lock-enabled" class="setting-help">
+                    Prevents display sleep when your browser allows it.
+                  </p>
+                </div>
+              </div>
             </div>
           </section>
           <div id="pwa-install-slot" class="pwa-install-slot" hidden></div>

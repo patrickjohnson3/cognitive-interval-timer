@@ -58,3 +58,23 @@ test("timer control icons are hidden from accessible names", function () {
     );
   });
 });
+
+test("complex behavior settings include accessible helper text", function () {
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const describedSettings = [
+    ["fullscreen_enabled", "help-fullscreen-enabled"],
+    ["minimal_mode_enabled", "help-minimal-mode-enabled"],
+    ["wake_lock_enabled", "help-wake-lock-enabled"],
+  ];
+
+  describedSettings.forEach(function eachSetting(setting) {
+    const inputId = setting[0];
+    const helpId = setting[1];
+
+    assert(
+      html.includes('id="' + inputId + '"') && html.includes('aria-describedby="' + helpId + '"'),
+      "missing helper relationship for " + inputId
+    );
+    assert(html.includes('id="' + helpId + '"'), "missing helper text for " + inputId);
+  });
+});
