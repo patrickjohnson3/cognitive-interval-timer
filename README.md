@@ -76,7 +76,8 @@ Then open:
 
 ## Tooling Setup
 
-Use Node `24.18.0`. The project includes `.node-version` for version managers that support it.
+Use Node 24.x. The project includes `.node-version` to pin the local default for
+version managers that support it.
 
 Install dev tooling once:
 
