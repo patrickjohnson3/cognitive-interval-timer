@@ -93,8 +93,35 @@ test("index includes iOS standalone PWA metadata", function () {
 
 test("app shell does not depend on external runtime assets", function () {
   const html = readProjectFile("index.html");
+  const runtimeAssetRefs = html.match(/<(script|link)[^>]+(?:src|href)="([^"]+)"/g) || [];
+  const externalRuntimeAssets = runtimeAssetRefs.filter(function isExternalRuntimeRef(ref) {
+    return !ref.includes('rel="canonical"') && /https?:\/\//.test(ref);
+  });
 
-  assert(!/https?:\/\//.test(html), "expected index shell to avoid external runtime URLs");
+  assert(
+    externalRuntimeAssets.length === 0,
+    "expected index shell runtime assets to avoid external URLs"
+  );
+});
+
+test("index includes canonical and social metadata", function () {
+  const html = readProjectFile("index.html");
+
+  assert(
+    html.includes(
+      '<link rel="canonical" href="https://patrickjohnson3.github.io/cognitive-interval-timer/" />'
+    ),
+    "missing canonical URL"
+  );
+  assert(html.includes('<meta property="og:type" content="website" />'), "missing og:type");
+  assert(/<meta\s+property="og:title"/.test(html), "missing og:title");
+  assert(/<meta\s+property="og:description"/.test(html), "missing og:description");
+  assert(/<meta\s+property="og:url"/.test(html), "missing og:url");
+  assert(/<meta\s+property="og:image"/.test(html), "missing og:image");
+  assert(/<meta\s+name="twitter:card"/.test(html), "missing Twitter card metadata");
+  assert(/<meta\s+name="twitter:title"/.test(html), "missing Twitter title");
+  assert(/<meta\s+name="twitter:description"/.test(html), "missing Twitter description");
+  assert(/<meta\s+name="twitter:image"/.test(html), "missing Twitter image");
 });
 
 test("manifest has installable app metadata and icons", function () {
