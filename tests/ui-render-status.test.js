@@ -36,6 +36,7 @@ function createDeps() {
     today: textNode(),
     long: textNode(),
     focusBlockBadge: textNode(),
+    focusBlockContext: textNode(),
     dirtyIndicator: textNode(),
     sessionNote: textNode(),
     controls: {
@@ -91,6 +92,8 @@ function createDeps() {
         sinceLongBreakPrefix: "long break: ",
         focusBlockPrefix: "Focus Block ",
         focusBlockReady: "Focus Block\nReady",
+        focusBlockSessionSuffix: "of session",
+        focusBlockReadyContext: "Ready to begin session.",
         primaryActionIcons: {
           idle: "▶",
           running: "⏸",
@@ -204,6 +207,10 @@ test("focus block badge shows Ready before timer has started", function () {
     deps.dom.focusBlockBadge.attributes["aria-label"] === "Focus Block Ready",
     "expected ready aria label"
   );
+  assert(
+    deps.dom.focusBlockContext.textContent === "Ready to begin session.",
+    "expected ready focus block context"
+  );
 });
 
 test("document title stays static before timer has started", function () {
@@ -245,7 +252,11 @@ test("focus block badge uses one-based display after timer has started", functio
     "expected first focus block label"
   );
   assert(
-    deps.dom.focusBlockBadge.attributes["aria-label"] === "Focus Block 1",
+    deps.dom.focusBlockContext.textContent === "of session",
+    "expected focus block session context"
+  );
+  assert(
+    deps.dom.focusBlockBadge.attributes["aria-label"] === "Focus Block 1 of session",
     "expected first focus block aria label"
   );
 });

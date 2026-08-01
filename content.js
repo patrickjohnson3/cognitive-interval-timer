@@ -72,6 +72,8 @@
       sinceLongBreakPrefix: "long break: ",
       focusBlockPrefix: "Focus Block ",
       focusBlockReady: "Focus Block\nReady",
+      focusBlockSessionSuffix: "of session",
+      focusBlockReadyContext: "Ready to begin session.",
       unsavedChanges: "Unsaved Changes",
       allSettingsSaved: "All Settings Saved",
       storageUnavailable: "Settings are not being saved in this browser.",

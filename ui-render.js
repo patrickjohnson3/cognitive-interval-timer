@@ -72,8 +72,14 @@
         focusBlockText: state.timer.hasStartedOnce
           ? (labels.focusBlockPrefix || "Focus Block ") + (state.stats.focusBlocksToday + 1)
           : labels.focusBlockReady || "Focus Block\nReady",
+        focusBlockContextText: state.timer.hasStartedOnce
+          ? labels.focusBlockSessionSuffix || "of session"
+          : labels.focusBlockReadyContext || "Ready to begin session.",
         focusBlockAriaLabel: state.timer.hasStartedOnce
-          ? (labels.focusBlockPrefix || "Focus Block ") + (state.stats.focusBlocksToday + 1)
+          ? (labels.focusBlockPrefix || "Focus Block ") +
+            (state.stats.focusBlocksToday + 1) +
+            " " +
+            (labels.focusBlockSessionSuffix || "of session")
           : (labels.focusBlockReady || "Focus Block Ready").replace(/\s+/g, " "),
         dirtyText: state.ui.storageWarning
           ? labels.storageUnavailable || "Settings are not being saved in this browser."
@@ -120,6 +126,7 @@
       dom.today.textContent = vm.todayText;
       dom.long.textContent = vm.sinceLongText;
       dom.focusBlockBadge.textContent = vm.focusBlockText;
+      dom.focusBlockContext.textContent = vm.focusBlockContextText;
       dom.focusBlockBadge.setAttribute("aria-label", vm.focusBlockAriaLabel);
       dom.dirtyIndicator.textContent = vm.dirtyText;
       dom.sessionNote.textContent = vm.sessionChangesText;

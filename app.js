@@ -80,6 +80,7 @@
       hint: byId("hint"),
       longHint: byId("long-hint"),
       focusBlockBadge: byId("focus-block-badge"),
+      focusBlockContext: byId("focus-block-context"),
       today: byId("today"),
       long: byId("long"),
       saveMsg: byId("save-msg"),
