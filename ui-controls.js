@@ -30,7 +30,7 @@
     }
 
     function bindControls(handlers) {
-      dom.controls.start.addEventListener("click", handlers.onPrimaryAction || handlers.onStart);
+      dom.controls.start.addEventListener("click", handlers.onPrimaryAction);
       dom.controls.skip.addEventListener("click", handlers.onSkip);
       dom.controls.reset.addEventListener("click", handlers.onReset);
 
@@ -48,45 +48,47 @@
         function onRestartMinimalBlockClick(event) {
           if (event && event.stopPropagation) event.stopPropagation();
           dom.controls.exitMinimalModeWrap.setAttribute("data-open", "false");
-          if (handlers.onReset) handlers.onReset();
+          handlers.onReset();
         }
       );
       dom.controls.exitMinimalMode.addEventListener("click", function onExitMinimalModeClick() {
         dom.controls.exitMinimalModeWrap.setAttribute("data-open", "false");
-        if (handlers.onExitMinimalMode) handlers.onExitMinimalMode();
+        handlers.onExitMinimalMode();
       });
       dom.theme.addEventListener("change", function themeChange(event) {
         handlers.onThemeChange(event.target.value);
       });
 
-      Object.keys(dom.fields).forEach(function watchField(key) {
-        const field = dom.fields[key];
-        const tag = field.tagName;
-        const type = field.type;
-
-        if (type === "checkbox" || tag === "SELECT") {
-          field.addEventListener("change", function onChange() {
-            if (key === "fullscreen_enabled" && handlers.onFullscreenToggle) {
-              handlers.onFullscreenToggle(field.checked);
-            }
-            if (key === "minimal_mode_enabled" && handlers.onMinimalModeToggle) {
-              handlers.onMinimalModeToggle(field.checked);
-            }
-            if (key === "wake_lock_enabled" && handlers.onWakeLockToggle) {
-              handlers.onWakeLockToggle(field.checked);
-            }
-            handlers.onSettingsInput(readSettingsForm());
-          });
-          return;
-        }
-
-        field.addEventListener("input", function onInput() {
-          handlers.onSettingsInput(readSettingsForm());
-        });
+      bindNumberField(dom.fields.prep, handlers);
+      bindNumberField(dom.fields.focus, handlers);
+      bindNumberField(dom.fields.recall, handlers);
+      bindNumberField(dom.fields.break, handlers);
+      bindNumberField(dom.fields.long_break, handlers);
+      bindNumberField(dom.fields.blocks_per_ultradian, handlers);
+      bindCheckbox(dom.fields.prep_enabled, function onPrepEnabledInput() {
+        handlers.onSettingsInput(readSettingsForm());
+      });
+      bindCheckbox(dom.fields.auto_start, function onAutoStartInput() {
+        handlers.onSettingsInput(readSettingsForm());
+      });
+      bindCheckbox(dom.fields.sound_enabled, function onSoundEnabledInput() {
+        handlers.onSettingsInput(readSettingsForm());
+      });
+      bindCheckbox(dom.fields.fullscreen_enabled, function onFullscreenInput(field) {
+        handlers.onFullscreenToggle(field.checked);
+        handlers.onSettingsInput(readSettingsForm());
+      });
+      bindCheckbox(dom.fields.minimal_mode_enabled, function onMinimalModeInput(field) {
+        handlers.onMinimalModeToggle(field.checked);
+        handlers.onSettingsInput(readSettingsForm());
+      });
+      bindCheckbox(dom.fields.wake_lock_enabled, function onWakeLockInput(field) {
+        handlers.onWakeLockToggle(field.checked);
+        handlers.onSettingsInput(readSettingsForm());
       });
 
       window.addEventListener("keydown", function onKeydown(event) {
-        if (event.key === "Escape" && handlers.onExitMinimalMode) {
+        if (event.key === "Escape") {
           dom.controls.exitMinimalModeWrap.setAttribute("data-open", "false");
           handlers.onExitMinimalMode();
           return;
@@ -102,58 +104,61 @@
         if (key === "r") handlers.onShortcut("reset");
       });
 
-      let lastMinimalPointerActionMs = 0;
-
-      function isMinimalPanelTarget(target) {
-        return Boolean(target && target.closest && target.closest("#minimal-exit-wrap"));
-      }
-
-      function isMinimalPanelOpen() {
-        return dom.controls.exitMinimalModeWrap.getAttribute("data-open") === "true";
-      }
-
-      function shouldHandleMinimalAction(event) {
-        if (!document.documentElement.hasAttribute("data-minimal-mode")) return false;
-        if (event.button != null && event.button !== 0) return false;
-        if (isMinimalPanelTarget(event.target)) return false;
-        return true;
-      }
-
-      function consumeMinimalEvent(event, source) {
-        if (source !== "click") lastMinimalPointerActionMs = Date.now();
-        if (event.cancelable && event.preventDefault) event.preventDefault();
-      }
-
-      function toggleMinimalTimer(event, source) {
-        if (!shouldHandleMinimalAction(event)) return;
-        const now = Date.now();
-        if (source === "click" && now - lastMinimalPointerActionMs < 500) return;
-        if (isMinimalPanelOpen()) {
-          dom.controls.exitMinimalModeWrap.setAttribute("data-open", "false");
-          consumeMinimalEvent(event, source);
-          return;
-        }
-        if (isFormTarget(event.target)) return;
-        consumeMinimalEvent(event, source);
-        handlers.onShortcut("toggle");
-      }
-
-      window.addEventListener("pointerup", function onWindowPointerUp(event) {
-        toggleMinimalTimer(event, "pointer");
-      });
-
-      window.addEventListener("touchend", function onWindowTouchEnd(event) {
-        toggleMinimalTimer(event, "touch");
-      });
-
-      window.addEventListener("click", function onWindowClick(event) {
-        toggleMinimalTimer(event, "click");
-      });
+      bindMinimalModeSurface(handlers);
 
       document.addEventListener("fullscreenchange", function onFullscreenChange() {
-        if (handlers.onFullscreenChange)
-          handlers.onFullscreenChange(Boolean(document.fullscreenElement));
+        handlers.onFullscreenChange(Boolean(document.fullscreenElement));
       });
+    }
+
+    function bindNumberField(field, handlers) {
+      field.addEventListener("input", function onInput() {
+        handlers.onSettingsInput(readSettingsForm());
+      });
+    }
+
+    function bindCheckbox(field, onChange) {
+      field.addEventListener("change", function onCheckboxChange() {
+        onChange(field);
+      });
+    }
+
+    function bindMinimalModeSurface(handlers) {
+      const eventName = "PointerEvent" in window ? "pointerup" : "click";
+      window.addEventListener(eventName, function onMinimalSurfaceAction(event) {
+        toggleMinimalTimer(event, handlers);
+      });
+    }
+
+    function isMinimalPanelTarget(target) {
+      return Boolean(target && target.closest && target.closest("#minimal-exit-wrap"));
+    }
+
+    function isMinimalPanelOpen() {
+      return dom.controls.exitMinimalModeWrap.getAttribute("data-open") === "true";
+    }
+
+    function shouldHandleMinimalAction(event) {
+      if (!document.documentElement.hasAttribute("data-minimal-mode")) return false;
+      if (event.button != null && event.button !== 0) return false;
+      if (isMinimalPanelTarget(event.target)) return false;
+      if (isFormTarget(event.target)) return false;
+      return true;
+    }
+
+    function consumeMinimalEvent(event) {
+      if (event.cancelable && event.preventDefault) event.preventDefault();
+    }
+
+    function toggleMinimalTimer(event, handlers) {
+      if (!shouldHandleMinimalAction(event)) return;
+      if (isMinimalPanelOpen()) {
+        dom.controls.exitMinimalModeWrap.setAttribute("data-open", "false");
+        consumeMinimalEvent(event);
+        return;
+      }
+      consumeMinimalEvent(event);
+      handlers.onShortcut("toggle");
     }
 
     return {
