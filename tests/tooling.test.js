@@ -31,6 +31,8 @@ function steps(job) {
 
 test("Node version metadata stays aligned", function () {
   const nodeVersion = read(".node-version").trim();
+  const majorVersion = nodeVersion.split(".")[0];
+  const engineRange = ">=" + majorVersion + " <" + (Number(majorVersion) + 1);
   const pkg = JSON.parse(read("package.json"));
   const lock = JSON.parse(read("package-lock.json"));
 
@@ -39,12 +41,12 @@ test("Node version metadata stays aligned", function () {
     ".node-version should contain an exact semver version"
   );
   assert(
-    pkg.engines && pkg.engines.node === nodeVersion,
-    "package engines.node should match .node-version"
+    pkg.engines && pkg.engines.node === engineRange,
+    "package engines.node should support the .node-version major"
   );
   assert(
-    lock.packages[""].engines.node === nodeVersion,
-    "lockfile root engines.node should match .node-version"
+    lock.packages[""].engines.node === engineRange,
+    "lockfile root engines.node should match package engines.node"
   );
 });
 
