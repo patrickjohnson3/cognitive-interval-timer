@@ -102,24 +102,39 @@
         if (key === "r") handlers.onShortcut("reset");
       });
 
-      let lastMinimalPointerToggleMs = 0;
+      let lastMinimalPointerActionMs = 0;
 
-      function shouldHandleMinimalToggle(event) {
+      function isMinimalPanelTarget(target) {
+        return Boolean(target && target.closest && target.closest("#minimal-exit-wrap"));
+      }
+
+      function isMinimalPanelOpen() {
+        return dom.controls.exitMinimalModeWrap.getAttribute("data-open") === "true";
+      }
+
+      function shouldHandleMinimalAction(event) {
         if (!document.documentElement.hasAttribute("data-minimal-mode")) return false;
         if (event.button != null && event.button !== 0) return false;
-        if (event.target && event.target.closest && event.target.closest("#minimal-exit-wrap")) {
-          return false;
-        }
-        if (isFormTarget(event.target)) return false;
+        if (isMinimalPanelTarget(event.target)) return false;
         return true;
       }
 
-      function toggleMinimalTimer(event, source) {
-        if (!shouldHandleMinimalToggle(event)) return;
-        const now = Date.now();
-        if (source === "click" && now - lastMinimalPointerToggleMs < 500) return;
-        if (source !== "click") lastMinimalPointerToggleMs = now;
+      function consumeMinimalEvent(event, source) {
+        if (source !== "click") lastMinimalPointerActionMs = Date.now();
         if (event.cancelable && event.preventDefault) event.preventDefault();
+      }
+
+      function toggleMinimalTimer(event, source) {
+        if (!shouldHandleMinimalAction(event)) return;
+        const now = Date.now();
+        if (source === "click" && now - lastMinimalPointerActionMs < 500) return;
+        if (isMinimalPanelOpen()) {
+          dom.controls.exitMinimalModeWrap.setAttribute("data-open", "false");
+          consumeMinimalEvent(event, source);
+          return;
+        }
+        if (isFormTarget(event.target)) return;
+        consumeMinimalEvent(event, source);
         handlers.onShortcut("toggle");
       }
 

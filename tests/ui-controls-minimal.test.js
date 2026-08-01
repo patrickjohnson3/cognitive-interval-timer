@@ -286,6 +286,48 @@ test("click after pointer release in minimal mode does not double toggle", funct
   );
 });
 
+test("clicking outside open minimal panel closes it without toggling timer", function () {
+  const ctx = bindWithBrowserStubs();
+  ctx.documentElement.setAttribute("data-minimal-mode", "true");
+  ctx.dom.controls.exitMinimalModeWrap.setAttribute("data-open", "true");
+  ctx.windowListeners.click({
+    button: 0,
+    cancelable: true,
+    preventDefault: function preventDefault() {
+      ctx.calls.push("prevent-default");
+    },
+    target: createNode({ id: "timer-panel" }),
+  });
+
+  assert(
+    ctx.dom.controls.exitMinimalModeWrap.getAttribute("data-open") === "false",
+    "expected outside click to close minimal panel"
+  );
+  assert(ctx.calls.includes("prevent-default"), "expected outside click to be consumed");
+  assert(
+    !ctx.calls.includes("shortcut:toggle"),
+    "outside click should not toggle timer while closing panel"
+  );
+});
+
+test("pointer close of minimal panel ignores synthesized click", function () {
+  const ctx = bindWithBrowserStubs();
+  const target = createNode({ id: "timer-panel" });
+  ctx.documentElement.setAttribute("data-minimal-mode", "true");
+  ctx.dom.controls.exitMinimalModeWrap.setAttribute("data-open", "true");
+  ctx.windowListeners.pointerup({ button: 0, target });
+  ctx.windowListeners.click({ button: 0, target });
+
+  assert(
+    ctx.dom.controls.exitMinimalModeWrap.getAttribute("data-open") === "false",
+    "expected pointer release to close minimal panel"
+  );
+  assert(
+    !ctx.calls.includes("shortcut:toggle"),
+    "synthesized click should not toggle after panel close"
+  );
+});
+
 test("restarting from minimal panel resets without toggling timer", function () {
   const ctx = bindWithBrowserStubs();
   ctx.documentElement.setAttribute("data-minimal-mode", "true");
