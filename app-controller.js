@@ -237,7 +237,15 @@
       if (!quietModeIsEnabled() && appState.settings.sound_enabled) {
         audio.playPhaseChime();
       }
+      showPhaseTransition(payload);
       announce.announce(a11y.formatAnnouncement("phase_started", { label: payload.label }));
+    }
+
+    function showPhaseTransition(payload) {
+      if (!payload || !payload.from || !announce.showTransition) return;
+      const from = Core.stateLabel(payload.from);
+      const to = payload.label || Core.stateLabel(payload.to);
+      announce.showTransition(from + " complete. " + to + " starts now.");
     }
 
     function applyStaticCopy() {

@@ -94,6 +94,7 @@ function setup(options) {
   const timerCalls = [];
   const hapticCalls = [];
   const audioCalls = [];
+  const transitionCalls = [];
 
   global.document = {
     fullscreenElement: null,
@@ -163,6 +164,9 @@ function setup(options) {
     Content,
     announce: {
       flashMessage: function flashMessage() {},
+      showTransition: function showTransition(message) {
+        transitionCalls.push(message);
+      },
       announce: function announce() {},
     },
     render,
@@ -245,6 +249,7 @@ function setup(options) {
     wakeLockCalls,
     hapticCalls,
     audioCalls,
+    transitionCalls,
   };
 }
 
@@ -278,10 +283,21 @@ test("primary action resumes while timer is paused", function () {
 
 test("phase changes trigger phase haptic feedback", function () {
   const ctx = setup();
-  ctx.app.onPhaseChange({ label: "Focus" });
+  ctx.app.onPhaseChange({ from: Core.PHASE.FOCUS, to: Core.PHASE.RECALL, label: "Recall" });
 
   assert(ctx.hapticCalls.includes("phase"), "expected phase-change haptic feedback");
   assert(ctx.audioCalls.includes("phase"), "expected phase-change sound");
+  assert(
+    ctx.transitionCalls.includes("Focus complete. Recall starts now."),
+    "expected readable phase transition"
+  );
+});
+
+test("initial phase start does not show completion transition", function () {
+  const ctx = setup();
+  ctx.app.onPhaseChange({ from: null, to: Core.PHASE.FOCUS, label: "Focus" });
+
+  assert(ctx.transitionCalls.length === 0, "initial start should not show completion transition");
 });
 
 test("quiet mode suppresses tap feedback", function () {

@@ -77,6 +77,7 @@
     return {
       state: byId("state"),
       time: byId("time"),
+      transitionMessage: byId("transition-message"),
       hint: byId("hint"),
       longHint: byId("long-hint"),
       focusBlockBadge: byId("focus-block-badge"),
