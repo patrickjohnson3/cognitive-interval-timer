@@ -151,12 +151,6 @@ test("normalizeSettings preserves wake lock preference", function () {
   assert(settings.wake_lock_enabled === true, "expected wake lock preference to normalize");
 });
 
-test("normalizeSettings accepts legacy prime setting keys", function () {
-  const settings = Core.normalizeSettings({ prime: 4, prime_enabled: false });
-  assert(settings.prep === 4, "expected legacy prime duration to map to prep");
-  assert(settings.prep_enabled === false, "expected legacy prime_enabled to map to prep_enabled");
-});
-
 if (!process.exitCode) {
   console.log("All tests passed.");
 }

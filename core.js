@@ -86,20 +86,7 @@
 
   function normalizeSettings(source) {
     const input = source || {};
-    const legacyAliases = {};
-    if (
-      Object.prototype.hasOwnProperty.call(input, "prime") &&
-      !Object.prototype.hasOwnProperty.call(input, "prep")
-    ) {
-      legacyAliases.prep = input.prime;
-    }
-    if (
-      Object.prototype.hasOwnProperty.call(input, "prime_enabled") &&
-      !Object.prototype.hasOwnProperty.call(input, "prep_enabled")
-    ) {
-      legacyAliases.prep_enabled = input.prime_enabled;
-    }
-    const merged = Object.assign({}, DEFAULT_SETTINGS, legacyAliases, input);
+    const merged = Object.assign({}, DEFAULT_SETTINGS, input);
     return {
       prep: clampInt(merged.prep, DEFAULT_SETTINGS.prep, 0, 60),
       focus: clampInt(merged.focus, DEFAULT_SETTINGS.focus, 1, 180),
@@ -227,8 +214,12 @@
       options || {}
     );
 
-    const outTimer = Object.assign({}, timer);
-    const outStats = normalizeStats(stats);
+    const outTimer = timer || {
+      running: false,
+      phase: initialPhase(settings),
+      remainingSec: phaseDurationSec(initialPhase(settings), settings),
+    };
+    const outStats = stats || normalizeStats(null);
     let remainingElapsed = Math.max(0, Number(elapsedSec) || 0);
     const events = [];
     let transitions = 0;

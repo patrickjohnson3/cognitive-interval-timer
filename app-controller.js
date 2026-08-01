@@ -11,7 +11,6 @@
     const announce = deps.announce;
     const render = deps.render;
     const controls = deps.controls;
-    const timer = deps.timer;
     const storage = deps.storage;
     const audio = deps.audio;
     const haptics = deps.haptics || {
@@ -53,6 +52,16 @@
       wakeLock: wakeLock,
       onUnavailable: reconcileWakeLockUnavailable,
     });
+    const timer =
+      deps.timer ||
+      deps.TimerEngine.create({
+        state: appState,
+        Core: Core,
+        hooks: {
+          onPhaseChange,
+          onStateChange,
+        },
+      });
 
     const controller = {
       initialize,

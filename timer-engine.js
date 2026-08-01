@@ -6,12 +6,7 @@
   }
 })(typeof self !== "undefined" ? self : this, function makeTimerEngine() {
   function create(config) {
-    const resolveState =
-      typeof config.state === "function"
-        ? config.state
-        : function getState() {
-            return config.state;
-          };
+    const state = config.state;
     const Core = config.Core;
     const hooks = config.hooks;
     let intervalId = null;
@@ -22,7 +17,6 @@
     }
 
     function start() {
-      const state = resolveState();
       state.stats = Core.rolloverStats(state.stats, Core.dateKey());
 
       if (!state.timer.hasStartedOnce) {
@@ -41,19 +35,16 @@
     }
 
     function pause() {
-      const state = resolveState();
       state.timer.running = false;
       state.timer.lastTickMs = null;
       hooks.onStateChange();
     }
 
     function reset() {
-      const state = resolveState();
       resetToPhase(Core.initialPhase(state.settings));
     }
 
     function resetToPhase(phase) {
-      const state = resolveState();
       state.stats = Core.rolloverStats(state.stats, Core.dateKey());
       state.timer.running = false;
       state.timer.lastTickMs = null;
@@ -64,7 +55,6 @@
     }
 
     function skip() {
-      const state = resolveState();
       const from = state.timer.phase;
       const to = Core.nextPhase(from, state.stats, state.settings);
       if (!Core.isValidTransition(from, to, state.stats, state.settings)) return;
@@ -76,7 +66,6 @@
     }
 
     function enterPhase(phase, options) {
-      const state = resolveState();
       const nextConfig = Object.assign(
         {
           reason: "transition",
@@ -115,7 +104,6 @@
     }
 
     function tick() {
-      const state = resolveState();
       if (!state.timer.running) return;
 
       state.stats = Core.rolloverStats(state.stats, Core.dateKey());

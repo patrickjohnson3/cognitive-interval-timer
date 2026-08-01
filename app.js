@@ -42,21 +42,6 @@
   const a11y = A11y.create({ Content: Content });
   const announce = UIAnnounce.create(dom);
 
-  let app = null;
-
-  const timer = TimerEngine.create({
-    state: getState,
-    Core: Core,
-    hooks: {
-      onPhaseChange: function onPhaseChange(payload) {
-        app.onPhaseChange(payload);
-      },
-      onStateChange: function onStateChange() {
-        app.onStateChange();
-      },
-    },
-  });
-
   const render = UIRender.create({
     dom: dom,
     Core: Core,
@@ -65,13 +50,13 @@
 
   const controls = UIControls.create(dom);
 
-  app = AppController.create({
+  const app = AppController.create({
     Core: Core,
     Content: Content,
     announce: announce,
     render: render,
     controls: controls,
-    timer: timer,
+    TimerEngine: TimerEngine,
     storage: storage,
     audio: audio,
     haptics: haptics,
@@ -82,10 +67,6 @@
 
   window.AppController = app.controller;
   app.controller.initialize();
-
-  function getState() {
-    return app.state;
-  }
 
   function hydrateAppVersion(node, versionInfo) {
     node.textContent = "Version " + versionInfo.label;
