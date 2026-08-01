@@ -51,6 +51,7 @@
     prep_enabled: true,
     auto_start: true,
     sound_enabled: true,
+    quiet_mode_enabled: false,
     fullscreen_enabled: false,
     minimal_mode_enabled: false,
     wake_lock_enabled: false,
@@ -109,6 +110,10 @@
         typeof merged.sound_enabled === "boolean"
           ? merged.sound_enabled
           : DEFAULT_SETTINGS.sound_enabled,
+      quiet_mode_enabled:
+        typeof merged.quiet_mode_enabled === "boolean"
+          ? merged.quiet_mode_enabled
+          : DEFAULT_SETTINGS.quiet_mode_enabled,
       fullscreen_enabled:
         typeof merged.fullscreen_enabled === "boolean"
           ? merged.fullscreen_enabled

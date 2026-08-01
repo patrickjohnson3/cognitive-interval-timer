@@ -184,23 +184,32 @@
       return normalized;
     }
 
-    function start() {
+    function quietModeIsEnabled() {
+      return appState.settings.quiet_mode_enabled;
+    }
+
+    function tapFeedback() {
+      if (quietModeIsEnabled()) return;
       haptics.tap();
+    }
+
+    function start() {
+      tapFeedback();
       timer.start();
     }
 
     function pause() {
-      haptics.tap();
+      tapFeedback();
       timer.pause();
     }
 
     function skip() {
-      haptics.tap();
+      tapFeedback();
       timer.skip();
     }
 
     function reset() {
-      haptics.tap();
+      tapFeedback();
       timer.reset();
     }
 
@@ -222,8 +231,10 @@
     }
 
     function onPhaseChange(payload) {
-      haptics.phaseChange();
-      if (appState.settings.sound_enabled) {
+      if (!quietModeIsEnabled()) {
+        haptics.phaseChange();
+      }
+      if (!quietModeIsEnabled() && appState.settings.sound_enabled) {
         audio.playPhaseChime();
       }
       announce.announce(a11y.formatAnnouncement("phase_started", { label: payload.label }));
@@ -235,6 +246,7 @@
       dom.copy.prepEnabled.textContent = Content.UI_COPY.startWithPrep;
       dom.copy.autoStart.textContent = Content.UI_COPY.autoStartNext;
       dom.copy.soundEnabled.textContent = Content.UI_COPY.soundOnPhaseChange;
+      dom.copy.quietModeEnabled.textContent = Content.UI_COPY.quietMode;
       dom.copy.fullscreenEnabled.textContent = Content.UI_COPY.fullscreenMode;
       dom.copy.minimalModeEnabled.textContent = Content.UI_COPY.minimalMode;
       dom.copy.wakeLockEnabled.textContent = Content.UI_COPY.keepScreenAwake;
@@ -278,6 +290,7 @@
         a.prep_enabled === b.prep_enabled &&
         a.auto_start === b.auto_start &&
         a.sound_enabled === b.sound_enabled &&
+        a.quiet_mode_enabled === b.quiet_mode_enabled &&
         a.fullscreen_enabled === b.fullscreen_enabled &&
         a.minimal_mode_enabled === b.minimal_mode_enabled &&
         a.wake_lock_enabled === b.wake_lock_enabled

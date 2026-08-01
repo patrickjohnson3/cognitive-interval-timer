@@ -63,6 +63,7 @@
     startWithPrep: "Start With Prep Phase",
     autoStartNext: "Auto-Start Next Phase",
     soundOnPhaseChange: "Play Sound On Phase Change",
+    quietMode: "Quiet Mode",
     fullscreenMode: "Fullscreen",
     minimalMode: "Minimal Mode",
     keepScreenAwake: "Keep Screen Awake",

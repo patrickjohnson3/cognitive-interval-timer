@@ -87,6 +87,11 @@ function createDom() {
         type: "checkbox",
         checked: true,
       }),
+      quiet_mode_enabled: createNode({
+        id: "quiet_mode_enabled",
+        tagName: "INPUT",
+        type: "checkbox",
+      }),
       fullscreen_enabled: createNode({
         id: "fullscreen_enabled",
         tagName: "INPUT",
@@ -217,6 +222,14 @@ test("fullscreen checkbox triggers fullscreen handler and dirty settings handler
   ctx.dom.fields.fullscreen_enabled.listeners.change();
 
   assert(ctx.calls.includes("fullscreen:true"), "expected fullscreen toggle handler");
+  assert(ctx.calls.includes("settings"), "expected settings dirty handler");
+});
+
+test("quiet mode checkbox triggers dirty settings handler", function () {
+  const ctx = bindWithBrowserStubs();
+  ctx.dom.fields.quiet_mode_enabled.checked = true;
+  ctx.dom.fields.quiet_mode_enabled.listeners.change();
+
   assert(ctx.calls.includes("settings"), "expected settings dirty handler");
 });
 

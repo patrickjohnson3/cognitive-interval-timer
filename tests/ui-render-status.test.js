@@ -54,6 +54,7 @@ function createDeps() {
       prep_enabled: { checked: false },
       auto_start: { checked: false },
       sound_enabled: { checked: false },
+      quiet_mode_enabled: { checked: false },
       fullscreen_enabled: { checked: false },
       minimal_mode_enabled: { checked: false },
       wake_lock_enabled: { checked: false },
@@ -130,6 +131,7 @@ function baseState() {
     },
     settings: {
       blocks_per_ultradian: 2,
+      quiet_mode_enabled: false,
     },
     ui: {
       settingsDirty: false,

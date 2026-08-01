@@ -51,6 +51,7 @@ function createDom() {
       prepEnabled: createNode(),
       autoStart: createNode(),
       soundEnabled: createNode(),
+      quietModeEnabled: createNode(),
       fullscreenEnabled: createNode(),
       minimalModeEnabled: createNode(),
       wakeLockEnabled: createNode(),
@@ -72,6 +73,7 @@ function createDom() {
       prep_enabled: createNode(),
       auto_start: createNode(),
       sound_enabled: createNode(),
+      quiet_mode_enabled: createNode(),
       fullscreen_enabled: createNode(),
       minimal_mode_enabled: createNode(),
       wake_lock_enabled: createNode(),
@@ -91,6 +93,7 @@ function setup(options) {
   const wakeLockCalls = [];
   const timerCalls = [];
   const hapticCalls = [];
+  const audioCalls = [];
 
   global.document = {
     fullscreenElement: null,
@@ -134,6 +137,7 @@ function setup(options) {
         prep_enabled: dom.fields.prep_enabled.checked,
         auto_start: dom.fields.auto_start.checked,
         sound_enabled: dom.fields.sound_enabled.checked,
+        quiet_mode_enabled: dom.fields.quiet_mode_enabled.checked,
         fullscreen_enabled: dom.fields.fullscreen_enabled.checked,
         minimal_mode_enabled: dom.fields.minimal_mode_enabled.checked,
         wake_lock_enabled: dom.fields.wake_lock_enabled.checked,
@@ -200,7 +204,9 @@ function setup(options) {
       },
     },
     audio: {
-      playPhaseChime: function playPhaseChime() {},
+      playPhaseChime: function playPhaseChime() {
+        audioCalls.push("phase");
+      },
     },
     haptics: {
       tap: function tap() {
@@ -238,6 +244,7 @@ function setup(options) {
     timerCalls,
     wakeLockCalls,
     hapticCalls,
+    audioCalls,
   };
 }
 
@@ -274,6 +281,25 @@ test("phase changes trigger phase haptic feedback", function () {
   ctx.app.onPhaseChange({ label: "Focus" });
 
   assert(ctx.hapticCalls.includes("phase"), "expected phase-change haptic feedback");
+  assert(ctx.audioCalls.includes("phase"), "expected phase-change sound");
+});
+
+test("quiet mode suppresses tap feedback", function () {
+  const ctx = setup({ storedSettings: Core.normalizeSettings({ quiet_mode_enabled: true }) });
+  ctx.boundHandlers.onPrimaryAction();
+
+  assert(ctx.timerCalls.includes("start"), "expected primary action to start timer");
+  assert(!ctx.hapticCalls.includes("tap"), "expected quiet mode to suppress tap haptics");
+});
+
+test("quiet mode suppresses phase sound and haptics", function () {
+  const ctx = setup({
+    storedSettings: Core.normalizeSettings({ quiet_mode_enabled: true, sound_enabled: true }),
+  });
+  ctx.app.onPhaseChange({ label: "Focus" });
+
+  assert(!ctx.hapticCalls.includes("phase"), "expected quiet mode to suppress phase haptics");
+  assert(!ctx.audioCalls.includes("phase"), "expected quiet mode to suppress phase sound");
 });
 
 test("memory-only storage shows a persistence warning", function () {

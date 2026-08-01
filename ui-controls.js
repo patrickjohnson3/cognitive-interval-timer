@@ -23,6 +23,7 @@
         prep_enabled: dom.fields.prep_enabled.checked,
         auto_start: dom.fields.auto_start.checked,
         sound_enabled: dom.fields.sound_enabled.checked,
+        quiet_mode_enabled: dom.fields.quiet_mode_enabled.checked,
         fullscreen_enabled: dom.fields.fullscreen_enabled.checked,
         minimal_mode_enabled: dom.fields.minimal_mode_enabled.checked,
         wake_lock_enabled: dom.fields.wake_lock_enabled.checked,
@@ -72,6 +73,9 @@
         handlers.onSettingsInput(readSettingsForm());
       });
       bindCheckbox(dom.fields.sound_enabled, function onSoundEnabledInput() {
+        handlers.onSettingsInput(readSettingsForm());
+      });
+      bindCheckbox(dom.fields.quiet_mode_enabled, function onQuietModeInput() {
         handlers.onSettingsInput(readSettingsForm());
       });
       bindCheckbox(dom.fields.fullscreen_enabled, function onFullscreenInput(field) {

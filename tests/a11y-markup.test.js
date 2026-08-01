@@ -62,6 +62,7 @@ test("timer control icons are hidden from accessible names", function () {
 test("complex behavior settings include accessible helper text", function () {
   const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
   const describedSettings = [
+    ["quiet_mode_enabled", "help-quiet-mode-enabled"],
     ["fullscreen_enabled", "help-fullscreen-enabled"],
     ["minimal_mode_enabled", "help-minimal-mode-enabled"],
     ["wake_lock_enabled", "help-wake-lock-enabled"],

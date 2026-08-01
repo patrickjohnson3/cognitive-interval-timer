@@ -167,6 +167,11 @@ test("normalizeSettings preserves wake lock preference", function () {
   assert(settings.wake_lock_enabled === true, "expected wake lock preference to normalize");
 });
 
+test("normalizeSettings preserves quiet mode preference", function () {
+  const settings = Core.normalizeSettings({ quiet_mode_enabled: true });
+  assert(settings.quiet_mode_enabled === true, "expected quiet mode preference to normalize");
+});
+
 if (!process.exitCode) {
   console.log("All tests passed.");
 }
