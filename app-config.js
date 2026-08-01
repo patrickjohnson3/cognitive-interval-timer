@@ -11,9 +11,9 @@
     description: "A phase-based focus timer for deep work, recall, and real breaks.",
     cachePrefix: "cognitive-interval-timer-",
     documentTitleSeparator: " - ",
-    manifestId: "./",
-    manifestStartUrl: "./",
-    manifestScope: "./",
+    manifestId: "/cognitive-interval-timer/",
+    manifestStartUrl: "/cognitive-interval-timer/",
+    manifestScope: "/cognitive-interval-timer/",
     manifestOrientation: "any",
   };
 });

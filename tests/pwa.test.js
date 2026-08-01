@@ -131,10 +131,10 @@ test("manifest has installable app metadata and icons", function () {
   assert(manifest.name === appConfig.name, "unexpected manifest name");
   assert(manifest.short_name === appConfig.shortName, "unexpected manifest short_name");
   assert(manifest.description === appConfig.description, "unexpected manifest description");
-  assert(manifest.id === appConfig.manifestId, "expected path-independent PWA id");
+  assert(manifest.id === appConfig.manifestId, "expected explicit PWA id");
   assert(manifest.display === "standalone", "expected standalone display mode");
-  assert(manifest.start_url === appConfig.manifestStartUrl, "expected path-independent start_url");
-  assert(manifest.scope === appConfig.manifestScope, "expected path-independent scope");
+  assert(manifest.start_url === appConfig.manifestStartUrl, "expected explicit start_url");
+  assert(manifest.scope === appConfig.manifestScope, "expected explicit scope");
   assert(
     Content.UI_COPY.labels.documentTitleBase === appConfig.name,
     "document title should use app config name"
@@ -205,7 +205,7 @@ test("manifest includes app store discovery metadata", function () {
     assert(shortcut.name, "shortcut should include a name");
     assert(shortcut.short_name, "shortcut should include a short_name");
     assert(shortcut.description, "shortcut should include a description");
-    assert(shortcut.url === "./", "shortcut should open the timer root");
+    assert(shortcut.url === appConfig.manifestStartUrl, "shortcut should open the timer root");
   });
 });
 

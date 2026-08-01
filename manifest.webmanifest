@@ -2,9 +2,9 @@
   "name": "Cognitive Interval Timer",
   "short_name": "CogTimer",
   "description": "A phase-based focus timer for deep work, recall, and real breaks.",
-  "id": "./",
-  "start_url": "./",
-  "scope": "./",
+  "id": "/cognitive-interval-timer/",
+  "start_url": "/cognitive-interval-timer/",
+  "scope": "/cognitive-interval-timer/",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#111827",
@@ -57,7 +57,7 @@
       "name": "Open Timer",
       "short_name": "Timer",
       "description": "Open the focus timer.",
-      "url": "./",
+      "url": "/cognitive-interval-timer/",
       "icons": [
         {
           "src": "assets/icons/icon-192.png",
