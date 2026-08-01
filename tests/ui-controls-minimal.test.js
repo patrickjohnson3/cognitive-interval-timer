@@ -247,6 +247,44 @@ test("clicking screen in minimal mode toggles start pause", function () {
   assert(ctx.calls.includes("shortcut:toggle"), "expected minimal click to toggle timer");
 });
 
+test("pointer release in minimal mode toggles start pause", function () {
+  const ctx = bindWithBrowserStubs();
+  ctx.documentElement.setAttribute("data-minimal-mode", "true");
+  ctx.windowListeners.pointerup({
+    button: 0,
+    cancelable: true,
+    preventDefault: function preventDefault() {},
+    target: createNode({ id: "timer-panel" }),
+  });
+
+  assert(ctx.calls.includes("shortcut:toggle"), "expected minimal pointerup to toggle timer");
+});
+
+test("touch release in minimal mode toggles start pause", function () {
+  const ctx = bindWithBrowserStubs();
+  ctx.documentElement.setAttribute("data-minimal-mode", "true");
+  ctx.windowListeners.touchend({
+    cancelable: true,
+    preventDefault: function preventDefault() {},
+    target: createNode({ id: "timer-panel" }),
+  });
+
+  assert(ctx.calls.includes("shortcut:toggle"), "expected minimal touchend to toggle timer");
+});
+
+test("click after pointer release in minimal mode does not double toggle", function () {
+  const ctx = bindWithBrowserStubs();
+  const target = createNode({ id: "timer-panel" });
+  ctx.documentElement.setAttribute("data-minimal-mode", "true");
+  ctx.windowListeners.pointerup({ button: 0, target });
+  ctx.windowListeners.click({ button: 0, target });
+
+  assert(
+    ctx.calls.filter((call) => call === "shortcut:toggle").length === 1,
+    "expected synthesized click to be ignored after pointer toggle"
+  );
+});
+
 test("clicking exit panel in minimal mode does not toggle timer", function () {
   const ctx = bindWithBrowserStubs();
   const exitTarget = createNode({ id: "minimal-exit-wrap" });

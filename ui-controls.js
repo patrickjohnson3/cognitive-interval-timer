@@ -94,12 +94,37 @@
         if (key === "r") handlers.onShortcut("reset");
       });
 
-      window.addEventListener("click", function onWindowClick(event) {
-        if (!document.documentElement.hasAttribute("data-minimal-mode")) return;
-        if (event.button != null && event.button !== 0) return;
-        if (event.target && event.target.closest && event.target.closest("#minimal-exit-wrap"))
-          return;
+      let lastMinimalPointerToggleMs = 0;
+
+      function shouldHandleMinimalToggle(event) {
+        if (!document.documentElement.hasAttribute("data-minimal-mode")) return false;
+        if (event.button != null && event.button !== 0) return false;
+        if (event.target && event.target.closest && event.target.closest("#minimal-exit-wrap")) {
+          return false;
+        }
+        if (isFormTarget(event.target)) return false;
+        return true;
+      }
+
+      function toggleMinimalTimer(event, source) {
+        if (!shouldHandleMinimalToggle(event)) return;
+        const now = Date.now();
+        if (source === "click" && now - lastMinimalPointerToggleMs < 500) return;
+        if (source !== "click") lastMinimalPointerToggleMs = now;
+        if (event.cancelable && event.preventDefault) event.preventDefault();
         handlers.onShortcut("toggle");
+      }
+
+      window.addEventListener("pointerup", function onWindowPointerUp(event) {
+        toggleMinimalTimer(event, "pointer");
+      });
+
+      window.addEventListener("touchend", function onWindowTouchEnd(event) {
+        toggleMinimalTimer(event, "touch");
+      });
+
+      window.addEventListener("click", function onWindowClick(event) {
+        toggleMinimalTimer(event, "click");
       });
 
       document.addEventListener("fullscreenchange", function onFullscreenChange() {
