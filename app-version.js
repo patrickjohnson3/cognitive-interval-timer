@@ -6,10 +6,10 @@
   }
 })(typeof self !== "undefined" ? self : this, function makeAppVersion() {
   return {
-    version: "1.0.0",
+    version: "1.1.0",
     build: "local",
     commit: "local",
     builtAt: "local",
-    label: "1.0.0-local",
+    label: "1.1.0-local",
   };
 });

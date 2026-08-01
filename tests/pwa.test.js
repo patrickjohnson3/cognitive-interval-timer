@@ -145,7 +145,7 @@ test("index exposes visible app version metadata", function () {
   const html = readProjectFile("index.html");
 
   assert(html.includes('id="app-version"'), "missing visible app version label");
-  assert(appVersion.label === "1.0.0-local", "unexpected local app version label");
+  assert(appVersion.label === "1.1.0-local", "unexpected local app version label");
 });
 
 test("service worker caches the app shell", function () {

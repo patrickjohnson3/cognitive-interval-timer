@@ -29,7 +29,7 @@ function assertVersionedArtifact() {
   const appVersion = fs.readFileSync(path.join(SITE_ROOT, "app-version.js"), "utf8");
   const serviceWorker = fs.readFileSync(path.join(SITE_ROOT, "service-worker.js"), "utf8");
 
-  if (!appVersion.includes('"label": "1.0.0+' + shortCommit + '"')) {
+  if (!appVersion.includes('"label": "1.1.0+' + shortCommit + '"')) {
     throw new Error("Pages artifact app-version.js does not include the commit build label");
   }
   if (!serviceWorker.includes('const SERVICE_WORKER_BUILD = "' + commit + '";')) {
