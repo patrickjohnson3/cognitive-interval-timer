@@ -2,6 +2,7 @@ const childProcess = require("child_process");
 const fs = require("fs");
 const path = require("path");
 const appShell = require("../app-shell-assets.js");
+const packageJson = require("../package.json");
 
 const ROOT = path.join(__dirname, "..");
 
@@ -36,6 +37,62 @@ function trackedFiles() {
     .filter(Boolean);
 }
 
+function gitValue(args, fallback) {
+  try {
+    return childProcess.execFileSync("git", args, { cwd: ROOT, encoding: "utf8" }).trim();
+  } catch {
+    return fallback;
+  }
+}
+
+function buildMetadata() {
+  const commit = process.env.GITHUB_SHA || gitValue(["rev-parse", "HEAD"], "local");
+  const shortCommit = commit === "local" ? "local" : commit.slice(0, 7);
+  const builtAt = process.env.GITHUB_SHA ? new Date().toISOString() : "local";
+  const version = packageJson.version;
+
+  return {
+    version,
+    build: commit,
+    commit,
+    builtAt,
+    label: version + "+" + shortCommit,
+  };
+}
+
+function appVersionSource(metadata) {
+  return (
+    "(function initAppVersion(root, factory) {\n" +
+    '  if (typeof module === "object" && module.exports) {\n' +
+    "    module.exports = factory();\n" +
+    "  } else {\n" +
+    "    root.PomodoroAppVersion = factory();\n" +
+    "  }\n" +
+    '})(typeof self !== "undefined" ? self : this, function makeAppVersion() {\n' +
+    "  return " +
+    JSON.stringify(metadata, null, 4) +
+    ";\n" +
+    "});\n"
+  );
+}
+
+function writeAppVersion(outputDir, metadata) {
+  fs.writeFileSync(path.join(outputDir, "app-version.js"), appVersionSource(metadata));
+}
+
+function writeServiceWorkerBuild(outputDir, metadata) {
+  const serviceWorkerPath = path.join(outputDir, "service-worker.js");
+  const serviceWorker = fs.readFileSync(serviceWorkerPath, "utf8");
+  const stampedServiceWorker = serviceWorker.replace(
+    'const SERVICE_WORKER_BUILD = "local";',
+    "const SERVICE_WORKER_BUILD = " + JSON.stringify(metadata.build) + ";"
+  );
+  if (stampedServiceWorker === serviceWorker) {
+    throw new Error("Missing service worker build placeholder");
+  }
+  fs.writeFileSync(serviceWorkerPath, stampedServiceWorker);
+}
+
 function preparePagesArtifact(outputArg) {
   const outputDir = path.resolve(ROOT, outputArg || "_site");
   assertInsideRoot(outputDir);
@@ -50,6 +107,10 @@ function preparePagesArtifact(outputArg) {
       fs.mkdirSync(path.dirname(destination), { recursive: true });
       fs.copyFileSync(source, destination);
     });
+
+  const metadata = buildMetadata();
+  writeAppVersion(outputDir, metadata);
+  writeServiceWorkerBuild(outputDir, metadata);
 
   const missingAppShellAssets = appShell.APP_SHELL.filter((asset) => asset !== "./").filter(
     (asset) => !fs.existsSync(path.join(outputDir, asset.replace(/^\.\//, "")))
@@ -69,5 +130,6 @@ if (require.main === module) {
 }
 
 module.exports = {
+  buildMetadata,
   preparePagesArtifact,
 };

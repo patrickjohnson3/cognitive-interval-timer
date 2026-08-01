@@ -16,6 +16,7 @@
   const TimerEngine = window.PomodoroTimerEngine;
   const AppController = window.PomodoroAppController;
   const A11y = window.PomodoroA11y;
+  const AppVersion = window.PomodoroAppVersion;
 
   if (
     !Core ||
@@ -34,12 +35,14 @@
     !TimerActions ||
     !TimerEngine ||
     !AppController ||
-    !A11y
+    !A11y ||
+    !AppVersion
   ) {
     throw new Error("Missing required modules. Ensure all scripts load before app.js");
   }
 
   const dom = createDOM();
+  hydrateAppVersion(dom.appVersion, AppVersion);
   const storage = Storage.createAdapter();
   const audio = Audio.createEngine();
   const haptics = Haptics.createController();
@@ -97,6 +100,11 @@
     return app.state;
   }
 
+  function hydrateAppVersion(node, versionInfo) {
+    node.textContent = "Version " + versionInfo.label;
+    node.title = "Build " + versionInfo.build + " from commit " + versionInfo.commit;
+  }
+
   function createDOM() {
     return {
       state: byId("state"),
@@ -112,6 +120,7 @@
       theme: byId("theme"),
       live: byId("live-announcer"),
       tagline: byId("tagline"),
+      appVersion: byId("app-version"),
       controls: {
         start: byId("start"),
         skip: byId("skip"),

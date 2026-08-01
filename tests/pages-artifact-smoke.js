@@ -1,4 +1,5 @@
 const childProcess = require("child_process");
+const fs = require("fs");
 const path = require("path");
 
 const ROOT = path.join(__dirname, "..");
@@ -18,8 +19,30 @@ function run(command, args, options) {
   }
 }
 
+function gitValue(args) {
+  return childProcess.execFileSync("git", args, { cwd: ROOT, encoding: "utf8" }).trim();
+}
+
+function assertVersionedArtifact() {
+  const commit = gitValue(["rev-parse", "HEAD"]);
+  const shortCommit = commit.slice(0, 7);
+  const appVersion = fs.readFileSync(path.join(SITE_ROOT, "app-version.js"), "utf8");
+  const serviceWorker = fs.readFileSync(path.join(SITE_ROOT, "service-worker.js"), "utf8");
+
+  if (!appVersion.includes('"label": "1.0.0+' + shortCommit + '"')) {
+    throw new Error("Pages artifact app-version.js does not include the commit build label");
+  }
+  if (!serviceWorker.includes('const SERVICE_WORKER_BUILD = "' + commit + '";')) {
+    throw new Error("Pages artifact service-worker.js does not include the commit build stamp");
+  }
+  if (serviceWorker.includes('const SERVICE_WORKER_BUILD = "local";')) {
+    throw new Error("Pages artifact service-worker.js still has the local build stamp");
+  }
+}
+
 try {
   run(NODE, ["scripts/build-pages.js", "_site"]);
+  assertVersionedArtifact();
   run(NODE, ["tests/pwa-offline-smoke.js"], { env: { APP_ROOT: SITE_ROOT } });
   console.log("Pages artifact smoke passed.");
 } catch (err) {

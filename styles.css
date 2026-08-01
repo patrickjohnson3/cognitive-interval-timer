@@ -340,6 +340,12 @@ kbd {
   line-height: 1.35;
 }
 
+.app-version {
+  margin: var(--space-2) 0 0;
+  color: var(--text-tertiary, var(--color-muted));
+  font-size: 0.78rem;
+}
+
 #pwa-install-button,
 #pwa-update-button {
   flex: 0 0 auto;

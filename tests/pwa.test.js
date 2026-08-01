@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const appConfig = require("../app-config.js");
 const appShell = require("../app-shell-assets.js");
+const appVersion = require("../app-version.js");
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -50,6 +51,7 @@ test("index links PWA manifest and registration script", function () {
     "missing dynamic theme-color meta"
   );
   assert(html.includes('<script src="pwa.js"></script>'), "missing PWA registration script");
+  assert(html.includes('<script src="app-version.js"></script>'), "missing app version script");
   assert(html.includes('<script src="app-config.js"></script>'), "missing app config script");
   assert(
     html.includes('<script src="pwa-prompts.js"></script>'),
@@ -139,6 +141,13 @@ test("manifest includes dedicated maskable icons", function () {
   });
 });
 
+test("index exposes visible app version metadata", function () {
+  const html = readProjectFile("index.html");
+
+  assert(html.includes('id="app-version"'), "missing visible app version label");
+  assert(appVersion.label === "1.0.0-local", "unexpected local app version label");
+});
+
 test("service worker caches the app shell", function () {
   const serviceWorker = readProjectFile("service-worker.js");
   const requiredAssets = shellAssetGroup("REQUIRED_APP_SHELL");
@@ -147,6 +156,7 @@ test("service worker caches the app shell", function () {
     "./index.html",
     "./manifest.webmanifest",
     "./styles.css",
+    "./app-version.js",
     "./app-config.js",
     "./haptics.js",
     "./display-services.js",
@@ -179,7 +189,7 @@ test("service worker caches the app shell", function () {
   );
 });
 
-test("service worker uses a stable app-scoped cache name", function () {
+test("service worker uses an app-scoped versioned cache name", function () {
   const serviceWorker = readProjectFile("service-worker.js");
 
   assert(
@@ -187,12 +197,16 @@ test("service worker uses a stable app-scoped cache name", function () {
     "cache prefix should come from app config"
   );
   assert(
-    serviceWorker.includes('const CACHE_NAME = CACHE_PREFIX + "app-shell";'),
-    "cache name should be stable and app-scoped"
+    serviceWorker.includes("const APP_VERSION = self.PomodoroAppVersion;"),
+    "cache version should come from generated app metadata"
   );
   assert(
-    !serviceWorker.includes("APP_VERSION"),
-    "service worker should not require manual version bumps"
+    serviceWorker.includes('const SERVICE_WORKER_BUILD = "local";'),
+    "service worker should include a deploy-stamped build placeholder"
+  );
+  assert(
+    serviceWorker.includes('const CACHE_NAME = CACHE_PREFIX + "app-shell-" + CACHE_VERSION;'),
+    "cache name should be app-scoped and versioned"
   );
 });
 

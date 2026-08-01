@@ -1,9 +1,12 @@
 if (typeof importScripts === "function") {
-  importScripts("./app-config.js", "./app-shell-assets.js");
+  importScripts("./app-config.js", "./app-version.js", "./app-shell-assets.js");
 }
 
 const CACHE_PREFIX = self.PomodoroAppConfig.cachePrefix;
-const CACHE_NAME = CACHE_PREFIX + "app-shell";
+const APP_VERSION = self.PomodoroAppVersion;
+const SERVICE_WORKER_BUILD = "local";
+const CACHE_VERSION = APP_VERSION.build || SERVICE_WORKER_BUILD || APP_VERSION.version || "local";
+const CACHE_NAME = CACHE_PREFIX + "app-shell-" + CACHE_VERSION;
 const REQUIRED_APP_SHELL = self.PomodoroAppShell.REQUIRED_APP_SHELL;
 const OPTIONAL_APP_SHELL = self.PomodoroAppShell.OPTIONAL_APP_SHELL;
 const APP_SHELL = self.PomodoroAppShell.APP_SHELL;

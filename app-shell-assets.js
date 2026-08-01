@@ -12,6 +12,7 @@
     "./themes/light.css",
     "./themes/dark.css",
     "./styles.css",
+    "./app-version.js",
     "./app-config.js",
     "./content.js",
     "./core.js",
