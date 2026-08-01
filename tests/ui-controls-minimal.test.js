@@ -53,6 +53,7 @@ function createDom() {
       defaults: createNode({ id: "defaults" }),
       exitMinimalModeWrap: createNode({ id: "minimal-exit-wrap" }),
       exitMinimalModeReveal: createNode({ id: "minimal-exit-reveal" }),
+      restartMinimalBlock: createNode({ id: "restart-minimal-block" }),
       exitMinimalMode: createNode({ id: "exit-minimal-mode" }),
     },
     theme: createNode({ id: "theme", tagName: "SELECT", value: "dark" }),
@@ -282,6 +283,25 @@ test("click after pointer release in minimal mode does not double toggle", funct
   assert(
     ctx.calls.filter((call) => call === "shortcut:toggle").length === 1,
     "expected synthesized click to be ignored after pointer toggle"
+  );
+});
+
+test("restarting from minimal panel resets without toggling timer", function () {
+  const ctx = bindWithBrowserStubs();
+  ctx.documentElement.setAttribute("data-minimal-mode", "true");
+  ctx.dom.controls.exitMinimalModeWrap.setAttribute("data-open", "true");
+  ctx.dom.controls.restartMinimalBlock.listeners.click({
+    stopPropagation: function stopPropagation() {
+      ctx.calls.push("stop-propagation");
+    },
+  });
+
+  assert(ctx.calls.includes("reset"), "expected minimal panel restart to reset block");
+  assert(ctx.calls.includes("stop-propagation"), "expected restart click not to bubble");
+  assert(!ctx.calls.includes("shortcut:toggle"), "restart should not toggle timer");
+  assert(
+    ctx.dom.controls.exitMinimalModeWrap.getAttribute("data-open") === "false",
+    "expected restart to close minimal panel"
   );
 });
 

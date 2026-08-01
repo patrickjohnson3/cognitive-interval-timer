@@ -43,6 +43,14 @@
         const open = dom.controls.exitMinimalModeWrap.getAttribute("data-open") === "true";
         dom.controls.exitMinimalModeWrap.setAttribute("data-open", open ? "false" : "true");
       });
+      dom.controls.restartMinimalBlock.addEventListener(
+        "click",
+        function onRestartMinimalBlockClick(event) {
+          if (event && event.stopPropagation) event.stopPropagation();
+          dom.controls.exitMinimalModeWrap.setAttribute("data-open", "false");
+          if (handlers.onReset) handlers.onReset();
+        }
+      );
       dom.controls.exitMinimalMode.addEventListener("click", function onExitMinimalModeClick() {
         dom.controls.exitMinimalModeWrap.setAttribute("data-open", "false");
         if (handlers.onExitMinimalMode) handlers.onExitMinimalMode();

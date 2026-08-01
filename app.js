@@ -120,6 +120,7 @@
         defaults: byId("defaults"),
         exitMinimalModeWrap: byId("minimal-exit-wrap"),
         exitMinimalModeReveal: byId("minimal-exit-reveal"),
+        restartMinimalBlock: byId("restart-minimal-block"),
         exitMinimalMode: byId("exit-minimal-mode"),
       },
       fields: {
