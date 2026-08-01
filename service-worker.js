@@ -20,14 +20,12 @@ function appShellAssetUrl(asset) {
   return new URL(asset, serviceWorkerBaseUrl()).href;
 }
 
-function appShellAssetUrls() {
-  return APP_SHELL.map(function toAbsoluteAssetUrl(asset) {
-    return appShellAssetUrl(asset);
-  });
-}
+const APP_SHELL_URLS = APP_SHELL.map(appShellAssetUrl);
+const APP_SHELL_URL_SET = new Set(APP_SHELL_URLS);
+const INDEX_URL = appShellAssetUrl("./index.html");
 
 function isAppShellRequest(requestUrl) {
-  return appShellAssetUrls().includes(requestUrl.href);
+  return APP_SHELL_URL_SET.has(requestUrl.href);
 }
 
 function cacheOptionalAsset(cache, asset) {
@@ -44,8 +42,48 @@ function cacheOptionalAsset(cache, asset) {
     });
 }
 
+function cacheResponse(cacheKey, response) {
+  if (!response || response.status !== 200 || response.type !== "basic") return response;
+  const responseCopy = response.clone();
+  return caches.open(CACHE_NAME).then(function cacheFreshResponse(cache) {
+    return cache.put(cacheKey, responseCopy).then(function cachedFreshResponse() {
+      return response;
+    });
+  });
+}
+
+function offlineResponse(message) {
+  return new Response(message, { status: 503, statusText: "Offline" });
+}
+
+function fetchNavigation(request) {
+  return fetch(request)
+    .then(function useFreshNavigation(response) {
+      if (!response || !response.ok || response.type !== "basic") return response;
+      return cacheResponse(INDEX_URL, response);
+    })
+    .catch(function fallBackToCachedShell() {
+      return caches.match(INDEX_URL).then(function useCachedShell(cached) {
+        return cached || offlineResponse("Offline app shell unavailable.");
+      });
+    });
+}
+
+function fetchAsset(request, requestUrl) {
+  return fetch(request)
+    .then(function useFreshAsset(response) {
+      if (!isAppShellRequest(requestUrl)) return response;
+      return cacheResponse(request, response);
+    })
+    .catch(function fallBackToCachedAsset() {
+      return caches.match(request).then(function useCachedAsset(cached) {
+        return cached || offlineResponse("Offline asset unavailable.");
+      });
+    });
+}
+
 function pruneCurrentAppShellCache() {
-  const expectedUrls = new Set(appShellAssetUrls());
+  const expectedUrls = new Set(APP_SHELL_URLS);
   return caches.open(CACHE_NAME).then(function pruneCache(cache) {
     return cache.keys().then(function deleteUnexpectedRequests(requests) {
       return Promise.all(
@@ -115,59 +153,9 @@ self.addEventListener("fetch", function handleFetch(event) {
   if (requestUrl.origin !== self.location.origin) return;
 
   if (request.mode === "navigate") {
-    const shellUrl = appShellAssetUrl("./index.html");
-    event.respondWith(
-      fetch(request)
-        .then(function useFreshNavigation(response) {
-          if (!response || !response.ok || response.type !== "basic") {
-            return response;
-          }
-
-          const responseCopy = response.clone();
-          event.waitUntil(
-            caches.open(CACHE_NAME).then(function cacheNavigation(cache) {
-              return cache.put(shellUrl, responseCopy);
-            })
-          );
-          return response;
-        })
-        .catch(function fallBackToCachedShell() {
-          return caches.match(shellUrl).then(function useCachedShell(cached) {
-            return (
-              cached ||
-              new Response("Offline app shell unavailable.", { status: 503, statusText: "Offline" })
-            );
-          });
-        })
-    );
+    event.respondWith(fetchNavigation(request));
     return;
   }
 
-  event.respondWith(
-    fetch(request)
-      .then(function useFreshAsset(response) {
-        if (!response || response.status !== 200 || response.type !== "basic") {
-          return response;
-        }
-        if (!isAppShellRequest(requestUrl)) {
-          return response;
-        }
-
-        const responseCopy = response.clone();
-        event.waitUntil(
-          caches.open(CACHE_NAME).then(function cacheResponse(cache) {
-            return cache.put(request, responseCopy);
-          })
-        );
-        return response;
-      })
-      .catch(function fallBackToCachedAsset() {
-        return caches.match(request).then(function useCachedAsset(cached) {
-          return (
-            cached ||
-            new Response("Offline asset unavailable.", { status: 503, statusText: "Offline" })
-          );
-        });
-      })
-  );
+  event.respondWith(fetchAsset(request, requestUrl));
 });
