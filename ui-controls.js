@@ -75,16 +75,16 @@
         handlers.onSettingsInput(readSettingsForm());
       });
       bindCheckbox(dom.fields.fullscreen_enabled, function onFullscreenInput(field) {
-        handlers.onFullscreenToggle(field.checked);
         handlers.onSettingsInput(readSettingsForm());
+        handlers.onFullscreenToggle(field.checked);
       });
       bindCheckbox(dom.fields.minimal_mode_enabled, function onMinimalModeInput(field) {
-        handlers.onMinimalModeToggle(field.checked);
         handlers.onSettingsInput(readSettingsForm());
+        handlers.onMinimalModeToggle(field.checked);
       });
       bindCheckbox(dom.fields.wake_lock_enabled, function onWakeLockInput(field) {
-        handlers.onWakeLockToggle(field.checked);
         handlers.onSettingsInput(readSettingsForm());
+        handlers.onWakeLockToggle(field.checked);
       });
 
       window.addEventListener("keydown", function onKeydown(event) {
@@ -124,7 +124,8 @@
     }
 
     function bindMinimalModeSurface(handlers) {
-      const eventName = "PointerEvent" in window ? "pointerup" : "click";
+      const eventName =
+        "PointerEvent" in window ? "pointerup" : "TouchEvent" in window ? "touchend" : "click";
       window.addEventListener(eventName, function onMinimalSurfaceAction(event) {
         toggleMinimalTimer(event, handlers);
       });

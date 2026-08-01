@@ -187,6 +187,9 @@ function bindWithBrowserStubs(options) {
   if (config.pointerEvents !== false) {
     global.window.PointerEvent = function PointerEvent() {};
   }
+  if (config.touchEvents) {
+    global.window.TouchEvent = function TouchEvent() {};
+  }
 
   UIControls.create(dom).bindControls(handlers);
   return { calls, dom, documentElement, documentListeners, windowListeners };
@@ -263,6 +266,18 @@ test("pointer release in minimal mode toggles start pause", function () {
   });
 
   assert(ctx.calls.includes("shortcut:toggle"), "expected minimal pointerup to toggle timer");
+});
+
+test("touch release in minimal mode toggles start pause without pointer events", function () {
+  const ctx = bindWithBrowserStubs({ pointerEvents: false, touchEvents: true });
+  ctx.documentElement.setAttribute("data-minimal-mode", "true");
+  ctx.windowListeners.touchend({
+    cancelable: true,
+    preventDefault: function preventDefault() {},
+    target: createNode({ id: "timer-panel" }),
+  });
+
+  assert(ctx.calls.includes("shortcut:toggle"), "expected minimal touchend to toggle timer");
 });
 
 test("clicking outside open minimal panel closes it without toggling timer", function () {

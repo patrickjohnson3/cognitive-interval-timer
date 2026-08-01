@@ -120,7 +120,7 @@
 
     function hydrateFromStorage() {
       const storedSettings = storage.getJSON(Core.STORAGE_KEYS.settings, Core.DEFAULT_SETTINGS);
-      appState.settings = Core.normalizeSettings(storedSettings);
+      appState.settings = normalizeAppSettings(storedSettings);
 
       const storedStats = storage.getJSON(Core.STORAGE_KEYS.stats, {
         dateKey: Core.dateKey(),
@@ -174,6 +174,14 @@
       if (sameStats(lastSavedStats, appState.stats)) return;
       syncStorageWarning(storage.setJSON(Core.STORAGE_KEYS.stats, appState.stats));
       lastSavedStats = cloneStats(appState.stats);
+    }
+
+    function normalizeAppSettings(rawSettings) {
+      const normalized = Core.normalizeSettings(rawSettings);
+      if (normalized.fullscreen_enabled || normalized.minimal_mode_enabled) {
+        normalized.wake_lock_enabled = true;
+      }
+      return normalized;
     }
 
     function start() {
@@ -277,7 +285,7 @@
     }
 
     function onSettingsInput(rawSettings) {
-      const normalized = Core.normalizeSettings(rawSettings);
+      const normalized = normalizeAppSettings(rawSettings);
       appState.ui.settingsDirty = !sameSettings(normalized, appState.settings);
       onStateChange();
     }
@@ -287,8 +295,12 @@
       if (config.hydrateForm) {
         render.hydrateSettingsForm(appState.settings);
       }
-      applyWakeLockSetting(appState.settings.wake_lock_enabled);
-      applyMinimalModeSetting(appState.settings.minimal_mode_enabled);
+      if (appState.settings.minimal_mode_enabled) {
+        applyMinimalModeSetting(true, appState.settings);
+      } else {
+        applyWakeLockSetting(appState.settings.wake_lock_enabled);
+        applyMinimalModeSetting(false, appState.settings);
+      }
 
       if (
         config.correctPrepPhase &&
@@ -318,9 +330,8 @@
     function onMinimalModeToggle(enabled) {
       if (enabled) {
         dom.fields.wake_lock_enabled.checked = true;
-        applyWakeLockSetting(true);
       }
-      return applyMinimalModeSetting(enabled);
+      return applyMinimalModeSetting(enabled, controls.readSettingsForm());
     }
 
     function onWakeLockToggle(enabled) {
@@ -330,7 +341,7 @@
     function onExitMinimalMode() {
       if (!doc.documentElement.hasAttribute("data-minimal-mode")) return;
       dom.fields.minimal_mode_enabled.checked = false;
-      applyMinimalModeSetting(false);
+      applyMinimalModeSetting(false, controls.readSettingsForm());
       onSettingsInput(controls.readSettingsForm());
     }
 
@@ -354,10 +365,26 @@
       if (dom.fields.wake_lock_enabled.checked) {
         dom.fields.wake_lock_enabled.checked = false;
       }
+      if (dom.fields.fullscreen_enabled.checked) {
+        dom.fields.fullscreen_enabled.checked = false;
+      }
+      if (dom.fields.minimal_mode_enabled.checked) {
+        dom.fields.minimal_mode_enabled.checked = false;
+      }
+      doc.documentElement.removeAttribute("data-minimal-mode");
+      applyFullscreenSetting(false);
 
-      if (appState.settings.wake_lock_enabled) {
+      if (
+        appState.settings.wake_lock_enabled ||
+        appState.settings.fullscreen_enabled ||
+        appState.settings.minimal_mode_enabled
+      ) {
         appState.settings = Core.normalizeSettings(
-          Object.assign({}, appState.settings, { wake_lock_enabled: false })
+          Object.assign({}, appState.settings, {
+            fullscreen_enabled: false,
+            minimal_mode_enabled: false,
+            wake_lock_enabled: false,
+          })
         );
         persistSettings(appState.settings);
         render.hydrateSettingsForm(appState.settings);
@@ -374,7 +401,8 @@
       return wakeLockService.setEnabled(enabled);
     }
 
-    function applyMinimalModeSetting(enabled) {
+    function applyMinimalModeSetting(enabled, rawSettings) {
+      const settings = normalizeAppSettings(rawSettings || appState.settings);
       if (enabled) {
         doc.documentElement.setAttribute("data-minimal-mode", "true");
         applyWakeLockSetting(true);
@@ -382,14 +410,14 @@
       }
 
       doc.documentElement.removeAttribute("data-minimal-mode");
-      return applyFullscreenSetting(appState.settings.fullscreen_enabled);
+      return applyFullscreenSetting(settings.fullscreen_enabled);
     }
 
     function saveSettings(rawSettings) {
       const previousSettings = appState.settings;
       const oldPhaseDuration = Core.phaseDurationSec(appState.timer.phase, previousSettings);
       const elapsedInPhase = Math.max(0, oldPhaseDuration - appState.timer.remainingSec);
-      const next = Core.normalizeSettings(rawSettings);
+      const next = normalizeAppSettings(rawSettings);
 
       if (next.auto_start !== appState.settings.auto_start) {
         appState.ui.sessionFlags.changedAutoStart = true;
@@ -416,7 +444,7 @@
     }
 
     function restoreDefaults() {
-      appState.settings = Core.normalizeSettings(Core.DEFAULT_SETTINGS);
+      appState.settings = normalizeAppSettings(Core.DEFAULT_SETTINGS);
       persistSettings(appState.settings);
 
       appState.ui.settingsDirty = false;
