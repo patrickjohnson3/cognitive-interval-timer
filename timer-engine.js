@@ -117,12 +117,8 @@
       if (elapsedSec <= 0) return;
       state.timer.lastTickMs = now;
 
-      const consumed = Core.consumeElapsed(
-        {
-          running: state.timer.running,
-          phase: state.timer.phase,
-          remainingSec: state.timer.remainingSec,
-        },
+      const consumed = Core.advanceTimerByElapsed(
+        state.timer,
         elapsedSec,
         state.settings,
         state.stats,
@@ -132,13 +128,9 @@
         }
       );
 
-      state.timer.running = consumed.timer.running;
-      state.timer.phase = consumed.timer.phase;
-      state.timer.remainingSec = consumed.timer.remainingSec;
       if (!state.timer.running) {
         state.timer.lastTickMs = null;
       }
-      state.stats = consumed.stats;
 
       if (consumed.transitionLimitHit) {
         state.timer.running = false;

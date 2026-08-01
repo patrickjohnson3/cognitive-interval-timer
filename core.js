@@ -205,7 +205,10 @@
     return mm + ":" + ss;
   }
 
-  function consumeElapsed(timer, elapsedSec, settings, stats, options) {
+  function advanceTimerByElapsed(timer, elapsedSec, settings, stats, options) {
+    if (!timer || !settings || !stats) {
+      throw new Error("advanceTimerByElapsed requires timer, settings, and stats");
+    }
     const config = Object.assign(
       {
         autoStart: settings.auto_start,
@@ -214,55 +217,49 @@
       options || {}
     );
 
-    const outTimer = timer || {
-      running: false,
-      phase: initialPhase(settings),
-      remainingSec: phaseDurationSec(initialPhase(settings), settings),
-    };
-    const outStats = stats || normalizeStats(null);
     let remainingElapsed = Math.max(0, Number(elapsedSec) || 0);
     const events = [];
     let transitions = 0;
 
-    while (remainingElapsed > 0 && outTimer.running) {
+    while (remainingElapsed > 0 && timer.running) {
       transitions += 1;
       if (transitions > config.maxTransitions) {
-        outTimer.running = false;
+        timer.running = false;
         break;
       }
 
-      if (outTimer.remainingSec > remainingElapsed) {
-        outTimer.remainingSec -= remainingElapsed;
+      if (timer.remainingSec > remainingElapsed) {
+        timer.remainingSec -= remainingElapsed;
         remainingElapsed = 0;
         break;
       }
 
-      remainingElapsed -= outTimer.remainingSec;
-      outTimer.remainingSec = 0;
+      remainingElapsed -= timer.remainingSec;
+      timer.remainingSec = 0;
 
-      const from = outTimer.phase;
-      const to = nextPhase(from, outStats, settings);
+      const from = timer.phase;
+      const to = nextPhase(from, stats, settings);
       const creditFocus = from === "focus" && to === "recall";
 
       if (to === "recall" && creditFocus) {
-        outStats.focusBlocksToday += 1;
-        outStats.focusBlocksSinceLong += 1;
+        stats.focusBlocksToday += 1;
+        stats.focusBlocksSinceLong += 1;
       }
 
       if (to === "long_break") {
-        outStats.focusBlocksSinceLong = 0;
+        stats.focusBlocksSinceLong = 0;
       }
 
-      outTimer.phase = to;
-      outTimer.remainingSec = phaseDurationSec(to, settings);
-      outTimer.running = Boolean(config.autoStart);
+      timer.phase = to;
+      timer.remainingSec = phaseDurationSec(to, settings);
+      timer.running = Boolean(config.autoStart);
 
       events.push({ type: "phase", from: from, to: to, creditFocus: creditFocus });
     }
 
     return {
-      timer: outTimer,
-      stats: outStats,
+      timer: timer,
+      stats: stats,
       events: events,
       remainingElapsed: remainingElapsed,
       transitionLimitHit: transitions > config.maxTransitions,
@@ -293,6 +290,6 @@
     canTransition,
     stateLabel,
     formatTime,
-    consumeElapsed,
+    advanceTimerByElapsed,
   };
 });

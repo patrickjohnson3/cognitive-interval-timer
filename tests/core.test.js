@@ -41,7 +41,7 @@ test("dateKey uses stable local ISO date format", function () {
   assert(key === "2026-07-05", "expected local YYYY-MM-DD key, got " + key);
 });
 
-test("consumeElapsed transitions and credits focus completion", function () {
+test("advanceTimerByElapsed transitions and credits focus completion", function () {
   const settings = Core.normalizeSettings({
     focus: 1,
     recall: 1,
@@ -57,13 +57,29 @@ test("consumeElapsed transitions and credits focus completion", function () {
     focusBlocksSinceLong: 0,
   });
 
-  const out = Core.consumeElapsed(timer, 12, settings, stats, { autoStart: true });
+  const out = Core.advanceTimerByElapsed(timer, 12, settings, stats, { autoStart: true });
   assert(out.timer.phase === "recall", "expected recall after 12s from focus with 10s remaining");
+  assert(timer.phase === "recall", "expected timer object to be advanced in place");
   assert(out.stats.focusBlocksToday === 1, "expected focusBlocksToday increment");
+  assert(stats.focusBlocksToday === 1, "expected stats object to be advanced in place");
   assert(out.stats.focusBlocksSinceLong === 1, "expected focusBlocksSinceLong increment");
 });
 
-test("consumeElapsed handles large elapsed time without dropping transitions", function () {
+test("advanceTimerByElapsed requires explicit state objects", function () {
+  const settings = Core.normalizeSettings(null);
+  const stats = Core.normalizeStats(null);
+  let threw = false;
+
+  try {
+    Core.advanceTimerByElapsed(null, 1, settings, stats);
+  } catch {
+    threw = true;
+  }
+
+  assert(threw === true, "expected missing timer to throw");
+});
+
+test("advanceTimerByElapsed handles large elapsed time without dropping transitions", function () {
   const settings = Core.normalizeSettings({
     prep: 1,
     focus: 1,
@@ -80,7 +96,7 @@ test("consumeElapsed handles large elapsed time without dropping transitions", f
     focusBlocksSinceLong: 0,
   });
 
-  const out = Core.consumeElapsed(timer, 700, settings, stats, {
+  const out = Core.advanceTimerByElapsed(timer, 700, settings, stats, {
     autoStart: true,
     maxTransitions: 1000,
   });
@@ -89,7 +105,7 @@ test("consumeElapsed handles large elapsed time without dropping transitions", f
   assert(out.remainingElapsed === 0, "elapsed time should be fully consumed");
 });
 
-test("consumeElapsed follows a full two-block cycle into long break", function () {
+test("advanceTimerByElapsed follows a full two-block cycle into long break", function () {
   const settings = Core.normalizeSettings({
     prep_enabled: true,
     blocks_per_ultradian: 2,
@@ -104,7 +120,7 @@ test("consumeElapsed follows a full two-block cycle into long break", function (
   const phases = [timer.phase];
 
   while (timer.phase !== "long_break") {
-    const out = Core.consumeElapsed(timer, 1, settings, stats, { autoStart: true });
+    const out = Core.advanceTimerByElapsed(timer, 1, settings, stats, { autoStart: true });
     assert(out.events.length === 1, "expected exactly one transition");
     timer = out.timer;
     stats = out.stats;
