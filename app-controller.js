@@ -1,10 +1,10 @@
 (function initAppController(root, factory) {
   if (typeof module === "object" && module.exports) {
-    module.exports = factory();
+    module.exports = factory(require("./display-services.js"));
   } else {
-    root.PomodoroAppController = factory();
+    root.PomodoroAppController = factory(root.PomodoroDisplayServices);
   }
-})(typeof self !== "undefined" ? self : this, function makeAppController() {
+})(typeof self !== "undefined" ? self : this, function makeAppController(DisplayServices) {
   function create(deps) {
     const Core = deps.Core;
     const Content = deps.Content;
@@ -19,12 +19,9 @@
       phaseChange: function noopPhaseChange() {},
     };
     const wakeLock = deps.wakeLock;
-    const DisplayMode = deps.DisplayMode;
-    const Persistence = deps.Persistence;
-    const SettingsEffects = deps.SettingsEffects;
-    const TimerActions = deps.TimerActions;
     const a11y = deps.a11y;
     const dom = deps.dom;
+    const doc = deps.documentRef || document;
 
     const appState = {
       settings: Core.normalizeSettings(null),
@@ -47,48 +44,22 @@
       },
     };
 
-    let settingsEffects = null;
-    const displayMode = DisplayMode.create({
-      dom: dom,
+    let lastSavedStats = null;
+    const fullscreenService = DisplayServices.createFullscreenService({
+      documentRef: doc,
+      onUnavailable: reconcileFullscreenUnavailable,
+    });
+    const wakeLockService = DisplayServices.createWakeLockService({
       wakeLock: wakeLock,
-      documentRef: document,
-      onFullscreenUnavailable: function onFullscreenUnavailable() {
-        if (settingsEffects) settingsEffects.reconcileFullscreenUnavailable();
-      },
-      onWakeLockUnavailable: function onWakeLockUnavailable() {
-        if (settingsEffects) settingsEffects.reconcileWakeLockUnavailable();
-      },
-    });
-    const persistence = Persistence.create({ Core, storage, state: appState });
-    const timerActions = TimerActions.create({
-      state: appState,
-      timer,
-      haptics,
-      audio,
-      announce,
-      a11y,
-    });
-
-    settingsEffects = SettingsEffects.create({
-      Core,
-      Content,
-      controls,
-      displayMode,
-      documentRef: document,
-      dom,
-      persistence,
-      render,
-      state: appState,
-      timer,
-      onStateChange,
+      onUnavailable: reconcileWakeLockUnavailable,
     });
 
     const controller = {
       initialize,
-      start: timerActions.start,
-      pause: timerActions.pause,
-      skip: timerActions.skip,
-      reset: timerActions.reset,
+      start,
+      pause,
+      skip,
+      reset,
       setTheme,
       saveSettings,
     };
@@ -96,41 +67,39 @@
     return {
       controller,
       state: appState,
-      onPhaseChange: timerActions.onPhaseChange,
+      onPhaseChange,
       onStateChange,
-      handleShortcut: timerActions.handleShortcut,
-      onSettingsInput: settingsEffects.onSettingsInput,
+      handleShortcut,
+      onSettingsInput,
       restoreDefaults,
     };
 
     function initialize() {
       hydrateFromStorage();
-      persistence.syncStorageWarning();
-      settingsEffects.applyStaticCopy();
-      a11y.applyAriaDefaults(document);
+      syncStorageWarning();
+      applyStaticCopy();
+      a11y.applyAriaDefaults(doc);
       render.setTagline(randomFrom(Content.SITE_TAGLINES));
       render.hydrateSettingsForm(appState.settings);
       render.hydrateTheme(appState.theme);
 
       controls.bindControls({
-        onStart: controller.start,
-        onPause: controller.pause,
-        onPrimaryAction: timerActions.onPrimaryAction,
+        onPrimaryAction,
         onSkip: controller.skip,
         onReset: controller.reset,
         onSaveSettings: controller.saveSettings,
         onRestoreDefaults: restoreDefaults,
         onThemeChange: controller.setTheme,
-        onShortcut: timerActions.handleShortcut,
-        onSettingsInput: settingsEffects.onSettingsInput,
-        onFullscreenToggle: settingsEffects.onFullscreenToggle,
-        onFullscreenChange: settingsEffects.onFullscreenChange,
-        onMinimalModeToggle: settingsEffects.onMinimalModeToggle,
-        onWakeLockToggle: settingsEffects.onWakeLockToggle,
-        onExitMinimalMode: settingsEffects.onExitMinimalMode,
+        onShortcut: handleShortcut,
+        onSettingsInput,
+        onFullscreenToggle,
+        onFullscreenChange,
+        onMinimalModeToggle,
+        onWakeLockToggle,
+        onExitMinimalMode,
       });
 
-      settingsEffects.applySettingsSideEffects({ hydrateForm: false });
+      applySettingsSideEffects({ hydrateForm: false });
       timer.startTicker();
       onStateChange();
     }
@@ -150,13 +119,261 @@
         focusBlocksSinceLong: 0,
       });
       appState.stats = Core.normalizeStats(storedStats, Core.dateKey());
-      persistence.initializeStatsSnapshot(appState.stats);
+      lastSavedStats = cloneStats(appState.stats);
 
       const storedTheme = storage.getText(Core.STORAGE_KEYS.theme, "dark");
       appState.theme = storedTheme === "light" ? "light" : "dark";
 
       appState.timer.phase = Core.initialPhase(appState.settings);
       appState.timer.remainingSec = Core.phaseDurationSec(appState.timer.phase, appState.settings);
+    }
+
+    function cloneStats(stats) {
+      return {
+        dateKey: stats.dateKey,
+        focusBlocksToday: stats.focusBlocksToday,
+        focusBlocksSinceLong: stats.focusBlocksSinceLong,
+      };
+    }
+
+    function sameStats(a, b) {
+      if (!a || !b) return false;
+      return (
+        a.dateKey === b.dateKey &&
+        a.focusBlocksToday === b.focusBlocksToday &&
+        a.focusBlocksSinceLong === b.focusBlocksSinceLong
+      );
+    }
+
+    function storageIsMemoryOnly() {
+      return typeof storage.mode === "function" && storage.mode() === "memory";
+    }
+
+    function syncStorageWarning(writeResult) {
+      appState.ui.storageWarning = writeResult === false || storageIsMemoryOnly();
+    }
+
+    function persistSettings(settings) {
+      syncStorageWarning(storage.setJSON(Core.STORAGE_KEYS.settings, settings));
+    }
+
+    function persistTheme(theme) {
+      syncStorageWarning(storage.setText(Core.STORAGE_KEYS.theme, theme));
+    }
+
+    function persistStatsIfChanged() {
+      if (sameStats(lastSavedStats, appState.stats)) return;
+      syncStorageWarning(storage.setJSON(Core.STORAGE_KEYS.stats, appState.stats));
+      lastSavedStats = cloneStats(appState.stats);
+    }
+
+    function start() {
+      haptics.tap();
+      timer.start();
+    }
+
+    function pause() {
+      haptics.tap();
+      timer.pause();
+    }
+
+    function skip() {
+      haptics.tap();
+      timer.skip();
+    }
+
+    function reset() {
+      haptics.tap();
+      timer.reset();
+    }
+
+    function onPrimaryAction() {
+      if (appState.timer.running) {
+        pause();
+        return;
+      }
+      start();
+    }
+
+    function handleShortcut(action) {
+      if (action === "toggle") {
+        onPrimaryAction();
+        return;
+      }
+      if (action === "skip") skip();
+      if (action === "reset") reset();
+    }
+
+    function onPhaseChange(payload) {
+      haptics.phaseChange();
+      if (appState.settings.sound_enabled) {
+        audio.playPhaseChime();
+      }
+      announce.announce(a11y.formatAnnouncement("phase_started", { label: payload.label }));
+    }
+
+    function applyStaticCopy() {
+      dom.copy.phaseSettingsHeading.textContent = Content.UI_COPY.phaseSettingsHeading;
+      dom.copy.blocks.textContent = Content.UI_COPY.blocksBeforeLongBreak;
+      dom.copy.prepEnabled.textContent = Content.UI_COPY.startWithPrep;
+      dom.copy.autoStart.textContent = Content.UI_COPY.autoStartNext;
+      dom.copy.soundEnabled.textContent = Content.UI_COPY.soundOnPhaseChange;
+      dom.copy.fullscreenEnabled.textContent = Content.UI_COPY.fullscreenMode;
+      dom.copy.minimalModeEnabled.textContent = Content.UI_COPY.minimalMode;
+      dom.copy.wakeLockEnabled.textContent = Content.UI_COPY.keepScreenAwake;
+      applyTooltipCopy();
+
+      Core.PHASES.forEach(function eachPhase(phase) {
+        if (!dom.copy.phaseLabels[phase]) return;
+        const contentPhaseConfig = Content.PHASE_CONFIG && Content.PHASE_CONFIG[phase];
+        dom.copy.phaseLabels[phase].textContent =
+          (contentPhaseConfig && contentPhaseConfig.settingsLabel) || Core.stateLabel(phase);
+      });
+    }
+
+    function applyTooltipCopy() {
+      if (!doc.querySelectorAll) return;
+      const tooltips = Content.UI_COPY.tooltips || {};
+      const wrappers = doc.querySelectorAll("[data-tooltip-key]");
+      wrappers.forEach(function eachTooltip(wrapper) {
+        const copy = tooltips[wrapper.getAttribute("data-tooltip-key")];
+        if (!copy) return;
+
+        const trigger = wrapper.querySelector(".tip-trigger");
+        const bubble = wrapper.querySelector(".tip-bubble");
+        const heading = bubble && bubble.querySelector("strong");
+        const body = bubble && bubble.querySelector("span");
+
+        if (trigger) trigger.setAttribute("aria-label", copy.triggerLabel);
+        if (heading) heading.textContent = copy.heading;
+        if (body) body.textContent = copy.body;
+      });
+    }
+
+    function sameSettings(a, b) {
+      return (
+        a.prep === b.prep &&
+        a.focus === b.focus &&
+        a.recall === b.recall &&
+        a.break === b.break &&
+        a.long_break === b.long_break &&
+        a.blocks_per_ultradian === b.blocks_per_ultradian &&
+        a.prep_enabled === b.prep_enabled &&
+        a.auto_start === b.auto_start &&
+        a.sound_enabled === b.sound_enabled &&
+        a.fullscreen_enabled === b.fullscreen_enabled &&
+        a.minimal_mode_enabled === b.minimal_mode_enabled &&
+        a.wake_lock_enabled === b.wake_lock_enabled
+      );
+    }
+
+    function onSettingsInput(rawSettings) {
+      const normalized = Core.normalizeSettings(rawSettings);
+      appState.ui.settingsDirty = !sameSettings(normalized, appState.settings);
+      onStateChange();
+    }
+
+    function applySettingsSideEffects(options) {
+      const config = Object.assign({ hydrateForm: true, correctPrepPhase: false }, options || {});
+      if (config.hydrateForm) {
+        render.hydrateSettingsForm(appState.settings);
+      }
+      applyWakeLockSetting(appState.settings.wake_lock_enabled);
+      applyMinimalModeSetting(appState.settings.minimal_mode_enabled);
+
+      if (
+        config.correctPrepPhase &&
+        !appState.settings.prep_enabled &&
+        appState.timer.phase === Core.PHASE.PREP
+      ) {
+        timer.resetToPhase(Core.PHASE.FOCUS);
+        return true;
+      }
+      return false;
+    }
+
+    function onFullscreenToggle(enabled) {
+      if (enabled) {
+        dom.fields.wake_lock_enabled.checked = true;
+        applyWakeLockSetting(true);
+      }
+      return applyFullscreenSetting(enabled);
+    }
+
+    function onFullscreenChange(isFullscreen) {
+      if (isFullscreen || !dom.fields.fullscreen_enabled.checked) return;
+      dom.fields.fullscreen_enabled.checked = false;
+      onSettingsInput(controls.readSettingsForm());
+    }
+
+    function onMinimalModeToggle(enabled) {
+      if (enabled) {
+        dom.fields.wake_lock_enabled.checked = true;
+        applyWakeLockSetting(true);
+      }
+      return applyMinimalModeSetting(enabled);
+    }
+
+    function onWakeLockToggle(enabled) {
+      return applyWakeLockSetting(enabled);
+    }
+
+    function onExitMinimalMode() {
+      if (!doc.documentElement.hasAttribute("data-minimal-mode")) return;
+      dom.fields.minimal_mode_enabled.checked = false;
+      applyMinimalModeSetting(false);
+      onSettingsInput(controls.readSettingsForm());
+    }
+
+    function reconcileFullscreenUnavailable() {
+      if (dom.fields.fullscreen_enabled.checked) {
+        dom.fields.fullscreen_enabled.checked = false;
+      }
+
+      if (appState.settings.fullscreen_enabled) {
+        appState.settings = Core.normalizeSettings(
+          Object.assign({}, appState.settings, { fullscreen_enabled: false })
+        );
+        persistSettings(appState.settings);
+        render.hydrateSettingsForm(appState.settings);
+      }
+
+      onSettingsInput(controls.readSettingsForm());
+    }
+
+    function reconcileWakeLockUnavailable() {
+      if (dom.fields.wake_lock_enabled.checked) {
+        dom.fields.wake_lock_enabled.checked = false;
+      }
+
+      if (appState.settings.wake_lock_enabled) {
+        appState.settings = Core.normalizeSettings(
+          Object.assign({}, appState.settings, { wake_lock_enabled: false })
+        );
+        persistSettings(appState.settings);
+        render.hydrateSettingsForm(appState.settings);
+      }
+
+      onSettingsInput(controls.readSettingsForm());
+    }
+
+    function applyFullscreenSetting(enabled) {
+      return fullscreenService.setEnabled(enabled);
+    }
+
+    function applyWakeLockSetting(enabled) {
+      return wakeLockService.setEnabled(enabled);
+    }
+
+    function applyMinimalModeSetting(enabled) {
+      if (enabled) {
+        doc.documentElement.setAttribute("data-minimal-mode", "true");
+        applyWakeLockSetting(true);
+        return applyFullscreenSetting(true);
+      }
+
+      doc.documentElement.removeAttribute("data-minimal-mode");
+      return applyFullscreenSetting(appState.settings.fullscreen_enabled);
     }
 
     function saveSettings(rawSettings) {
@@ -173,7 +390,7 @@
       }
 
       appState.settings = next;
-      persistence.persistSettings(appState.settings);
+      persistSettings(appState.settings);
 
       if (!appState.timer.running) {
         const nextPhaseDuration = Core.phaseDurationSec(appState.timer.phase, appState.settings);
@@ -181,7 +398,7 @@
       }
 
       appState.ui.settingsDirty = false;
-      const resetToFocus = settingsEffects.applySettingsSideEffects({ correctPrepPhase: true });
+      const resetToFocus = applySettingsSideEffects({ correctPrepPhase: true });
       announce.flashMessage(a11y.formatAnnouncement("settings_saved"));
 
       if (resetToFocus) return;
@@ -191,27 +408,27 @@
 
     function restoreDefaults() {
       appState.settings = Core.normalizeSettings(Core.DEFAULT_SETTINGS);
-      persistence.persistSettings(appState.settings);
+      persistSettings(appState.settings);
 
       appState.ui.settingsDirty = false;
       appState.ui.sessionFlags.changedAutoStart = false;
       appState.ui.sessionFlags.changedSound = false;
 
-      settingsEffects.applySettingsSideEffects();
+      applySettingsSideEffects();
       timer.reset();
       announce.flashMessage(a11y.formatAnnouncement("defaults_restored"));
     }
 
     function setTheme(nextTheme) {
       appState.theme = nextTheme === "dark" ? "dark" : "light";
-      persistence.persistTheme(appState.theme);
+      persistTheme(appState.theme);
       render.hydrateTheme(appState.theme);
       onStateChange();
     }
 
     function onStateChange() {
       appState.stats = Core.rolloverStats(appState.stats, Core.dateKey());
-      persistence.persistStatsIfChanged();
+      persistStatsIfChanged();
       render.render(appState);
     }
   }

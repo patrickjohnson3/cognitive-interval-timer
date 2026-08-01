@@ -1,10 +1,6 @@
 const AppController = require("../app-controller.js");
 const Core = require("../core.js");
 const Content = require("../content.js");
-const DisplayMode = require("../display-mode.js");
-const Persistence = require("../controller-persistence.js");
-const SettingsEffects = require("../controller-settings-effects.js");
-const TimerActions = require("../controller-timer-actions.js");
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -223,10 +219,6 @@ function setup(options) {
         return Promise.resolve(true);
       },
     },
-    DisplayMode,
-    Persistence,
-    SettingsEffects,
-    TimerActions,
     a11y: {
       applyAriaDefaults: function applyAriaDefaults() {},
       formatAnnouncement: function formatAnnouncement() {

@@ -8,10 +8,7 @@
   const Audio = window.PomodoroAudio;
   const Haptics = window.PomodoroHaptics;
   const WakeLock = window.PomodoroWakeLock;
-  const DisplayMode = window.PomodoroDisplayMode;
-  const Persistence = window.PomodoroControllerPersistence;
-  const SettingsEffects = window.PomodoroControllerSettingsEffects;
-  const TimerActions = window.PomodoroControllerTimerActions;
+  const DisplayServices = window.PomodoroDisplayServices;
   const TimerEngine = window.PomodoroTimerEngine;
   const AppController = window.PomodoroAppController;
   const A11y = window.PomodoroA11y;
@@ -27,10 +24,7 @@
     !Audio ||
     !Haptics ||
     !WakeLock ||
-    !DisplayMode ||
-    !Persistence ||
-    !SettingsEffects ||
-    !TimerActions ||
+    !DisplayServices ||
     !TimerEngine ||
     !AppController ||
     !A11y ||
@@ -82,10 +76,6 @@
     audio: audio,
     haptics: haptics,
     wakeLock: wakeLock,
-    DisplayMode: DisplayMode,
-    Persistence: Persistence,
-    SettingsEffects: SettingsEffects,
-    TimerActions: TimerActions,
     a11y: a11y,
     dom: dom,
   });

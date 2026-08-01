@@ -93,37 +93,8 @@
     };
   }
 
-  function createMinimalModeService(deps) {
-    const doc = deps.documentRef || document;
-    const dom = deps.dom;
-    const fullscreen = deps.fullscreen;
-    const wakeLock = deps.wakeLock;
-    let active = false;
-
-    function setEnabled(enabled, settings) {
-      active = Boolean(enabled);
-      if (enabled) {
-        doc.documentElement.setAttribute("data-minimal-mode", "true");
-        dom.fields.wake_lock_enabled.checked = true;
-        wakeLock.setEnabled(true);
-        return fullscreen.setEnabled(true);
-      }
-
-      doc.documentElement.removeAttribute("data-minimal-mode");
-      return fullscreen.setEnabled(Boolean(settings && settings.fullscreen_enabled));
-    }
-
-    return {
-      setEnabled,
-      isActive: function isActive() {
-        return active;
-      },
-    };
-  }
-
   return {
     createFullscreenService,
     createWakeLockService,
-    createMinimalModeService,
   };
 });
