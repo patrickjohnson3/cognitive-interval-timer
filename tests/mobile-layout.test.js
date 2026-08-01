@@ -79,6 +79,21 @@ test("minimal mode uses small viewport height on mobile", function () {
   assert(minimalSection.includes("min-height: 100svh;"), "missing minimal mode svh height");
 });
 
+test("minimal mode has a stronger reading hierarchy", function () {
+  const css = read("styles.css");
+  const minimalSection = css.slice(css.indexOf(':root[data-minimal-mode="true"] .app'));
+  const requiredSnippets = [
+    "letter-spacing: 0.22em;",
+    "font-size: clamp(5.25rem, 22vw, 12rem);",
+    "font-size: clamp(1.35rem, 3.8vw, 2.35rem);",
+    "max-width: min(760px, 92vw);",
+  ];
+
+  requiredSnippets.forEach((snippet) => {
+    assert(minimalSection.includes(snippet), "missing minimal readability rule: " + snippet);
+  });
+});
+
 if (!process.exitCode) {
   console.log("All tests passed.");
 }

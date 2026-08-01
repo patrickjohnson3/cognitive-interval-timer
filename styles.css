@@ -609,9 +609,24 @@ select {
   margin: 0;
 }
 
+:root[data-minimal-mode="true"] .state {
+  font-size: clamp(0.95rem, 2.2vw, 1.35rem);
+  letter-spacing: 0.22em;
+}
+
+:root[data-minimal-mode="true"] .time {
+  font-size: clamp(5.25rem, 22vw, 12rem);
+  line-height: 0.92;
+  font-weight: 800;
+  text-shadow: 0 0 18px var(--color-accent-glow);
+}
+
 :root[data-minimal-mode="true"] .hint {
-  max-width: min(680px, 92vw);
+  max-width: min(760px, 92vw);
   text-align: center;
+  font-size: clamp(1.35rem, 3.8vw, 2.35rem);
+  line-height: 1.22;
+  padding: var(--space-3) var(--space-4);
 }
 
 .minimal-exit-wrap {
