@@ -85,6 +85,7 @@ function loadServiceWorkerRuntime(options) {
             return Promise.resolve([]);
           },
           put: function put(request, response) {
+            if (config.cachePutError) return Promise.reject(config.cachePutError);
             cacheWrites.push(request.url || request);
             cached.set(request.url || request, response);
             return Promise.resolve();
@@ -446,6 +447,29 @@ test("service worker runtime-caches only app-shell assets", async function () {
     !runtime.cacheWrites.includes("https://example.test/notes.json"),
     "expected non-shell request to skip cache"
   );
+});
+
+test("service worker returns network response when cache write fails", async function () {
+  const networkResponse = {
+    ok: true,
+    status: 200,
+    type: "basic",
+    clone: function clone() {
+      return this;
+    },
+  };
+  const runtime = loadServiceWorkerRuntime({
+    cachePutError: new Error("cache unavailable"),
+    fetchResponse: function fetchResponse() {
+      return networkResponse;
+    },
+  });
+
+  const response = await runFetch(runtime, {
+    url: "https://example.test/app.js",
+  });
+
+  assert(response === networkResponse, "expected network response despite cache write failure");
 });
 
 test("service worker falls back to cached shell for offline navigation", async function () {

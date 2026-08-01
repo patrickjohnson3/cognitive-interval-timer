@@ -56,3 +56,48 @@ test("wake lock service reconciles rejected requests", async function () {
   assert(wakeLock.isActive() === false, "expected inactive wake lock state");
   assert(unavailable === 1, "expected unavailable callback");
 });
+
+test("fullscreen service ignores stale async results", async function () {
+  let resolveEnter = null;
+  const doc = {
+    fullscreenElement: null,
+    documentElement: {
+      requestFullscreen: function requestFullscreen() {
+        return new Promise(function waitForEnter(resolve) {
+          resolveEnter = resolve;
+        });
+      },
+    },
+  };
+  const fullscreen = DisplayServices.createFullscreenService({ documentRef: doc });
+  const enablePromise = fullscreen.setEnabled(true);
+  const disablePromise = fullscreen.setEnabled(false);
+
+  resolveEnter();
+  await enablePromise;
+  await disablePromise;
+
+  assert(fullscreen.isActive() === false, "expected latest fullscreen request to win");
+});
+
+test("wake lock service ignores stale async results", async function () {
+  let resolveEnable = null;
+  const wakeLock = DisplayServices.createWakeLockService({
+    wakeLock: {
+      setEnabled: function setEnabled(enabled) {
+        if (!enabled) return Promise.resolve(false);
+        return new Promise(function waitForEnable(resolve) {
+          resolveEnable = resolve;
+        });
+      },
+    },
+  });
+  const enablePromise = wakeLock.setEnabled(true);
+  const disablePromise = wakeLock.setEnabled(false);
+
+  resolveEnable(true);
+  await enablePromise;
+  await disablePromise;
+
+  assert(wakeLock.isActive() === false, "expected latest wake lock request to win");
+});

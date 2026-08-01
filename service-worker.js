@@ -45,11 +45,16 @@ function cacheOptionalAsset(cache, asset) {
 function cacheResponse(cacheKey, response) {
   if (!response || response.status !== 200 || response.type !== "basic") return response;
   const responseCopy = response.clone();
-  return caches.open(CACHE_NAME).then(function cacheFreshResponse(cache) {
-    return cache.put(cacheKey, responseCopy).then(function cachedFreshResponse() {
+  return caches
+    .open(CACHE_NAME)
+    .then(function cacheFreshResponse(cache) {
+      return cache.put(cacheKey, responseCopy).then(function cachedFreshResponse() {
+        return response;
+      });
+    })
+    .catch(function ignoreCacheWriteError() {
       return response;
     });
-  });
 }
 
 function offlineResponse(message) {

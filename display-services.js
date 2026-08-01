@@ -9,8 +9,10 @@
     const doc = deps.documentRef || document;
     const onUnavailable = deps.onUnavailable || function noop() {};
     let active = false;
+    let requestId = 0;
 
     function setEnabled(enabled) {
+      const currentRequestId = ++requestId;
       const root = doc.documentElement;
       const activeFullscreen = doc.fullscreenElement || null;
 
@@ -18,11 +20,11 @@
         if (doc.exitFullscreen) {
           return Promise.resolve(doc.exitFullscreen())
             .then(function fullscreenExited() {
-              active = false;
+              if (currentRequestId === requestId) active = false;
               return false;
             })
             .catch(function fullscreenExitFailed() {
-              active = Boolean(doc.fullscreenElement);
+              if (currentRequestId === requestId) active = Boolean(doc.fullscreenElement);
               return active;
             });
         }
@@ -42,12 +44,14 @@
       if (root && root.requestFullscreen) {
         return Promise.resolve(root.requestFullscreen())
           .then(function fullscreenEntered() {
-            active = true;
+            if (currentRequestId === requestId) active = true;
             return true;
           })
           .catch(function handleFullscreenEnterError() {
-            active = false;
-            onUnavailable();
+            if (currentRequestId === requestId) {
+              active = false;
+              onUnavailable();
+            }
             return false;
           });
       }
@@ -69,8 +73,10 @@
     const wakeLock = deps.wakeLock;
     const onUnavailable = deps.onUnavailable || function noop() {};
     let active = false;
+    let requestId = 0;
 
     function setEnabled(enabled) {
+      const currentRequestId = ++requestId;
       if (!wakeLock || typeof wakeLock.setEnabled !== "function") {
         active = false;
         if (enabled) onUnavailable();
@@ -78,8 +84,10 @@
       }
       return Promise.resolve(wakeLock.setEnabled(enabled)).then(
         function handleWakeLockResult(result) {
-          active = enabled && result !== false;
-          if (enabled && result === false) onUnavailable();
+          if (currentRequestId === requestId) {
+            active = enabled && result !== false;
+            if (enabled && result === false) onUnavailable();
+          }
           return result;
         }
       );
