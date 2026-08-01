@@ -1,7 +1,6 @@
 (function bootstrapApp() {
   const Core = window.PomodoroCore;
   const Content = window.PomodoroContent;
-  const ViewModel = window.PomodoroViewModel;
   const UIAnnounce = window.PomodoroUIAnnounce;
   const UIRender = window.PomodoroUIRender;
   const UIControls = window.PomodoroUIControls;
@@ -21,7 +20,6 @@
   if (
     !Core ||
     !Content ||
-    !ViewModel ||
     !UIAnnounce ||
     !UIRender ||
     !UIControls ||
@@ -49,7 +47,6 @@
   const wakeLock = WakeLock.createController();
   const a11y = A11y.create({ Content: Content });
   const announce = UIAnnounce.create(dom);
-  const viewModel = ViewModel.create({ Core: Core, Content: Content });
 
   let app = null;
 
@@ -68,8 +65,8 @@
 
   const render = UIRender.create({
     dom: dom,
-    viewModel: viewModel,
-    storage: storage,
+    Core: Core,
+    Content: Content,
   });
 
   const controls = UIControls.create(dom);

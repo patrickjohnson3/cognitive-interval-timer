@@ -16,7 +16,6 @@
     "./app-config.js",
     "./content.js",
     "./core.js",
-    "./view-model.js",
     "./ui-announce.js",
     "./ui-render.js",
     "./ui-controls.js",

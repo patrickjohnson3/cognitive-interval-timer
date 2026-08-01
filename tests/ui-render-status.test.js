@@ -1,5 +1,4 @@
 const UIRender = require("../ui-render.js");
-const ViewModel = require("../view-model.js");
 const { controlButtonNode, textNode } = require("./helpers/dom.js");
 
 global.document = {
@@ -111,7 +110,7 @@ function createDeps() {
     },
   };
 
-  return { dom, viewModel: ViewModel.create({ Core, Content }), storage };
+  return { dom, Core, Content, storage };
 }
 
 function baseState() {
