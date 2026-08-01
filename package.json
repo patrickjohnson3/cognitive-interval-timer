@@ -20,5 +20,13 @@
     "eslint": "^9.20.1",
     "prettier": "^3.5.3"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/patrickjohnson3/cognitive-interval-timer.git"
+  },
+  "homepage": "https://patrickjohnson3.github.io/cognitive-interval-timer/",
+  "bugs": {
+    "url": "https://github.com/patrickjohnson3/cognitive-interval-timer/issues"
+  }
 }
