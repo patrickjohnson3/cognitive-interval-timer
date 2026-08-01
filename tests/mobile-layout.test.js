@@ -94,6 +94,26 @@ test("minimal mode has a stronger reading hierarchy", function () {
   });
 });
 
+test("narrow mobile layout has calmer reading spacing", function () {
+  const css = read("styles.css");
+  const mobileSection = css.slice(css.indexOf("@media (max-width: 760px)"));
+  const requiredSnippets = [
+    ".controls button",
+    "min-height: 48px;",
+    "padding-block: 0.8rem;",
+    ".long-hint",
+    "line-height: 1.58;",
+    ".checks",
+    "gap: var(--space-4);",
+    ".setting-help",
+    "line-height: 1.45;",
+  ];
+
+  requiredSnippets.forEach((snippet) => {
+    assert(mobileSection.includes(snippet), "missing mobile readability rule: " + snippet);
+  });
+});
+
 if (!process.exitCode) {
   console.log("All tests passed.");
 }

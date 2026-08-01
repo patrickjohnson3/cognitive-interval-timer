@@ -770,6 +770,37 @@ select {
     padding: var(--space-5);
   }
 
+  .controls {
+    gap: var(--space-3);
+    margin-top: var(--space-1);
+  }
+
+  .controls button {
+    min-height: 48px;
+    padding-block: 0.8rem;
+  }
+
+  .long-hint {
+    line-height: 1.58;
+    margin-bottom: var(--space-4);
+  }
+
+  .checks {
+    gap: var(--space-4);
+  }
+
+  .settings-subgroup {
+    gap: var(--space-3);
+  }
+
+  .setting-option {
+    gap: var(--space-1);
+  }
+
+  .setting-help {
+    line-height: 1.45;
+  }
+
   .pwa-prompt-card {
     align-items: stretch;
     flex-direction: column;
