@@ -79,18 +79,21 @@ test("minimal mode uses small viewport height on mobile", function () {
   assert(minimalSection.includes("min-height: 100svh;"), "missing minimal mode svh height");
 });
 
-test("minimal mode exit panel avoids mobile top edge", function () {
+test("minimal mode exit panel uses bottom drawer layout", function () {
   const css = read("styles.css");
   const minimalSection = css.slice(css.indexOf(".minimal-exit-panel"));
   const requiredSnippets = [
+    "bottom: calc(env(safe-area-inset-bottom, 0px) + 68px);",
+    "width: min(320px, calc(100vw - (var(--space-5) * 2)));",
     "pointer-events: none;",
-    "transform: translateY(calc(-100% - var(--space-2)));",
-    "top: calc(env(safe-area-inset-top, 0px) + 18px);",
-    "width: 56px;",
-    "height: 40px;",
-    "top: calc(env(safe-area-inset-top, 0px) + 12px);",
+    "transform: translate(-50%, calc(100% + 96px));",
+    "bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);",
+    "width: 72px;",
+    "height: 44px;",
+    "inset: 0;",
     ':root[data-minimal-mode="true"] .minimal-exit-wrap[data-open="true"] .minimal-exit-panel',
     "pointer-events: auto;",
+    "transform: translate(-50%, 0);",
     "@media (hover: none)",
     "opacity: 0.32;",
   ];
