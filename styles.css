@@ -693,8 +693,12 @@ select {
   border-top: 0;
   border-radius: 0 0 12px 12px;
   box-shadow: var(--elevation-2);
-  transform: translateY(calc(-100% + 10px));
-  transition: transform 160ms ease;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(calc(-100% - var(--space-2)));
+  transition:
+    opacity 120ms ease,
+    transform 160ms ease;
 }
 
 .minimal-exit-reveal {
@@ -737,9 +741,9 @@ select {
   background: var(--theme-row-bg);
 }
 
-:root[data-minimal-mode="true"] .minimal-exit-wrap:hover .minimal-exit-panel,
-:root[data-minimal-mode="true"] .minimal-exit-wrap:focus-within .minimal-exit-panel,
 :root[data-minimal-mode="true"] .minimal-exit-wrap[data-open="true"] .minimal-exit-panel {
+  opacity: 1;
+  pointer-events: auto;
   transform: translateY(0);
 }
 

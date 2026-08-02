@@ -81,12 +81,16 @@ test("minimal mode uses small viewport height on mobile", function () {
 
 test("minimal mode exit panel avoids mobile top edge", function () {
   const css = read("styles.css");
-  const minimalSection = css.slice(css.indexOf(".minimal-exit-reveal"));
+  const minimalSection = css.slice(css.indexOf(".minimal-exit-panel"));
   const requiredSnippets = [
+    "pointer-events: none;",
+    "transform: translateY(calc(-100% - var(--space-2)));",
     "top: calc(env(safe-area-inset-top, 0px) + 18px);",
     "width: 56px;",
     "height: 40px;",
     "top: calc(env(safe-area-inset-top, 0px) + 12px);",
+    ':root[data-minimal-mode="true"] .minimal-exit-wrap[data-open="true"] .minimal-exit-panel',
+    "pointer-events: auto;",
     "@media (hover: none)",
     "opacity: 0.32;",
   ];
@@ -94,6 +98,14 @@ test("minimal mode exit panel avoids mobile top edge", function () {
   requiredSnippets.forEach((snippet) => {
     assert(minimalSection.includes(snippet), "missing minimal panel mobile edge rule: " + snippet);
   });
+  assert(
+    !minimalSection.includes(".minimal-exit-wrap:hover .minimal-exit-panel"),
+    "hover should not auto-open minimal panel"
+  );
+  assert(
+    !minimalSection.includes(".minimal-exit-wrap:focus-within .minimal-exit-panel"),
+    "focus should not auto-open minimal panel"
+  );
 });
 
 test("minimal mode has a stronger reading hierarchy", function () {
