@@ -209,6 +209,25 @@ test("minimal mode checkbox triggers minimal handler and dirty settings handler"
   assert(ctx.calls.includes("settings"), "expected settings dirty handler");
 });
 
+test("minimal reveal click opens panel without bubbling", function () {
+  const ctx = bindWithBrowserStubs();
+  ctx.dom.controls.exitMinimalModeReveal.listeners.click({
+    preventDefault: function preventDefault() {
+      ctx.calls.push("prevent-default");
+    },
+    stopPropagation: function stopPropagation() {
+      ctx.calls.push("stop-propagation");
+    },
+  });
+
+  assert(
+    ctx.dom.controls.exitMinimalModeWrap.getAttribute("data-open") === "true",
+    "expected reveal click to open minimal panel"
+  );
+  assert(ctx.calls.includes("prevent-default"), "expected reveal click to be consumed");
+  assert(ctx.calls.includes("stop-propagation"), "expected reveal click not to bubble");
+});
+
 test("primary action button triggers primary action handler", function () {
   const ctx = bindWithBrowserStubs();
   ctx.dom.controls.start.listeners.click();

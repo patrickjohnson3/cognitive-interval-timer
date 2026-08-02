@@ -40,10 +40,15 @@
       });
 
       dom.controls.defaults.addEventListener("click", handlers.onRestoreDefaults);
-      dom.controls.exitMinimalModeReveal.addEventListener("click", function onMinimalRevealClick() {
-        const open = dom.controls.exitMinimalModeWrap.getAttribute("data-open") === "true";
-        dom.controls.exitMinimalModeWrap.setAttribute("data-open", open ? "false" : "true");
-      });
+      dom.controls.exitMinimalModeReveal.addEventListener(
+        "click",
+        function onMinimalRevealClick(event) {
+          if (event && event.preventDefault) event.preventDefault();
+          if (event && event.stopPropagation) event.stopPropagation();
+          const open = dom.controls.exitMinimalModeWrap.getAttribute("data-open") === "true";
+          dom.controls.exitMinimalModeWrap.setAttribute("data-open", open ? "false" : "true");
+        }
+      );
       dom.controls.restartMinimalBlock.addEventListener(
         "click",
         function onRestartMinimalBlockClick(event) {

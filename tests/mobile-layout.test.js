@@ -79,6 +79,23 @@ test("minimal mode uses small viewport height on mobile", function () {
   assert(minimalSection.includes("min-height: 100svh;"), "missing minimal mode svh height");
 });
 
+test("minimal mode exit panel avoids mobile top edge", function () {
+  const css = read("styles.css");
+  const minimalSection = css.slice(css.indexOf(".minimal-exit-reveal"));
+  const requiredSnippets = [
+    "top: calc(env(safe-area-inset-top, 0px) + 18px);",
+    "width: 56px;",
+    "height: 40px;",
+    "top: calc(env(safe-area-inset-top, 0px) + 12px);",
+    "@media (hover: none)",
+    "opacity: 0.32;",
+  ];
+
+  requiredSnippets.forEach((snippet) => {
+    assert(minimalSection.includes(snippet), "missing minimal panel mobile edge rule: " + snippet);
+  });
+});
+
 test("minimal mode has a stronger reading hierarchy", function () {
   const css = read("styles.css");
   const minimalSection = css.slice(css.indexOf(':root[data-minimal-mode="true"] .app'));

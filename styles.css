@@ -698,27 +698,28 @@ select {
 }
 
 .minimal-exit-reveal {
-  position: absolute;
-  top: 100%;
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 18px);
   left: 50%;
-  transform: translate(-50%, -1px);
-  width: 22px;
-  height: 14px;
+  transform: translateX(-50%);
+  width: 56px;
+  height: 40px;
   padding: 0;
-  border-radius: 0 0 8px 8px;
-  border-top: 0;
+  border-radius: 999px;
   font-size: 0.68rem;
   color: var(--text-tertiary, var(--sidebar-label-color));
+  background: transparent;
   opacity: 0;
   transition:
     opacity 140ms ease,
-    color 140ms ease;
+    color 140ms ease,
+    background 140ms ease;
 }
 
 :root[data-minimal-mode="true"] .minimal-exit-wrap {
   display: block;
   position: fixed;
-  top: 0;
+  top: calc(env(safe-area-inset-top, 0px) + 12px);
   left: 50%;
   transform: translateX(-50%);
   z-index: 70;
@@ -733,12 +734,19 @@ select {
 :root[data-minimal-mode="true"] .minimal-exit-wrap:hover .minimal-exit-reveal,
 :root[data-minimal-mode="true"] .minimal-exit-wrap:focus-within .minimal-exit-reveal {
   color: var(--text-primary, var(--color-text));
+  background: var(--theme-row-bg);
 }
 
 :root[data-minimal-mode="true"] .minimal-exit-wrap:hover .minimal-exit-panel,
 :root[data-minimal-mode="true"] .minimal-exit-wrap:focus-within .minimal-exit-panel,
 :root[data-minimal-mode="true"] .minimal-exit-wrap[data-open="true"] .minimal-exit-panel {
   transform: translateY(0);
+}
+
+@media (hover: none) {
+  :root[data-minimal-mode="true"] .minimal-exit-reveal {
+    opacity: 0.32;
+  }
 }
 
 .sr-only {
