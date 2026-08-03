@@ -12,6 +12,7 @@ This is a client-side PWA timer built from plain HTML, CSS, and JavaScript modul
 - `npm run format:check`: checks Prettier formatting.
 - `npm run format`: formats the repository with Prettier.
 - `npm run build:pages`: builds the GitHub Pages artifact into `_site/`.
+- `python3 -m http.server 5500`: serves the app locally; open `http://localhost:5500/`.
 
 Use Node 24.x, matching `.node-version` and `package.json` engines.
 
