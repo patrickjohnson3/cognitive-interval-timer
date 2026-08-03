@@ -21,6 +21,10 @@ Run `npm run validate` before commits that touch runtime logic, PWA behavior, se
 
 Use 2-space indentation, LF endings, UTF-8, and final newlines per `.editorconfig`. Keep JavaScript plain and dependency-light. Modules expose browser globals through small IIFEs and CommonJS exports for tests. Prefer descriptive names such as `createFullscreenService`, `normalizeSettings`, and `focusBlockContext`; avoid clever abbreviations. Run Prettier before committing.
 
+## Architecture Overview
+
+`core.js` and `timer-engine.js` own timer state and phase rules. `app-controller.js` coordinates storage, audio, haptics, fullscreen, wake lock, and rendering. `ui-render.js` updates DOM output; `ui-controls.js` wires DOM input.
+
 ## Testing Guidelines
 
 Tests use Node’s built-in `node:test` runner plus simple custom assertions in individual files. Add or update tests with behavior changes, especially for timer state, PWA behavior, accessibility, mobile layout, and service-worker caching. Test files use the pattern `tests/<area>.test.js`. For CSS regressions, existing tests often assert specific selectors or token usage.
