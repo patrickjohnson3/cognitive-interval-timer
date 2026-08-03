@@ -1,0 +1,32 @@
+# Repository Guidelines
+
+## Project Structure & Module Organization
+
+This is a client-side PWA timer built from plain HTML, CSS, and JavaScript modules. Runtime files live at the repository root: `index.html`, `app.js`, `app-controller.js`, `core.js`, `timer-engine.js`, `ui-*.js`, `pwa.js`, and `service-worker.js`. Theme tokens are in `themes/light.css` and `themes/dark.css`; shared styling is in `styles.css`. Static PWA assets live under `assets/`. Tests are in `tests/*.test.js`, with small helpers in `tests/helpers/`. Build scripts are in `scripts/`. `_site/` is generated output; do not edit it directly.
+
+## Build, Test, and Development Commands
+
+- `npm run validate`: full project gate; runs format check, lint, unit tests, PWA offline smoke, and Pages artifact smoke.
+- `npm test`: runs Node’s built-in test runner against `tests/*.test.js`.
+- `npm run lint`: runs ESLint across the repo.
+- `npm run format:check`: checks Prettier formatting.
+- `npm run format`: formats the repository with Prettier.
+- `npm run build:pages`: builds the GitHub Pages artifact into `_site/`.
+
+Use Node 24.x, matching `.node-version` and `package.json` engines.
+
+## Coding Style & Naming Conventions
+
+Use 2-space indentation, LF endings, UTF-8, and final newlines per `.editorconfig`. Keep JavaScript plain and dependency-light. Modules expose browser globals through small IIFEs and CommonJS exports for tests. Prefer descriptive names such as `createFullscreenService`, `normalizeSettings`, and `focusBlockContext`; avoid clever abbreviations. Run Prettier before committing.
+
+## Testing Guidelines
+
+Tests use Node’s built-in `node:test` runner plus simple custom assertions in individual files. Add or update tests with behavior changes, especially for timer state, PWA behavior, accessibility, mobile layout, and service-worker caching. Test files use the pattern `tests/<area>.test.js`. For CSS regressions, existing tests often assert specific selectors or token usage.
+
+## Commit & Pull Request Guidelines
+
+Recent commits use short imperative messages, for example `Add quiet mode setting` and `Use bottom drawer for minimal controls`. Keep commits focused and avoid bundling unrelated UI, logic, and formatting changes. Pull requests should include a concise summary, validation results, linked issues when relevant, and screenshots or phone notes for visual/mobile changes.
+
+## Security & Configuration Tips
+
+Do not commit secrets or machine-specific paths. Keep PWA manifest paths aligned with `app-config.js`. Treat `service-worker.js`, `app-shell-assets.js`, and `manifest.webmanifest` as a coordinated set when adding runtime assets.
