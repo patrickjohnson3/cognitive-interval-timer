@@ -28,6 +28,7 @@ Tests use Node’s built-in `node:test` runner plus simple custom assertions in 
 ## Commit & Pull Request Guidelines
 
 Recent commits use short imperative messages, for example `Add quiet mode setting` and `Use bottom drawer for minimal controls`. Keep commits focused and avoid bundling unrelated UI, logic, and formatting changes. Pull requests should include a concise summary, validation results, linked issues when relevant, and screenshots or phone notes for visual/mobile changes.
+Keep `master` clean, validate before pushing, and avoid force-push unless explicitly agreed.
 
 ## Security & Configuration Tips
 
