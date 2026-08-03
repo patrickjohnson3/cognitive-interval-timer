@@ -15,6 +15,7 @@ This is a client-side PWA timer built from plain HTML, CSS, and JavaScript modul
 - `python3 -m http.server 5500`: serves the app locally; open `http://localhost:5500/`.
 
 Use Node 24.x, matching `.node-version` and `package.json` engines.
+Run `npm run validate` before commits that touch runtime logic, PWA behavior, service-worker caching, settings, or responsive layout.
 
 ## Coding Style & Naming Conventions
 
