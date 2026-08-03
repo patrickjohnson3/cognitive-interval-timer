@@ -35,7 +35,7 @@ Preserve `aria-label`, `aria-live`, keyboard shortcuts, visible focus, and minim
 
 ## Commit & Pull Request Guidelines
 
-Recent commits use short imperative messages, for example `Add quiet mode setting` and `Use bottom drawer for minimal controls`. Keep commits focused and avoid bundling unrelated UI, logic, and formatting changes. Pull requests should include a concise summary, validation results, linked issues when relevant, and screenshots or phone notes for visual/mobile changes.
+Recent commits use short imperative messages, for example `Add quiet mode setting` and `Use bottom drawer for minimal controls`. Keep commits focused and avoid bundling unrelated UI, logic, and formatting changes. Pull requests should include a concise summary, validation results, linked issues when relevant, and screenshots or phone notes for visual/mobile changes. Include mobile/PWA notes for minimal mode, fullscreen, install/update prompts, and responsive layout work.
 Keep `master` clean, validate before pushing, and avoid force-push unless explicitly agreed.
 
 ## Security & Configuration Tips
