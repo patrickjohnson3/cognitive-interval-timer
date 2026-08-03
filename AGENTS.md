@@ -27,7 +27,7 @@ Use 2-space indentation, LF endings, UTF-8, and final newlines per `.editorconfi
 
 ## Testing Guidelines
 
-Tests use Node’s built-in `node:test` runner plus simple custom assertions in individual files. Add or update tests with behavior changes, especially for timer state, PWA behavior, accessibility, mobile layout, and service-worker caching. Test files use the pattern `tests/<area>.test.js`. For CSS regressions, existing tests often assert specific selectors or token usage.
+`npm test` uses Node’s built-in test runner; many test files define local `test()` and `assert()` helpers. Add or update tests with behavior changes, especially for timer state, PWA behavior, accessibility, mobile layout, and service-worker caching. Test files use the pattern `tests/<area>.test.js`. For CSS regressions, existing tests often assert specific selectors or token usage.
 
 ## Commit & Pull Request Guidelines
 
