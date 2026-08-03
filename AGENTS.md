@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-This is a client-side PWA timer built from HTML, CSS, and JavaScript. Runtime files live at the root: `index.html`, `app.js`, `app-controller.js`, `core.js`, `timer-engine.js`, `ui-*.js`, `pwa.js`, and `service-worker.js`. Theme tokens are in `themes/`; shared styling is in `styles.css`; PWA assets live under `assets/`. Tests are in `tests/`; scripts are in `scripts/`. `_site/` is generated; do not edit or commit it unless deployment requires it.
+This is a client-side PWA timer built from HTML, CSS, and JavaScript. Runtime files live at the root: `index.html`, `app.js`, `app-controller.js`, `core.js`, `timer-engine.js`, `ui-*.js`, `pwa.js`, and `service-worker.js`. Theme tokens are in `themes/`; shared styling is in `styles.css`; PWA assets live under `assets/`. Tests are in `tests/`; scripts are in `scripts/`. `_site/` is generated output and is ignored by Git. Never edit it directly.
 
 ## Build, Test, and Development Commands
 
@@ -24,10 +24,13 @@ Use 2-space indentation, LF endings, UTF-8, and final newlines per `.editorconfi
 ## Architecture Overview
 
 `core.js` and `timer-engine.js` own timer state and phase rules. `app-controller.js` coordinates storage, audio, haptics, fullscreen, wake lock, and rendering. `ui-render.js` updates output; `ui-controls.js` wires input.
+This project intentionally uses plain browser JavaScript with minimal dependencies and no runtime build step. Preserve that unless there is a deliberate architectural decision to change it.
+Keep ownership boundaries explicit: timer business logic belongs in `core.js` or `timer-engine.js`; rendering belongs in `ui-render.js`; DOM events belong in `ui-controls.js`; cross-cutting side effects belong in `app-controller.js`. Do not move timer logic into rendering or DOM event handlers.
 
 ## Testing Guidelines
 
 `npm test` uses Node’s runner; many files define local `test()` and `assert()` helpers. Add tests for behavior changes, especially timer state, PWA behavior, accessibility, mobile layout, and service-worker caching. Test files use `tests/<area>.test.js`. CSS regressions often assert selectors or token usage.
+Changes affecting startup, asset loading, or caching should be tested with the service worker enabled, not only in a fresh browser session.
 
 ## Accessibility Expectations
 
