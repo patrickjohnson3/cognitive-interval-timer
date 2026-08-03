@@ -31,4 +31,4 @@ Recent commits use short imperative messages, for example `Add quiet mode settin
 
 ## Security & Configuration Tips
 
-Do not commit secrets or machine-specific paths. Keep PWA manifest paths aligned with `app-config.js`. Treat `service-worker.js`, `app-shell-assets.js`, and `manifest.webmanifest` as a coordinated set when adding runtime assets.
+Do not commit secrets or machine-specific paths. Keep PWA manifest paths aligned with `app-config.js`. When adding or removing runtime assets, update `app-shell-assets.js` and related PWA tests or offline caching can silently break. Treat `service-worker.js`, `app-shell-assets.js`, and `manifest.webmanifest` as a coordinated set.
