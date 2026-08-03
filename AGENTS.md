@@ -29,6 +29,10 @@ Use 2-space indentation, LF endings, UTF-8, and final newlines per `.editorconfi
 
 `npm test` uses Node’s built-in test runner; many test files define local `test()` and `assert()` helpers. Add or update tests with behavior changes, especially for timer state, PWA behavior, accessibility, mobile layout, and service-worker caching. Test files use the pattern `tests/<area>.test.js`. For CSS regressions, existing tests often assert specific selectors or token usage.
 
+## Accessibility Expectations
+
+Preserve `aria-label`, `aria-live`, keyboard shortcuts, visible focus, and minimal-mode escape paths when changing controls. Run relevant a11y tests for markup or interaction changes.
+
 ## Commit & Pull Request Guidelines
 
 Recent commits use short imperative messages, for example `Add quiet mode setting` and `Use bottom drawer for minimal controls`. Keep commits focused and avoid bundling unrelated UI, logic, and formatting changes. Pull requests should include a concise summary, validation results, linked issues when relevant, and screenshots or phone notes for visual/mobile changes.
