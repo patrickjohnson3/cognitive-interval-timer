@@ -12,8 +12,8 @@
     const now =
       config.now ||
       function monotonicNow() {
-        if (typeof performance !== "undefined" && typeof performance.now === "function") {
-          return performance.now();
+        if (globalThis.performance && typeof globalThis.performance.now === "function") {
+          return globalThis.performance.now();
         }
         return Date.now();
       };
