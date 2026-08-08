@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
   <title id="title">Cognitive Interval Timer desktop screenshot</title>
-  <desc id="desc">A dark focus timer interface with phase, timer, controls, and settings.</desc>
+  <desc id="desc">A wide view of the dark focus timer interface with its active phase and guidance.</desc>
   <rect width="1280" height="720" fill="#0f172a" />
   <rect x="90" y="64" width="1100" height="592" rx="36" fill="#182338" stroke="#31415f" stroke-width="2" />
   <text x="150" y="136" fill="#f8fafc" font-family="Georgia, serif" font-size="46" font-weight="700">Cognitive Interval Timer</text>

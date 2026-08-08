@@ -14,8 +14,10 @@
   <rect x="44" y="352" width="302" height="72" rx="10" fill="#1d2b44" stroke="#2e4569" />
   <text x="58" y="382" fill="#f8fafc" font-family="Arial, sans-serif" font-size="16" font-weight="700">Prepare your mind.</text>
   <text x="58" y="406" fill="#f8fafc" font-family="Arial, sans-serif" font-size="16" font-weight="700">Choose one clear goal.</text>
-  <rect x="44" y="452" width="154" height="42" rx="12" fill="#2f6fed" />
-  <text x="86" y="480" fill="#ffffff" font-family="Arial, sans-serif" font-size="16" font-weight="700">Start</text>
-  <rect x="208" y="452" width="138" height="42" rx="12" fill="#25344c" />
-  <text x="238" y="480" fill="#ffffff" font-family="Arial, sans-serif" font-size="16" font-weight="700">Next</text>
+  <rect x="44" y="452" width="148" height="42" rx="12" fill="#2f6fed" />
+  <text x="82" y="480" fill="#ffffff" font-family="Arial, sans-serif" font-size="16" font-weight="700">▶ Start</text>
+  <rect x="202" y="452" width="144" height="42" rx="12" fill="#25344c" />
+  <text x="218" y="480" fill="#ffffff" font-family="Arial, sans-serif" font-size="14" font-weight="700">⏭ Next Phase</text>
+  <rect x="44" y="504" width="148" height="42" rx="12" fill="#25344c" />
+  <text x="58" y="532" fill="#ffffff" font-family="Arial, sans-serif" font-size="14" font-weight="700">↺ Restart Block</text>
 </svg>
