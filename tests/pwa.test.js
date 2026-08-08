@@ -370,3 +370,9 @@ test("PWA registration handles browser install prompt", function () {
     "install prompt should not share fixed update styling"
   );
 });
+
+test("display settings explain their immediate and saved behavior", function () {
+  const html = readProjectFile("index.html");
+  assert(html.includes("These switches apply immediately."));
+  assert(html.includes("Save settings to remember them after refresh."));
+});

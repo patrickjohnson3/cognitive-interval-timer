@@ -540,6 +540,10 @@ select {
   text-transform: uppercase;
 }
 
+.display-settings-help {
+  margin: calc(-1 * var(--space-1)) 0 var(--space-1);
+}
+
 .checks label {
   display: flex;
   align-items: center;
