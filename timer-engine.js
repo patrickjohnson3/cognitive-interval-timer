@@ -107,6 +107,15 @@
       const elapsedSec = (now - state.timer.lastTickMs) / 1000;
       if (elapsedSec <= 0) return;
       state.timer.lastTickMs = now;
+      const previousDisplaySecond = Math.floor(state.timer.remainingSec);
+
+      if (state.timer.remainingSec > elapsedSec) {
+        state.timer.remainingSec -= elapsedSec;
+        if (Math.floor(state.timer.remainingSec) !== previousDisplaySecond) {
+          hooks.onStateChange();
+        }
+        return;
+      }
 
       const consumed = Core.advanceTimerByElapsed(
         state.timer,

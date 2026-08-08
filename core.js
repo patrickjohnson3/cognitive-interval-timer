@@ -140,10 +140,10 @@
 
   function rolloverStats(stats, nowKey) {
     const today = nowKey || dateKey();
-    const next = Object.assign(
-      { dateKey: today, focusBlocksToday: 0, focusBlocksSinceLong: 0 },
-      stats || {}
-    );
+    const next = stats || { dateKey: today, focusBlocksToday: 0, focusBlocksSinceLong: 0 };
+    if (typeof next.focusBlocksToday !== "number") next.focusBlocksToday = 0;
+    if (typeof next.focusBlocksSinceLong !== "number") next.focusBlocksSinceLong = 0;
+    if (!next.dateKey) next.dateKey = today;
     if (next.dateKey !== today) {
       next.dateKey = today;
       next.focusBlocksToday = 0;

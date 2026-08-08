@@ -73,3 +73,27 @@ test("suspension discards hidden elapsed time", function () {
   );
   assert(ctx.state.stats.focusBlocksToday === 0, "expected no focus completion while suspended");
 });
+
+test("ordinary ticks render only when the displayed second changes", function () {
+  const ctx = createTimerContext();
+  const originalSetInterval = global.setInterval;
+  let tick = null;
+  global.setInterval = function captureTicker(callback) {
+    tick = callback;
+    return 1;
+  };
+
+  try {
+    ctx.timer.startTicker();
+    ctx.state.timer.remainingSec = 29.8;
+    ctx.state.timer.lastTickMs = Date.now() - 100;
+    tick();
+    assert(ctx.stateChanges.length === 0, "expected sub-second tick to skip rendering");
+
+    ctx.state.timer.lastTickMs = Date.now() - 1100;
+    tick();
+    assert(ctx.stateChanges.length === 1, "expected displayed-second change to render");
+  } finally {
+    global.setInterval = originalSetInterval;
+  }
+});
