@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { parseWorkflowYaml } = require("./helpers/workflow-yaml.js");
+const { preparePagesArtifact } = require("../scripts/prepare-pages-artifact.js");
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -124,6 +125,21 @@ test("Validation wrapper runs project checks without npm", function () {
   assert(
     validate.includes("tests/pages-artifact-smoke.js"),
     "validate should run the Pages artifact smoke test"
+  );
+});
+
+test("Pages artifact build refuses destructive output targets", function () {
+  let error = null;
+  try {
+    preparePagesArtifact(".");
+  } catch (caught) {
+    error = caught;
+  }
+
+  assert(error, "expected repository-root output to be rejected");
+  assert(
+    error.message.includes("Pages artifacts may only be written"),
+    "expected a clear generated-output error"
   );
 });
 

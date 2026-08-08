@@ -5,6 +5,7 @@ const appShell = require("../app-shell-assets.js");
 const packageJson = require("../package.json");
 
 const ROOT = path.join(__dirname, "..");
+const SITE_ROOT = path.join(ROOT, "_site");
 
 const DEV_ONLY_PATHS = new Set([
   ".gitignore",
@@ -23,10 +24,9 @@ function isDevOnly(file) {
   return DEV_ONLY_PATHS.has(file) || DEV_ONLY_PREFIXES.some((prefix) => file.startsWith(prefix));
 }
 
-function assertInsideRoot(target) {
-  const relative = path.relative(ROOT, target);
-  if (relative.startsWith("..") || path.isAbsolute(relative)) {
-    throw new Error("Refusing to write outside repository: " + target);
+function assertGeneratedOutput(target) {
+  if (target !== SITE_ROOT) {
+    throw new Error("Pages artifacts may only be written to " + SITE_ROOT);
   }
 }
 
@@ -95,7 +95,7 @@ function writeServiceWorkerBuild(outputDir, metadata) {
 
 function preparePagesArtifact(outputArg) {
   const outputDir = path.resolve(ROOT, outputArg || "_site");
-  assertInsideRoot(outputDir);
+  assertGeneratedOutput(outputDir);
   fs.rmSync(outputDir, { recursive: true, force: true });
   fs.mkdirSync(outputDir, { recursive: true });
 
