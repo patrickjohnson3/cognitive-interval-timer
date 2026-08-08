@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { parseWorkflowYaml } = require("./helpers/workflow-yaml.js");
-const { preparePagesArtifact } = require("../scripts/prepare-pages-artifact.js");
+const { DEPLOY_FILES, preparePagesArtifact } = require("../scripts/prepare-pages-artifact.js");
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -141,6 +141,14 @@ test("Pages artifact build refuses destructive output targets", function () {
     error.message.includes("Pages artifacts may only be written"),
     "expected a clear generated-output error"
   );
+});
+
+test("Pages artifact uses an explicit runtime allowlist", function () {
+  ["AGENTS.md", "README.md", "SECURITY.md", "TODO.md", "package.json"].forEach((file) => {
+    assert(!DEPLOY_FILES.includes(file), "development file should not deploy: " + file);
+  });
+  assert(DEPLOY_FILES.includes("index.html"), "expected index in deploy allowlist");
+  assert(DEPLOY_FILES.includes("service-worker.js"), "expected service worker in deploy allowlist");
 });
 
 if (!process.exitCode) {

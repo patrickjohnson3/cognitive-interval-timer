@@ -6,35 +6,14 @@ const packageJson = require("../package.json");
 
 const ROOT = path.join(__dirname, "..");
 const SITE_ROOT = path.join(ROOT, "_site");
-
-const DEV_ONLY_PATHS = new Set([
-  ".gitignore",
-  ".node-version",
-  ".prettierignore",
-  ".prettierrc.json",
-  "eslint.config.js",
-  "package-lock.json",
-  "package.json",
-  "README.md",
-]);
-
-const DEV_ONLY_PREFIXES = [".github/", "scripts/", "tests/"];
-
-function isDevOnly(file) {
-  return DEV_ONLY_PATHS.has(file) || DEV_ONLY_PREFIXES.some((prefix) => file.startsWith(prefix));
-}
+const DEPLOY_FILES = appShell.APP_SHELL.concat("./service-worker.js")
+  .filter((asset) => asset !== "./")
+  .map((asset) => asset.replace(/^\.\//, ""));
 
 function assertGeneratedOutput(target) {
   if (target !== SITE_ROOT) {
     throw new Error("Pages artifacts may only be written to " + SITE_ROOT);
   }
-}
-
-function trackedFiles() {
-  return childProcess
-    .execFileSync("git", ["ls-files"], { cwd: ROOT, encoding: "utf8" })
-    .split("\n")
-    .filter(Boolean);
 }
 
 function gitValue(args, fallback) {
@@ -86,27 +65,15 @@ function preparePagesArtifact(outputArg) {
   fs.rmSync(outputDir, { recursive: true, force: true });
   fs.mkdirSync(outputDir, { recursive: true });
 
-  trackedFiles()
-    .filter((file) => !isDevOnly(file))
-    .forEach((file) => {
-      const source = path.join(ROOT, file);
-      const destination = path.join(outputDir, file);
-      fs.mkdirSync(path.dirname(destination), { recursive: true });
-      fs.copyFileSync(source, destination);
-    });
+  DEPLOY_FILES.forEach((file) => {
+    const source = path.join(ROOT, file);
+    const destination = path.join(outputDir, file);
+    fs.mkdirSync(path.dirname(destination), { recursive: true });
+    fs.copyFileSync(source, destination);
+  });
 
   const metadata = buildMetadata();
   writeAppVersion(outputDir, metadata);
-
-  const missingAppShellAssets = appShell.APP_SHELL.filter((asset) => asset !== "./").filter(
-    (asset) => !fs.existsSync(path.join(outputDir, asset.replace(/^\.\//, "")))
-  );
-
-  if (missingAppShellAssets.length > 0) {
-    throw new Error(
-      "Missing app shell assets in Pages artifact: " + missingAppShellAssets.join(", ")
-    );
-  }
 
   return outputDir;
 }
@@ -116,6 +83,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+  DEPLOY_FILES,
   buildMetadata,
   preparePagesArtifact,
 };
