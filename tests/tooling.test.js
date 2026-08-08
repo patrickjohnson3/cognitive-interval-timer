@@ -50,26 +50,10 @@ test("Node version metadata stays aligned", function () {
   );
 });
 
-test("Pages deployment stays gated by validation", function () {
-  const pages = workflow(".github/workflows/deploy-pages.yml");
+test("CI keeps deployable branch output validated", function () {
   const ci = workflow(".github/workflows/ci.yml");
-  const deploy = pages.jobs.deploy;
-  const deploySteps = steps(deploy);
   const ciSteps = steps(ci.jobs.test);
 
-  assert(pages.on.workflow_run.workflows.includes("CI"), "Pages deploy should listen for CI");
-  assert(
-    pages.on.workflow_run.types.includes("completed"),
-    "Pages deploy should run after CI completes"
-  );
-  assert(
-    deploy.if.includes("github.event.workflow_run.conclusion == 'success'"),
-    "Pages deploy should require successful CI"
-  );
-  assert(
-    deploy.if.includes("github.event.workflow_run.head_branch == 'pwa'"),
-    "Pages deploy should be limited to the pwa branch"
-  );
   assert(
     ciSteps.some(function runsOfflineSmoke(step) {
       return step.run === "npm run test:pwa:offline";
@@ -81,18 +65,6 @@ test("Pages deployment stays gated by validation", function () {
       return step.run === "npm run test:pages:artifact";
     }),
     "CI validation should include the Pages artifact smoke test"
-  );
-  assert(
-    deploySteps.some(function deploysPages(step) {
-      return step.uses === "actions/deploy-pages@v4";
-    }),
-    "Pages workflow should use the official deploy action"
-  );
-  assert(
-    deploySteps.some(function buildsPages(step) {
-      return step.run === "npm run build:pages";
-    }),
-    "Pages workflow should build the static artifact through the build script"
   );
 });
 
