@@ -355,9 +355,11 @@
         render.setSettingField("wake_lock_enabled", true);
         updateDraftFromForm();
       }
-      return displayModes.setMinimalMode(enabled, appState.draftSettings, {
+      const result = displayModes.setMinimalMode(enabled, appState.draftSettings, {
         wakeLockBeforeMinimal: wakeLockBeforeMinimal,
       });
+      if (enabled) controls.focusMinimalModeReveal();
+      return result;
     }
 
     function onWakeLockToggle(enabled) {
@@ -390,6 +392,7 @@
       displayModes.setMinimalMode(false, appState.draftSettings, options);
       updateDraftFromForm();
       onStateChange();
+      controls.focusPrimaryAction();
     }
 
     function renderMinimalModeState(active, restoredWakeLock) {
@@ -401,6 +404,7 @@
       render.setSettingField("minimal_mode_enabled", false);
       updateDraftFromForm();
       onStateChange();
+      controls.focusPrimaryAction();
     }
 
     function reconcileFullscreenExited() {

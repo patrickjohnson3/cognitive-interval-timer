@@ -16,8 +16,12 @@ function createNode(options) {
     checked: Boolean(config.checked),
     isContentEditable: false,
     listeners,
+    focusCount: 0,
     addEventListener: function addEventListener(type, handler) {
       listeners[type] = handler;
+    },
+    focus: function focus() {
+      this.focusCount += 1;
     },
     checkValidity: function checkValidity() {
       return true;
@@ -253,6 +257,15 @@ test("minimal reveal click opens panel without bubbling", function () {
   );
   assert(ctx.calls.includes("prevent-default"), "expected reveal click to be consumed");
   assert(ctx.calls.includes("stop-propagation"), "expected reveal click not to bubble");
+  assert.equal(ctx.dom.controls.restartMinimalBlock.focusCount, 1);
+});
+
+test("collapsing minimal controls returns focus to the disclosure", function () {
+  const ctx = bindWithBrowserStubs();
+  ctx.dom.controls.exitMinimalModeReveal.listeners.click({});
+  ctx.dom.controls.exitMinimalModeReveal.listeners.click({});
+
+  assert.equal(ctx.dom.controls.exitMinimalModeReveal.focusCount, 1);
 });
 
 test("closed minimal panel is removed from keyboard navigation", function () {
@@ -312,8 +325,14 @@ test("wake lock checkbox triggers wake lock handler and dirty settings handler",
   assert(ctx.calls.includes("settings"), "expected settings dirty handler");
 });
 
-test("Escape exits minimal mode", function () {
+test("Escape closes an open minimal panel before exiting minimal mode", function () {
   const ctx = bindWithBrowserStubs();
+  ctx.dom.controls.exitMinimalModeReveal.listeners.click({});
+  ctx.windowListeners.keydown({ key: "Escape", target: createNode({ tagName: "BODY" }) });
+
+  assert(!ctx.calls.includes("exit-minimal"), "expected first Escape to close the disclosure");
+  assert.equal(ctx.dom.controls.exitMinimalModeReveal.focusCount, 1);
+
   ctx.windowListeners.keydown({ key: "Escape", target: createNode({ tagName: "BODY" }) });
 
   assert(ctx.calls.includes("exit-minimal"), "expected Escape to exit minimal mode");

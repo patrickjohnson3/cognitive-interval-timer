@@ -132,6 +132,8 @@ function setup(options) {
         wake_lock_enabled: dom.fields.wake_lock_enabled.checked,
       };
     },
+    focusMinimalModeReveal: function focusMinimalModeReveal() {},
+    focusPrimaryAction: function focusPrimaryAction() {},
   };
 
   const windowRef = {

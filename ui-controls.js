@@ -59,6 +59,8 @@
           if (event && event.stopPropagation) event.stopPropagation();
           const open = dom.controls.exitMinimalModeWrap.getAttribute("data-open") === "true";
           setMinimalPanelOpen(!open);
+          if (open) focusMinimalModeReveal();
+          else dom.controls.restartMinimalBlock.focus();
         }
       );
       dom.controls.restartMinimalBlock.addEventListener(
@@ -66,6 +68,7 @@
         function onRestartMinimalBlockClick(event) {
           if (event && event.stopPropagation) event.stopPropagation();
           setMinimalPanelOpen(false);
+          focusMinimalModeReveal();
           handlers.onReset();
         }
       );
@@ -111,6 +114,11 @@
 
       window.addEventListener("keydown", function onKeydown(event) {
         if (event.key === "Escape") {
+          if (isMinimalPanelOpen()) {
+            setMinimalPanelOpen(false);
+            focusMinimalModeReveal();
+            return;
+          }
           setMinimalPanelOpen(false);
           handlers.onExitMinimalMode();
           return;
@@ -183,6 +191,7 @@
       if (!shouldHandleMinimalAction(event)) return;
       if (isMinimalPanelOpen()) {
         setMinimalPanelOpen(false);
+        focusMinimalModeReveal();
         consumeMinimalEvent(event);
         return;
       }
@@ -190,9 +199,19 @@
       handlers.onShortcut("toggle");
     }
 
+    function focusMinimalModeReveal() {
+      dom.controls.exitMinimalModeReveal.focus();
+    }
+
+    function focusPrimaryAction() {
+      dom.controls.start.focus();
+    }
+
     return {
       bindControls,
       readSettingsForm,
+      focusMinimalModeReveal,
+      focusPrimaryAction,
     };
   }
 
