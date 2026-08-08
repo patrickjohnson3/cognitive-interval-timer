@@ -46,6 +46,7 @@
     };
 
     let lastSavedStats = null;
+    let lastSavedTimer = null;
     let minimalModeHistoryActive = false;
     let wakeLockBeforeMinimalMode = null;
     const fullscreenService = DisplayServices.createFullscreenService({
@@ -140,8 +141,9 @@
       const storedTheme = storage.getText(Core.STORAGE_KEYS.theme, "dark");
       appState.theme = storedTheme === "light" ? "light" : "dark";
 
-      appState.timer.phase = Core.initialPhase(appState.settings);
-      appState.timer.remainingSec = Core.phaseDurationSec(appState.timer.phase, appState.settings);
+      const storedTimer = storage.getJSON(Core.STORAGE_KEYS.timer, null);
+      appState.timer = Core.normalizeTimerState(storedTimer, appState.settings);
+      lastSavedTimer = timerSnapshot(appState.timer);
     }
 
     function cloneStats(stats) {
@@ -158,6 +160,25 @@
         a.dateKey === b.dateKey &&
         a.focusBlocksToday === b.focusBlocksToday &&
         a.focusBlocksSinceLong === b.focusBlocksSinceLong
+      );
+    }
+
+    function timerSnapshot(timerState) {
+      return {
+        status: timerState.status,
+        phase: timerState.phase,
+        focusBlockNumber: timerState.focusBlockNumber,
+        remainingSec: Math.ceil(timerState.remainingSec),
+      };
+    }
+
+    function sameTimerSnapshot(a, b) {
+      if (!a || !b) return false;
+      return (
+        a.status === b.status &&
+        a.phase === b.phase &&
+        a.focusBlockNumber === b.focusBlockNumber &&
+        a.remainingSec === b.remainingSec
       );
     }
 
@@ -181,6 +202,13 @@
       if (sameStats(lastSavedStats, appState.stats)) return;
       syncStorageWarning(storage.setJSON(Core.STORAGE_KEYS.stats, appState.stats));
       lastSavedStats = cloneStats(appState.stats);
+    }
+
+    function persistTimerIfChanged() {
+      const snapshot = timerSnapshot(appState.timer);
+      if (sameTimerSnapshot(lastSavedTimer, snapshot)) return;
+      syncStorageWarning(storage.setJSON(Core.STORAGE_KEYS.timer, snapshot));
+      lastSavedTimer = snapshot;
     }
 
     function normalizeAppSettings(rawSettings) {
@@ -564,6 +592,7 @@
     function onStateChange() {
       appState.stats = Core.rolloverStats(appState.stats, Core.dateKey());
       persistStatsIfChanged();
+      persistTimerIfChanged();
       render.render(appState);
     }
 

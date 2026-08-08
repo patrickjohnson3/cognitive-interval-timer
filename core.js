@@ -61,6 +61,7 @@
     settings: "better_pomodoro_settings_v1",
     stats: "better_pomodoro_stats_v1",
     theme: "better_pomodoro_theme_v1",
+    timer: "better_pomodoro_timer_v1",
   };
 
   const TICK_INTERVAL_MS = 250;
@@ -167,6 +168,22 @@
     const key = (PHASE_CONFIG[phase] && PHASE_CONFIG[phase].durationKey) || phase;
     const minutes = Number(settings[key] || 0);
     return Math.max(0, minutes * 60);
+  }
+
+  function normalizeTimerState(source, settings) {
+    const input = source || {};
+    const phase = PHASES.includes(input.phase) ? input.phase : initialPhase(settings);
+    const status = Object.values(STATUS).includes(input.status) ? input.status : STATUS.IDLE;
+    const defaultRemaining = phaseDurationSec(phase, settings);
+    const remaining = Number(input.remainingSec);
+
+    return {
+      status,
+      phase,
+      focusBlockNumber: status === STATUS.IDLE ? 0 : clampInt(input.focusBlockNumber, 1, 1, 100000),
+      remainingSec: Number.isFinite(remaining) && remaining >= 0 ? remaining : defaultRemaining,
+      lastTickMs: null,
+    };
   }
 
   function resolvePhaseTransition(from, context) {
@@ -309,6 +326,7 @@
     rolloverStats,
     initialPhase,
     phaseDurationSec,
+    normalizeTimerState,
     nextPhase,
     isValidTransition,
     resolvePhaseTransition,

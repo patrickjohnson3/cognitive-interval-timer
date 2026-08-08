@@ -88,6 +88,9 @@ function setup(options) {
   if (config.storedSettings) {
     stored[Core.STORAGE_KEYS.settings] = config.storedSettings;
   }
+  if (config.storedTimer) {
+    stored[Core.STORAGE_KEYS.timer] = config.storedTimer;
+  }
   const fullscreenRequests = [];
   let boundHandlers = null;
   const wakeLockCalls = [];
@@ -298,6 +301,22 @@ test("document visibility freezes and resynchronizes the timer clock", function 
 
   assert(ctx.timerCalls.includes("suspended:true"), "expected hidden timer suspension");
   assert(ctx.timerCalls.includes("suspended:false"), "expected visible timer resynchronization");
+});
+
+test("timer session state survives application initialization", function () {
+  const ctx = setup({
+    storedTimer: {
+      status: Core.STATUS.PAUSED,
+      phase: Core.PHASE.RECALL,
+      focusBlockNumber: 2,
+      remainingSec: 42,
+    },
+  });
+
+  assert(ctx.app.state.timer.status === Core.STATUS.PAUSED, "expected paused status to restore");
+  assert(ctx.app.state.timer.phase === Core.PHASE.RECALL, "expected recall phase to restore");
+  assert(ctx.app.state.timer.focusBlockNumber === 2, "expected active block to restore");
+  assert(ctx.app.state.timer.remainingSec === 42, "expected remaining time to restore");
 });
 
 test("primary action pauses while timer is running", function () {

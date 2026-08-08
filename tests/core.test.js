@@ -188,6 +188,25 @@ test("normalizeSettings preserves quiet mode preference", function () {
   assert(settings.quiet_mode_enabled === true, "expected quiet mode preference to normalize");
 });
 
+test("normalizeTimerState restores a persisted timer without elapsed wall time", function () {
+  const settings = Core.normalizeSettings(null);
+  const timer = Core.normalizeTimerState(
+    {
+      status: Core.STATUS.RUNNING,
+      phase: Core.PHASE.RECALL,
+      focusBlockNumber: 3,
+      remainingSec: 77,
+    },
+    settings
+  );
+
+  assert(timer.status === Core.STATUS.RUNNING, "expected running status to restore");
+  assert(timer.phase === Core.PHASE.RECALL, "expected phase to restore");
+  assert(timer.focusBlockNumber === 3, "expected active block to restore");
+  assert(timer.remainingSec === 77, "expected remaining time to restore unchanged");
+  assert(timer.lastTickMs === null, "expected a fresh wall-clock anchor");
+});
+
 if (!process.exitCode) {
   console.log("All tests passed.");
 }
