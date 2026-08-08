@@ -345,7 +345,7 @@
 
     function applySettingsSideEffects(options) {
       const config = Object.assign(
-        { hydrateForm: true, correctPrepPhase: false, activateDisplayModes: true },
+        { hydrateForm: true, correctInitialPhase: false, activateDisplayModes: true },
         options || {}
       );
       if (config.hydrateForm) {
@@ -361,12 +361,13 @@
         applyMinimalModeSetting(false, appState.settings);
       }
 
+      const initialPhase = Core.initialPhase(appState.settings);
       if (
-        config.correctPrepPhase &&
-        !appState.settings.prep_enabled &&
-        appState.timer.phase === Core.PHASE.PREP
+        config.correctInitialPhase &&
+        appState.timer.status === Core.STATUS.IDLE &&
+        appState.timer.phase !== initialPhase
       ) {
-        timer.resetToPhase(Core.PHASE.FOCUS);
+        timer.resetToPhase(initialPhase);
         return true;
       }
       return false;
@@ -574,10 +575,10 @@
       }
 
       appState.ui.settingsDirty = false;
-      const resetToFocus = applySettingsSideEffects({ correctPrepPhase: true });
+      const resetToInitialPhase = applySettingsSideEffects({ correctInitialPhase: true });
       announce.flashMessage(a11y.formatAnnouncement("settings_saved"));
 
-      if (resetToFocus) return;
+      if (resetToInitialPhase) return;
 
       onStateChange();
     }

@@ -180,7 +180,9 @@ function setup(options) {
       },
       skip: function skip() {},
       reset: function reset() {},
-      resetToPhase: function resetToPhase() {},
+      resetToPhase: function resetToPhase(phase) {
+        timerCalls.push("resetToPhase:" + phase);
+      },
       setSuspended: function setSuspended(suspended) {
         timerCalls.push("suspended:" + suspended);
       },
@@ -753,4 +755,27 @@ test("saving minimal mode preserves the explicit wake lock preference", function
   const saved = ctx.stored[Core.STORAGE_KEYS.settings];
   assert(saved.minimal_mode_enabled === true, "expected minimal mode setting to save");
   assert(saved.wake_lock_enabled === false, "expected wake lock preference to remain explicit");
+});
+
+test("saving Prep as the idle starting phase resets the timer to Prep", function () {
+  const ctx = setup({ storedSettings: Core.normalizeSettings({ prep_enabled: false }) });
+  ctx.app.controller.saveSettings(
+    Object.assign({}, ctx.app.state.settings, {
+      prep_enabled: true,
+    })
+  );
+
+  assert(ctx.timerCalls.includes("resetToPhase:" + Core.PHASE.PREP));
+});
+
+test("disabling Prep while idle resets the timer to Focus", function () {
+  const ctx = setup({ storedSettings: Core.normalizeSettings({ prep_enabled: true }) });
+  ctx.app.state.timer.phase = Core.PHASE.PREP;
+  ctx.app.controller.saveSettings(
+    Object.assign({}, ctx.app.state.settings, {
+      prep_enabled: false,
+    })
+  );
+
+  assert(ctx.timerCalls.includes("resetToPhase:" + Core.PHASE.FOCUS));
 });
