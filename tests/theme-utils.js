@@ -40,28 +40,6 @@ function parseThemeTokens() {
   };
 }
 
-function parseColorChannels(value) {
-  const hex = value.match(/^#([0-9a-fA-F]{6})$/);
-  if (hex) {
-    const raw = hex[1];
-    return [
-      parseInt(raw.slice(0, 2), 16),
-      parseInt(raw.slice(2, 4), 16),
-      parseInt(raw.slice(4, 6), 16),
-    ];
-  }
-
-  const rgb = value.match(/^rgba?\(([^)]+)\)$/);
-  if (rgb) {
-    const parts = rgb[1].split(",").map((v) => v.trim());
-    if (parts.length >= 3) {
-      return [Number(parts[0]), Number(parts[1]), Number(parts[2])];
-    }
-  }
-
-  return null;
-}
-
 function parseHex(value) {
   const hex = value.match(/^#([0-9a-fA-F]{6})$/);
   if (!hex) return null;
@@ -95,7 +73,6 @@ function contrastRatio(hexA, hexB) {
 
 module.exports = {
   parseThemeTokens,
-  parseColorChannels,
   parseHex,
   contrastRatio,
 };

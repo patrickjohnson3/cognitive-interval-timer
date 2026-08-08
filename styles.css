@@ -392,11 +392,6 @@ kbd {
   min-width: 110px;
 }
 
-.cycle-stack {
-  display: grid;
-  gap: var(--space-3);
-}
-
 .cycle-paired-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

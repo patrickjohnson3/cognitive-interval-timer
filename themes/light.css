@@ -8,13 +8,10 @@
   --color-muted: #52606d;
   --color-accent: #2563eb;
   --color-accent-strong: #1d4ed8;
-  --color-accent-soft: #dbeafe;
   --color-accent-glow: rgba(37, 99, 235, 0.2);
   --color-break-accent: #16a34a;
-  --color-recall-accent: #7c3aed;
   --color-success: #16a34a;
   --color-border: #e4e7eb;
-  --color-shadow: rgba(31, 41, 51, 0.12);
   --color-button: #f8fafc;
   --color-button-hover: #eef2f7;
   --color-input: #ffffff;
@@ -49,7 +46,6 @@
   --button-primary-hover-bg: linear-gradient(160deg, var(--color-accent-strong), #1e40af);
   --theme-row-bg: #fcfdff;
   --panel-bg: linear-gradient(170deg, var(--color-surface), #f8fafc);
-  --card-bg: var(--color-surface);
   --bg-gradient:
     radial-gradient(circle at 14% 18%, #e8eef5, transparent 42%),
     radial-gradient(circle at 86% 82%, #edf4ff, transparent 44%),
