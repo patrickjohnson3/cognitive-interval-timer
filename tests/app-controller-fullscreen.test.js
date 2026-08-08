@@ -546,6 +546,42 @@ test("exiting minimal mode from UI removes the synthetic history entry", functio
   );
 });
 
+test("exiting minimal mode restores previously disabled wake lock", function () {
+  const ctx = setup();
+  ctx.dom.fields.wake_lock_enabled.checked = false;
+  ctx.dom.fields.minimal_mode_enabled.checked = true;
+  ctx.boundHandlers.onMinimalModeToggle(true);
+
+  ctx.boundHandlers.onExitMinimalMode();
+
+  assert(
+    ctx.dom.fields.wake_lock_enabled.checked === false,
+    "expected wake lock checkbox to restore to disabled"
+  );
+  assert(
+    ctx.wakeLockCalls[ctx.wakeLockCalls.length - 1] === false,
+    "expected wake lock to be released"
+  );
+});
+
+test("exiting minimal mode preserves previously enabled wake lock", function () {
+  const ctx = setup();
+  ctx.dom.fields.wake_lock_enabled.checked = true;
+  ctx.dom.fields.minimal_mode_enabled.checked = true;
+  ctx.boundHandlers.onMinimalModeToggle(true);
+
+  ctx.boundHandlers.onExitMinimalMode();
+
+  assert(
+    ctx.dom.fields.wake_lock_enabled.checked === true,
+    "expected wake lock checkbox to remain enabled"
+  );
+  assert(
+    ctx.wakeLockCalls[ctx.wakeLockCalls.length - 1] === true,
+    "expected wake lock to remain requested"
+  );
+});
+
 test("wake lock rejection clears wake lock field", async function () {
   const ctx = setup({ wakeLockResult: false });
   ctx.dom.fields.wake_lock_enabled.checked = true;

@@ -46,6 +46,7 @@
 
     let lastSavedStats = null;
     let minimalModeHistoryActive = false;
+    let wakeLockBeforeMinimalMode = null;
     const fullscreenService = DisplayServices.createFullscreenService({
       documentRef: doc,
       onUnavailable: reconcileFullscreenUnavailable,
@@ -358,6 +359,7 @@
 
     function onMinimalModeToggle(enabled) {
       if (enabled) {
+        rememberWakeLockBeforeMinimalMode();
         dom.fields.wake_lock_enabled.checked = true;
       }
       return applyMinimalModeSetting(enabled, controls.readSettingsForm());
@@ -441,6 +443,7 @@
 
         minimalModeHistoryActive = false;
         dom.fields.minimal_mode_enabled.checked = false;
+        restoreWakeLockAfterMinimalMode();
         applyMinimalModeSetting(false, controls.readSettingsForm(), { updateHistory: false });
         onSettingsInput(controls.readSettingsForm());
       });
@@ -478,6 +481,18 @@
       }
     }
 
+    function rememberWakeLockBeforeMinimalMode() {
+      if (doc.documentElement.hasAttribute("data-minimal-mode")) return;
+      wakeLockBeforeMinimalMode = Boolean(dom.fields.wake_lock_enabled.checked);
+    }
+
+    function restoreWakeLockAfterMinimalMode() {
+      if (wakeLockBeforeMinimalMode === null) return;
+      dom.fields.wake_lock_enabled.checked = wakeLockBeforeMinimalMode;
+      applyWakeLockSetting(wakeLockBeforeMinimalMode);
+      wakeLockBeforeMinimalMode = null;
+    }
+
     function applyMinimalModeSetting(enabled, rawSettings, options) {
       const config = Object.assign({ updateHistory: true }, options || {});
       const settings = normalizeAppSettings(rawSettings || appState.settings);
@@ -490,6 +505,7 @@
 
       doc.documentElement.removeAttribute("data-minimal-mode");
       if (config.updateHistory) exitMinimalModeHistory();
+      restoreWakeLockAfterMinimalMode();
       return applyFullscreenSetting(settings.fullscreen_enabled);
     }
 
