@@ -95,6 +95,8 @@ function setup(options) {
   const hapticCalls = [];
   const audioCalls = [];
   const transitionCalls = [];
+  const historyCalls = [];
+  const windowListeners = {};
 
   global.document = {
     fullscreenElement: null,
@@ -143,6 +145,20 @@ function setup(options) {
         minimal_mode_enabled: dom.fields.minimal_mode_enabled.checked,
         wake_lock_enabled: dom.fields.wake_lock_enabled.checked,
       };
+    },
+  };
+
+  const windowRef = {
+    history: {
+      pushState: function pushState(state, title) {
+        historyCalls.push({ type: "pushState", state, title });
+      },
+      back: function back() {
+        historyCalls.push({ type: "back" });
+      },
+    },
+    addEventListener: function addEventListener(type, handler) {
+      windowListeners[type] = handler;
     },
   };
 
@@ -236,6 +252,7 @@ function setup(options) {
       },
     },
     dom,
+    windowRef,
   });
 
   app.controller.initialize();
@@ -250,6 +267,8 @@ function setup(options) {
     hapticCalls,
     audioCalls,
     transitionCalls,
+    historyCalls,
+    windowListeners,
   };
 }
 
@@ -433,6 +452,44 @@ test("minimal mode toggle enables keep screen awake", function () {
   assert(ctx.wakeLockCalls.includes(true), "expected wake lock to be requested");
 });
 
+test("minimal mode pushes a single back-button history entry", function () {
+  const ctx = setup();
+  ctx.boundHandlers.onMinimalModeToggle(true);
+  ctx.boundHandlers.onMinimalModeToggle(true);
+
+  const pushes = ctx.historyCalls.filter(function isPush(call) {
+    return call.type === "pushState";
+  });
+  assert(pushes.length === 1, "expected one minimal mode history entry");
+  assert(
+    pushes[0].state.appState === "minimal-mode",
+    "expected minimal mode marker in history state"
+  );
+});
+
+test("Android back exits minimal mode before leaving the app", function () {
+  const ctx = setup();
+  ctx.dom.fields.minimal_mode_enabled.checked = true;
+  ctx.boundHandlers.onMinimalModeToggle(true);
+
+  ctx.windowListeners.popstate({});
+
+  assert(
+    !global.document.documentElement.hasAttribute("data-minimal-mode"),
+    "expected back navigation to exit minimal mode"
+  );
+  assert(
+    ctx.dom.fields.minimal_mode_enabled.checked === false,
+    "expected minimal mode checkbox to clear"
+  );
+  assert(
+    !ctx.historyCalls.some(function isBack(call) {
+      return call.type === "back";
+    }),
+    "expected hardware back handling not to call history.back again"
+  );
+});
+
 test("exiting minimal mode restores current fullscreen form state", function () {
   const ctx = setup();
   global.document.documentElement.setAttribute("data-minimal-mode", "true");
@@ -444,6 +501,25 @@ test("exiting minimal mode restores current fullscreen form state", function () 
   assert(
     ctx.fullscreenRequests.includes(true),
     "expected exit from minimal mode to honor current fullscreen field"
+  );
+});
+
+test("exiting minimal mode from UI removes the synthetic history entry", function () {
+  const ctx = setup();
+  ctx.dom.fields.minimal_mode_enabled.checked = true;
+  ctx.boundHandlers.onMinimalModeToggle(true);
+
+  ctx.boundHandlers.onExitMinimalMode();
+
+  assert(
+    ctx.historyCalls.some(function isBack(call) {
+      return call.type === "back";
+    }),
+    "expected UI exit to remove minimal mode history entry"
+  );
+  assert(
+    !global.document.documentElement.hasAttribute("data-minimal-mode"),
+    "expected UI exit to remove minimal mode attribute"
   );
 });
 

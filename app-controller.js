@@ -21,6 +21,7 @@
     const a11y = deps.a11y;
     const dom = deps.dom;
     const doc = deps.documentRef || document;
+    const win = deps.windowRef || (typeof window !== "undefined" ? window : null);
 
     const appState = {
       settings: Core.normalizeSettings(null),
@@ -44,6 +45,7 @@
     };
 
     let lastSavedStats = null;
+    let minimalModeHistoryActive = false;
     const fullscreenService = DisplayServices.createFullscreenService({
       documentRef: doc,
       onUnavailable: reconcileFullscreenUnavailable,
@@ -108,6 +110,7 @@
         onExitMinimalMode,
       });
 
+      bindMinimalModeHistory();
       applySettingsSideEffects({ hydrateForm: false });
       timer.startTicker();
       onStateChange();
@@ -393,6 +396,7 @@
         dom.fields.minimal_mode_enabled.checked = false;
       }
       doc.documentElement.removeAttribute("data-minimal-mode");
+      exitMinimalModeHistory();
       applyFullscreenSetting(false);
 
       if (
@@ -422,15 +426,65 @@
       return wakeLockService.setEnabled(enabled);
     }
 
-    function applyMinimalModeSetting(enabled, rawSettings) {
+    function bindMinimalModeHistory() {
+      if (!win || typeof win.addEventListener !== "function") return;
+      win.addEventListener("popstate", function onMinimalModePopState() {
+        if (!doc.documentElement.hasAttribute("data-minimal-mode")) {
+          minimalModeHistoryActive = false;
+          return;
+        }
+
+        minimalModeHistoryActive = false;
+        dom.fields.minimal_mode_enabled.checked = false;
+        applyMinimalModeSetting(false, controls.readSettingsForm(), { updateHistory: false });
+        onSettingsInput(controls.readSettingsForm());
+      });
+    }
+
+    function canUseHistory() {
+      return (
+        win &&
+        win.history &&
+        typeof win.history.pushState === "function" &&
+        typeof win.history.back === "function"
+      );
+    }
+
+    function enterMinimalModeHistory() {
+      if (minimalModeHistoryActive || !canUseHistory()) return;
+      try {
+        win.history.pushState({ appState: "minimal-mode" }, "");
+        minimalModeHistoryActive = true;
+      } catch {
+        minimalModeHistoryActive = false;
+      }
+    }
+
+    function exitMinimalModeHistory() {
+      if (!minimalModeHistoryActive || !canUseHistory()) {
+        minimalModeHistoryActive = false;
+        return;
+      }
+      minimalModeHistoryActive = false;
+      try {
+        win.history.back();
+      } catch {
+        // If history cleanup fails, the visible app state has still exited minimal mode.
+      }
+    }
+
+    function applyMinimalModeSetting(enabled, rawSettings, options) {
+      const config = Object.assign({ updateHistory: true }, options || {});
       const settings = normalizeAppSettings(rawSettings || appState.settings);
       if (enabled) {
         doc.documentElement.setAttribute("data-minimal-mode", "true");
+        if (config.updateHistory) enterMinimalModeHistory();
         applyWakeLockSetting(true);
         return applyFullscreenSetting(true);
       }
 
       doc.documentElement.removeAttribute("data-minimal-mode");
+      if (config.updateHistory) exitMinimalModeHistory();
       return applyFullscreenSetting(settings.fullscreen_enabled);
     }
 
