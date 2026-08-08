@@ -329,8 +329,20 @@
     function onSettingsInput(rawSettings) {
       const normalized = normalizeAppSettings(rawSettings);
       appState.draftSettings = normalized;
-      appState.ui.settingsDirty = !sameSettings(normalized, appState.settings);
+      appState.ui.settingsDirty =
+        !rawNumericSettingsAreValid(rawSettings, normalized) ||
+        !sameSettings(normalized, appState.settings);
       onStateChange();
+    }
+
+    function rawNumericSettingsAreValid(rawSettings, normalized) {
+      return Core.SETTING_FIELDS.every(function rawSettingIsValid(descriptor) {
+        if (descriptor.type !== "number") return true;
+        const rawValue = rawSettings[descriptor.key];
+        if (typeof rawValue === "string" && rawValue.trim() === "") return false;
+        const numberValue = Number(rawValue);
+        return Number.isInteger(numberValue) && numberValue === normalized[descriptor.key];
+      });
     }
 
     function applySettingsSideEffects(options) {

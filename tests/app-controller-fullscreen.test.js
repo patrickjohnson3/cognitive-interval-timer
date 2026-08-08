@@ -405,6 +405,16 @@ test("unsaved settings are tracked as explicit draft state", function () {
   assert(ctx.app.state.ui.settingsDirty === true, "expected draft to be marked unsaved");
 });
 
+test("clamped numeric input remains marked unsaved", function () {
+  const ctx = setup({ storedSettings: Core.normalizeSettings({ focus: 180 }) });
+  const rawSettings = Object.assign({}, ctx.app.state.settings, { focus: "999" });
+
+  ctx.app.onSettingsInput(rawSettings);
+
+  assert.equal(ctx.app.state.draftSettings.focus, 180);
+  assert.equal(ctx.app.state.ui.settingsDirty, true);
+});
+
 test("fullscreen toggle enables keep screen awake", function () {
   const ctx = setup();
   ctx.boundHandlers.onFullscreenToggle(true);

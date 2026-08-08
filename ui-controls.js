@@ -27,6 +27,18 @@
       }, {});
     }
 
+    function validateSettingsForm() {
+      const invalidDescriptor = settingFields.find(function findInvalidSetting(descriptor) {
+        const field = dom.fields[descriptor.key];
+        return descriptor.type === "number" && field.checkValidity && !field.checkValidity();
+      });
+      if (!invalidDescriptor) return true;
+
+      const invalidField = dom.fields[invalidDescriptor.key];
+      if (invalidField.reportValidity) invalidField.reportValidity();
+      return false;
+    }
+
     function bindControls(handlers) {
       setMinimalPanelOpen(false);
       dom.controls.start.addEventListener("click", handlers.onPrimaryAction);
@@ -34,6 +46,7 @@
       dom.controls.reset.addEventListener("click", handlers.onReset);
 
       dom.controls.save.addEventListener("click", function saveClick() {
+        if (!validateSettingsForm()) return;
         handlers.onSaveSettings(readSettingsForm());
       });
 

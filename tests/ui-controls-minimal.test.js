@@ -19,6 +19,9 @@ function createNode(options) {
     addEventListener: function addEventListener(type, handler) {
       listeners[type] = handler;
     },
+    checkValidity: function checkValidity() {
+      return true;
+    },
     getAttribute: function getAttribute(name) {
       return attrs[name];
     },
@@ -207,6 +210,22 @@ test("saved display activation button invokes its handler", function () {
   ctx.dom.controls.activateDisplayModes.listeners.click();
 
   assert(ctx.calls.includes("activate-display"));
+});
+
+test("invalid numeric settings are reported instead of saved", function () {
+  const ctx = bindWithBrowserStubs();
+  let reported = false;
+  ctx.dom.fields.focus.checkValidity = function checkValidity() {
+    return false;
+  };
+  ctx.dom.fields.focus.reportValidity = function reportValidity() {
+    reported = true;
+  };
+
+  ctx.dom.controls.save.listeners.click();
+
+  assert(reported, "expected native validity UI");
+  assert(!ctx.calls.includes("save"), "expected invalid settings not to save");
 });
 
 test("minimal reveal click opens panel without bubbling", function () {

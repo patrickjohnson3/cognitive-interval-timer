@@ -377,3 +377,13 @@ test("display settings explain their immediate and saved behavior", function () 
   assert(html.includes("Save settings to remember them after refresh."));
   assert(html.includes('id="activate-display-modes"'));
 });
+
+test("numeric settings require valid whole values", function () {
+  const html = readProjectFile("index.html");
+  const numericInputs = html.match(/<input[^>]+type="number"[^>]+>/g) || [];
+  assert.equal(numericInputs.length, 6);
+  numericInputs.forEach(function verifyNumericInput(input) {
+    assert(input.includes('step="1"'));
+    assert(input.includes("required"));
+  });
+});
