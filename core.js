@@ -210,6 +210,34 @@
     return mm + ":" + ss;
   }
 
+  function transitionToPhase(timer, stats, settings, to, options) {
+    if (!timer || !stats || !settings) {
+      throw new Error("transitionToPhase requires timer, settings, and stats");
+    }
+    const config = Object.assign(
+      { autoStart: settings.auto_start, creditFocus: false },
+      options || {}
+    );
+    const from = timer.phase;
+
+    if (to === PHASE.RECALL && config.creditFocus) {
+      stats.focusBlocksToday += 1;
+      stats.focusBlocksSinceLong += 1;
+    }
+    if (to === PHASE.LONG_BREAK) {
+      stats.focusBlocksSinceLong = 0;
+    }
+    if (to === PHASE.FOCUS && (from === PHASE.SHORT_BREAK || from === PHASE.LONG_BREAK)) {
+      timer.focusBlockNumber = Math.max(1, Number(timer.focusBlockNumber) + 1 || 1);
+    }
+
+    timer.phase = to;
+    timer.remainingSec = phaseDurationSec(to, settings);
+    timer.status = config.autoStart ? STATUS.RUNNING : STATUS.PAUSED;
+
+    return { type: "phase", from: from, to: to, creditFocus: config.creditFocus };
+  }
+
   function advanceTimerByElapsed(timer, elapsedSec, settings, stats, options) {
     if (!timer || !settings || !stats) {
       throw new Error("advanceTimerByElapsed requires timer, settings, and stats");
@@ -246,23 +274,12 @@
       const to = nextPhase(from, stats, settings);
       const creditFocus = from === "focus" && to === "recall";
 
-      if (to === "recall" && creditFocus) {
-        stats.focusBlocksToday += 1;
-        stats.focusBlocksSinceLong += 1;
-      }
-
-      if (to === "long_break") {
-        stats.focusBlocksSinceLong = 0;
-      }
-      if (to === PHASE.FOCUS && (from === PHASE.SHORT_BREAK || from === PHASE.LONG_BREAK)) {
-        timer.focusBlockNumber = Math.max(1, Number(timer.focusBlockNumber) + 1 || 1);
-      }
-
-      timer.phase = to;
-      timer.remainingSec = phaseDurationSec(to, settings);
-      timer.status = config.autoStart ? STATUS.RUNNING : STATUS.PAUSED;
-
-      events.push({ type: "phase", from: from, to: to, creditFocus: creditFocus });
+      events.push(
+        transitionToPhase(timer, stats, settings, to, {
+          autoStart: config.autoStart,
+          creditFocus: creditFocus,
+        })
+      );
     }
 
     return {
@@ -298,6 +315,7 @@
     canTransition,
     stateLabel,
     formatTime,
+    transitionToPhase,
     advanceTimerByElapsed,
   };
 });

@@ -81,23 +81,7 @@
         return;
       }
 
-      if (phase === Core.PHASE.RECALL && nextConfig.creditFocus) {
-        state.stats.focusBlocksToday += 1;
-        state.stats.focusBlocksSinceLong += 1;
-      }
-      if (phase === Core.PHASE.LONG_BREAK) {
-        state.stats.focusBlocksSinceLong = 0;
-      }
-      if (
-        phase === Core.PHASE.FOCUS &&
-        (from === Core.PHASE.SHORT_BREAK || from === Core.PHASE.LONG_BREAK)
-      ) {
-        state.timer.focusBlockNumber = Math.max(1, Number(state.timer.focusBlockNumber) + 1 || 1);
-      }
-
-      state.timer.phase = phase;
-      state.timer.remainingSec = Core.phaseDurationSec(phase, state.settings);
-      state.timer.status = nextConfig.autoStart ? Core.STATUS.RUNNING : Core.STATUS.PAUSED;
+      Core.transitionToPhase(state.timer, state.stats, state.settings, phase, nextConfig);
       state.timer.lastTickMs = state.timer.status === Core.STATUS.RUNNING ? Date.now() : null;
 
       hooks.onPhaseChange({
