@@ -61,7 +61,11 @@
     }
 
     function setJSON(key, value) {
-      return setText(key, JSON.stringify(value));
+      try {
+        return setText(key, JSON.stringify(value));
+      } catch {
+        return false;
+      }
     }
 
     return {

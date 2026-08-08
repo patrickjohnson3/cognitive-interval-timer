@@ -52,3 +52,22 @@ test("storage adapter removes malformed JSON and reports recovery", function () 
   assert.equal(adapter.hadReadError(), true);
   assert.equal(values.has("session"), false);
 });
+
+test("storage adapter reports unserializable values without throwing", function () {
+  const adapter = Storage.createAdapter({
+    localStorage: {
+      getItem: function getItem() {
+        return null;
+      },
+      setItem: function setItem() {
+        throw new Error("setItem should not run");
+      },
+      removeItem: function removeItem() {},
+    },
+  });
+  const cyclic = {};
+  cyclic.self = cyclic;
+
+  assert.equal(adapter.setJSON("session", cyclic), false);
+  assert.equal(adapter.setJSON("session", { count: 1n }), false);
+});
