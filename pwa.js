@@ -6,6 +6,7 @@
   const prompts = promptFactory && promptFactory.create({ documentRef: document });
   let refreshing = false;
   let updateRequested = false;
+  let updateTimeoutId = null;
   let deferredInstallPrompt = null;
 
   if (!prompts) {
@@ -76,20 +77,48 @@
       buttonText: pwaCopy.updateButton || "Update",
       pendingText: pwaCopy.updatePending || "Updating...",
       ariaLabel: pwaCopy.updateAriaLabel || "Update app to the latest version",
-      onUpdate: function updateApp() {
+      onUpdate: function updateApp(button) {
         if (!registration.waiting) return false;
-        updateRequested = true;
-        registration.waiting.postMessage({ type: "SKIP_WAITING" });
-        return true;
+        try {
+          updateRequested = true;
+          registration.waiting.postMessage({ type: "SKIP_WAITING" });
+          updateTimeoutId = window.setTimeout(function updateTimedOut() {
+            resetUpdateRequest(button, true);
+          }, 10000);
+          return true;
+        } catch {
+          resetUpdateRequest(button, true);
+          return false;
+        }
       },
     });
+  }
+
+  function resetUpdateRequest(button, showError) {
+    if (updateTimeoutId) window.clearTimeout(updateTimeoutId);
+    updateTimeoutId = null;
+    updateRequested = false;
+    if (button) {
+      button.disabled = false;
+      button.textContent = pwaCopy.updateButton || "Update";
+    }
+    if (showError) {
+      showServiceWorkerStatus(pwaCopy.updateErrorCopy || "The update could not start. Try again.");
+    }
   }
 
   if (supportsServiceWorker) {
     navigator.serviceWorker.addEventListener("controllerchange", function reloadAfterUpdate() {
       if (!updateRequested || refreshing) return;
+      if (updateTimeoutId) window.clearTimeout(updateTimeoutId);
+      updateTimeoutId = null;
       refreshing = true;
       window.location.reload();
+    });
+    navigator.serviceWorker.addEventListener("message", function handleWorkerMessage(event) {
+      if (!event.data || event.data.type !== "SKIP_WAITING_RESULT" || event.data.ok !== false)
+        return;
+      resetUpdateRequest(document.getElementById("pwa-update-button"), true);
     });
   }
 

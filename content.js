@@ -99,6 +99,7 @@
       updateCopy: "A newer version is ready.",
       updateButton: "Update",
       updatePending: "Updating...",
+      updateErrorCopy: "The update could not start. Try again.",
       updateAriaLabel: "Update app to the latest version",
       unsupportedCopy: "Offline support is unavailable in this browser.",
       registrationErrorCopy: "Offline support is unavailable right now.",

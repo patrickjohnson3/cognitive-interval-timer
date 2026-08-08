@@ -176,7 +176,18 @@ self.addEventListener("install", function installServiceWorker(event) {
 
 self.addEventListener("message", function handleServiceWorkerMessage(event) {
   if (event.data && event.data.type === "SKIP_WAITING") {
-    self.skipWaiting();
+    event.waitUntil(
+      Promise.resolve()
+        .then(function activateWaitingWorker() {
+          return self.skipWaiting();
+        })
+        .then(function acknowledgeActivation() {
+          if (event.source) event.source.postMessage({ type: "SKIP_WAITING_RESULT", ok: true });
+        })
+        .catch(function rejectActivation() {
+          if (event.source) event.source.postMessage({ type: "SKIP_WAITING_RESULT", ok: false });
+        })
+    );
   }
 });
 

@@ -79,6 +79,10 @@ function loadServiceWorkerRuntime(options) {
       },
     },
     self: {
+      skipWaiting: function skipWaiting() {
+        if (config.skipWaitingError) return Promise.reject(config.skipWaitingError);
+        return Promise.resolve();
+      },
       clients: {
         claim: function claim() {
           return Promise.resolve();
@@ -144,6 +148,8 @@ function loadPWA(options) {
   const bodyChildren = [];
   const listeners = {};
   const reloads = [];
+  const timeouts = new Map();
+  let nextTimeoutId = 1;
   const slot = {
     id: "pwa-install-slot",
     hidden: true,
@@ -203,6 +209,15 @@ function loadPWA(options) {
       matchMedia: function matchMedia(query) {
         return { matches: Boolean(config.displayModes && config.displayModes[query]) };
       },
+      setTimeout: function setTimeout(callback) {
+        const id = nextTimeoutId;
+        nextTimeoutId += 1;
+        timeouts.set(id, callback);
+        return id;
+      },
+      clearTimeout: function clearTimeout(id) {
+        timeouts.delete(id);
+      },
     },
   };
   context.self = context;
@@ -210,7 +225,7 @@ function loadPWA(options) {
   vm.runInNewContext(readProjectFile("pwa-prompts.js"), context, { filename: "pwa-prompts.js" });
   context.window.PomodoroPWAPrompts = context.PomodoroPWAPrompts;
   vm.runInNewContext(readProjectFile("pwa.js"), context, { filename: "pwa.js" });
-  return { bodyChildren, listeners, nodes, registration, reloads, slot };
+  return { bodyChildren, listeners, nodes, registration, reloads, slot, timeouts };
 }
 
 test("PWA update prompt renders in settings slot and posts skip-waiting", async function () {
@@ -289,6 +304,43 @@ test("PWA update click tolerates a missing waiting worker", async function () {
     runtime.nodes["pwa-update-button"].disabled === false,
     "button should not disable without a waiting worker"
   );
+});
+
+test("PWA update click recovers when worker messaging fails", async function () {
+  const registration = {
+    waiting: {
+      postMessage: function postMessage() {
+        throw new Error("worker became redundant");
+      },
+    },
+    addEventListener: function addEventListener() {},
+  };
+  const runtime = loadPWA({ registration });
+
+  runtime.listeners["window:load"]();
+  await flushPromises();
+  runtime.nodes["pwa-update-button"].listeners.click();
+
+  assert.equal(runtime.nodes["pwa-update-button"].disabled, false);
+  assert.equal(runtime.nodes["pwa-update-button"].textContent, "Update");
+  assert(runtime.nodes["pwa-status"]);
+});
+
+test("PWA update timeout restores the update button", async function () {
+  const registration = {
+    waiting: { postMessage: function postMessage() {} },
+    addEventListener: function addEventListener() {},
+  };
+  const runtime = loadPWA({ registration });
+
+  runtime.listeners["window:load"]();
+  await flushPromises();
+  runtime.nodes["pwa-update-button"].listeners.click();
+  const timeout = Array.from(runtime.timeouts.values())[0];
+  timeout();
+
+  assert.equal(runtime.nodes["pwa-update-button"].disabled, false);
+  assert.equal(runtime.nodes["pwa-update-button"].textContent, "Update");
 });
 
 test("PWA update prompt renders in regular browser mode", async function () {
@@ -426,6 +478,30 @@ test("service worker deletes only this app's old caches", async function () {
   assert(!deletedCaches.includes(currentCache), "current app cache should not be deleted");
   assert(!deletedRequests.includes(expectedRequest.url), "expected app-shell request to be kept");
   assert(deletedRequests.includes(staleRequest.url), "expected stale current-cache entry to prune");
+});
+
+test("service worker keeps update activation alive and acknowledges it", async function () {
+  const runtime = loadServiceWorkerRuntime();
+  const messages = [];
+  let activation = null;
+
+  runtime.listeners.message({
+    data: { type: "SKIP_WAITING" },
+    source: {
+      postMessage: function postMessage(message) {
+        messages.push(message);
+      },
+    },
+    waitUntil: function waitUntil(promise) {
+      activation = promise;
+    },
+  });
+
+  assert(activation, "expected activation to extend the message lifetime");
+  await activation;
+  assert.equal(messages.length, 1);
+  assert.equal(messages[0].type, "SKIP_WAITING_RESULT");
+  assert.equal(messages[0].ok, true);
 });
 
 test("service worker runtime-caches only app-shell assets", async function () {
