@@ -9,9 +9,14 @@
     const scope = env || {};
     const nav = scope.navigator || (typeof navigator !== "undefined" ? navigator : null);
     const doc = scope.document || (typeof document !== "undefined" ? document : null);
+    const schedule = scope.setTimeout || setTimeout;
+    const cancelSchedule = scope.clearTimeout || clearTimeout;
+    const retryDelayMs = scope.retryDelayMs || 1000;
     let wakeLock = null;
     let wanted = false;
     let requestId = 0;
+    let retryTimeoutId = null;
+    let retryAfterRelease = true;
 
     function isSupported() {
       return Boolean(nav && nav.wakeLock && typeof nav.wakeLock.request === "function");
@@ -20,11 +25,25 @@
     function rememberRelease(lock) {
       if (!lock || typeof lock.addEventListener !== "function") return;
       lock.addEventListener("release", function onRelease() {
-        if (wakeLock === lock) wakeLock = null;
+        if (wakeLock !== lock) return;
+        wakeLock = null;
+        if (
+          !wanted ||
+          !retryAfterRelease ||
+          (doc && doc.visibilityState !== "visible") ||
+          retryTimeoutId
+        ) {
+          return;
+        }
+        retryTimeoutId = schedule(function retryReleasedWakeLock() {
+          retryTimeoutId = null;
+          requestLock({ retryAfterRelease: false });
+        }, retryDelayMs);
       });
     }
 
-    function requestLock() {
+    function requestLock(options) {
+      const config = Object.assign({ retryAfterRelease: true }, options || {});
       if (!wanted || !isSupported()) return Promise.resolve(false);
       if (doc && doc.visibilityState === "hidden") return Promise.resolve(false);
       if (wakeLock) return Promise.resolve(true);
@@ -43,6 +62,7 @@
               });
           }
           wakeLock = lock;
+          retryAfterRelease = config.retryAfterRelease;
           rememberRelease(lock);
           return true;
         })
@@ -54,6 +74,10 @@
 
     function releaseLock() {
       requestId += 1;
+      if (retryTimeoutId) {
+        cancelSchedule(retryTimeoutId);
+        retryTimeoutId = null;
+      }
       const lock = wakeLock;
       wakeLock = null;
       if (!lock || typeof lock.release !== "function") return Promise.resolve(false);
@@ -75,7 +99,7 @@
 
     function handleVisibilityChange() {
       if (!wanted || !doc || doc.visibilityState !== "visible") return;
-      requestLock();
+      requestLock({ retryAfterRelease: true });
     }
 
     if (doc && typeof doc.addEventListener === "function") {

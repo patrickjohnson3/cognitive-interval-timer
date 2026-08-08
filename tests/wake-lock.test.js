@@ -86,3 +86,43 @@ test("releases a pending lock that resolves after wake lock is disabled", async 
   assert((await pendingEnable) === false, "expected stale enable request to report disabled");
   assert(lock.released === true, "expected stale lock to be released immediately");
 });
+
+test("retries one spontaneous visible wake-lock release", async function () {
+  const releaseListeners = [];
+  const scheduled = [];
+  let requests = 0;
+  const wakeLock = WakeLock.createController({
+    document: { visibilityState: "visible", addEventListener: function addEventListener() {} },
+    navigator: {
+      wakeLock: {
+        request: function request() {
+          requests += 1;
+          return Promise.resolve({
+            addEventListener: function addEventListener(type, listener) {
+              if (type === "release") releaseListeners.push(listener);
+            },
+            release: function release() {
+              return Promise.resolve();
+            },
+          });
+        },
+      },
+    },
+    setTimeout: function setTimeout(callback) {
+      scheduled.push(callback);
+      return scheduled.length;
+    },
+    clearTimeout: function clearTimeout() {},
+  });
+
+  await wakeLock.setEnabled(true);
+  releaseListeners[0]();
+  assert.equal(scheduled.length, 1);
+  scheduled[0]();
+  await Promise.resolve();
+  await Promise.resolve();
+  assert.equal(requests, 2);
+
+  releaseListeners[1]();
+  assert.equal(scheduled.length, 1, "retry-acquired lock should not create an endless loop");
+});
