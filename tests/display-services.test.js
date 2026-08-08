@@ -52,6 +52,35 @@ test("fullscreen service ignores stale async results", async function () {
   assert(doc.fullscreenElement === null, "expected stale fullscreen entry to be exited");
 });
 
+test("fullscreen service coalesces repeated enable requests", async function () {
+  let requests = 0;
+  let resolveEnter = null;
+  const doc = {
+    fullscreenElement: null,
+    documentElement: {
+      requestFullscreen: function requestFullscreen() {
+        requests += 1;
+        return new Promise(function waitForEnter(resolve) {
+          resolveEnter = function finishEnter() {
+            doc.fullscreenElement = doc.documentElement;
+            resolve();
+          };
+        });
+      },
+    },
+  };
+  const fullscreen = DisplayServices.createFullscreenService({ documentRef: doc });
+
+  const first = fullscreen.setEnabled(true);
+  const second = fullscreen.setEnabled(true);
+  resolveEnter();
+
+  assert.equal(await first, true);
+  assert.equal(await second, true);
+  assert.equal(requests, 1);
+  assert.equal(doc.fullscreenElement, doc.documentElement);
+});
+
 test("display mode service owns minimal fullscreen wake lock and history state", async function () {
   const events = [];
   const listeners = {};

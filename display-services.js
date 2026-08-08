@@ -8,10 +8,11 @@
   function createFullscreenService(deps) {
     const doc = deps.documentRef || document;
     const onUnavailable = deps.onUnavailable || function noop() {};
-    let requestId = 0;
+    let desiredEnabled = false;
+    let pendingEnable = null;
 
     function setEnabled(enabled) {
-      const currentRequestId = ++requestId;
+      desiredEnabled = Boolean(enabled);
       const root = doc.documentElement;
       const activeFullscreen = doc.fullscreenElement || null;
 
@@ -29,16 +30,18 @@
       }
 
       if (!enabled) {
+        if (pendingEnable) return pendingEnable;
         return Promise.resolve(false);
       }
       if (activeFullscreen) {
         return Promise.resolve(true);
       }
+      if (pendingEnable) return pendingEnable;
 
       if (root && root.requestFullscreen) {
-        return Promise.resolve(root.requestFullscreen())
+        pendingEnable = Promise.resolve(root.requestFullscreen())
           .then(function fullscreenEntered() {
-            if (currentRequestId !== requestId && doc.fullscreenElement && doc.exitFullscreen) {
+            if (!desiredEnabled && doc.fullscreenElement && doc.exitFullscreen) {
               return Promise.resolve(doc.exitFullscreen()).then(function exitStaleFullscreen() {
                 return false;
               });
@@ -46,11 +49,13 @@
             return true;
           })
           .catch(function handleFullscreenEnterError() {
-            if (currentRequestId === requestId) {
-              onUnavailable();
-            }
+            if (desiredEnabled) onUnavailable();
             return false;
+          })
+          .finally(function clearPendingEnable() {
+            pendingEnable = null;
           });
+        return pendingEnable;
       }
 
       onUnavailable();
