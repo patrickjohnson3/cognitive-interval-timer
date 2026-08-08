@@ -361,6 +361,17 @@ test("failed storage write shows a persistence warning", function () {
   assert(ctx.app.state.ui.storageWarning === true, "expected failed storage warning");
 });
 
+test("unsaved settings are tracked as explicit draft state", function () {
+  const ctx = setup();
+  const draft = Object.assign({}, Core.DEFAULT_SETTINGS, { focus: 60 });
+
+  ctx.app.onSettingsInput(draft);
+
+  assert(ctx.app.state.settings.focus === 45, "expected persisted settings to remain unchanged");
+  assert(ctx.app.state.draftSettings.focus === 60, "expected draft settings to update");
+  assert(ctx.app.state.ui.settingsDirty === true, "expected draft to be marked unsaved");
+});
+
 test("fullscreen toggle enables keep screen awake", function () {
   const ctx = setup();
   ctx.boundHandlers.onFullscreenToggle(true);

@@ -25,6 +25,7 @@
 
     const appState = {
       settings: Core.normalizeSettings(null),
+      draftSettings: Core.normalizeSettings(null),
       stats: Core.normalizeStats(null),
       theme: "dark",
       timer: {
@@ -125,6 +126,7 @@
     function hydrateFromStorage() {
       const storedSettings = storage.getJSON(Core.STORAGE_KEYS.settings, Core.DEFAULT_SETTINGS);
       appState.settings = normalizeAppSettings(storedSettings);
+      appState.draftSettings = Object.assign({}, appState.settings);
 
       const storedStats = storage.getJSON(Core.STORAGE_KEYS.stats, {
         dateKey: Core.dateKey(),
@@ -307,6 +309,7 @@
 
     function onSettingsInput(rawSettings) {
       const normalized = normalizeAppSettings(rawSettings);
+      appState.draftSettings = normalized;
       appState.ui.settingsDirty = !sameSettings(normalized, appState.settings);
       onStateChange();
     }
@@ -315,6 +318,7 @@
       const config = Object.assign({ hydrateForm: true, correctPrepPhase: false }, options || {});
       if (config.hydrateForm) {
         render.hydrateSettingsForm(appState.settings);
+        appState.draftSettings = Object.assign({}, appState.settings);
       }
       if (appState.settings.minimal_mode_enabled) {
         applyMinimalModeSetting(true, appState.settings);
@@ -337,6 +341,7 @@
     function onFullscreenToggle(enabled) {
       if (enabled) {
         dom.fields.wake_lock_enabled.checked = true;
+        updateDraftFromForm();
         applyWakeLockSetting(true);
       }
       return applyFullscreenSetting(enabled);
@@ -357,8 +362,9 @@
       if (enabled) {
         rememberWakeLockBeforeMinimalMode();
         dom.fields.wake_lock_enabled.checked = true;
+        updateDraftFromForm();
       }
-      return applyMinimalModeSetting(enabled, controls.readSettingsForm());
+      return applyMinimalModeSetting(enabled);
     }
 
     function onWakeLockToggle(enabled) {
@@ -368,8 +374,9 @@
     function onExitMinimalMode() {
       if (!doc.documentElement.hasAttribute("data-minimal-mode")) return;
       dom.fields.minimal_mode_enabled.checked = false;
-      applyMinimalModeSetting(false, controls.readSettingsForm());
-      onSettingsInput(controls.readSettingsForm());
+      updateDraftFromForm();
+      applyMinimalModeSetting(false);
+      onStateChange();
     }
 
     function reconcileFullscreenUnavailable() {
@@ -382,10 +389,10 @@
           Object.assign({}, appState.settings, { fullscreen_enabled: false })
         );
         persistSettings(appState.settings);
-        render.hydrateSettingsForm(appState.settings);
       }
 
-      onSettingsInput(controls.readSettingsForm());
+      updateDraftFromForm();
+      onStateChange();
     }
 
     function reconcileWakeLockUnavailable() {
@@ -400,10 +407,10 @@
           })
         );
         persistSettings(appState.settings);
-        render.hydrateSettingsForm(appState.settings);
       }
 
-      onSettingsInput(controls.readSettingsForm());
+      updateDraftFromForm();
+      onStateChange();
     }
 
     function applyFullscreenSetting(enabled) {
@@ -425,8 +432,9 @@
         minimalModeHistoryActive = false;
         dom.fields.minimal_mode_enabled.checked = false;
         restoreWakeLockAfterMinimalMode();
-        applyMinimalModeSetting(false, controls.readSettingsForm(), { updateHistory: false });
-        onSettingsInput(controls.readSettingsForm());
+        updateDraftFromForm();
+        applyMinimalModeSetting(false, null, { updateHistory: false });
+        onStateChange();
       });
     }
 
@@ -470,13 +478,14 @@
     function restoreWakeLockAfterMinimalMode() {
       if (wakeLockBeforeMinimalMode === null) return;
       dom.fields.wake_lock_enabled.checked = wakeLockBeforeMinimalMode;
+      updateDraftFromForm();
       applyWakeLockSetting(wakeLockBeforeMinimalMode);
       wakeLockBeforeMinimalMode = null;
     }
 
     function applyMinimalModeSetting(enabled, rawSettings, options) {
       const config = Object.assign({ updateHistory: true }, options || {});
-      const settings = normalizeAppSettings(rawSettings || appState.settings);
+      const settings = normalizeAppSettings(rawSettings || appState.draftSettings);
       if (enabled) {
         doc.documentElement.setAttribute("data-minimal-mode", "true");
         if (config.updateHistory) enterMinimalModeHistory();
@@ -495,6 +504,7 @@
       const oldPhaseDuration = Core.phaseDurationSec(appState.timer.phase, previousSettings);
       const elapsedInPhase = Math.max(0, oldPhaseDuration - appState.timer.remainingSec);
       const next = normalizeAppSettings(rawSettings);
+      appState.draftSettings = Object.assign({}, next);
 
       if (next.auto_start !== appState.settings.auto_start) {
         appState.ui.sessionFlags.changedAutoStart = true;
@@ -522,6 +532,7 @@
 
     function restoreDefaults() {
       appState.settings = normalizeAppSettings(Core.DEFAULT_SETTINGS);
+      appState.draftSettings = Object.assign({}, appState.settings);
       persistSettings(appState.settings);
 
       appState.ui.settingsDirty = false;
@@ -544,6 +555,11 @@
       appState.stats = Core.rolloverStats(appState.stats, Core.dateKey());
       persistStatsIfChanged();
       render.render(appState);
+    }
+
+    function updateDraftFromForm() {
+      appState.draftSettings = normalizeAppSettings(controls.readSettingsForm());
+      appState.ui.settingsDirty = !sameSettings(appState.draftSettings, appState.settings);
     }
   }
 
