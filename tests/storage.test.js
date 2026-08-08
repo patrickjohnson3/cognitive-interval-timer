@@ -31,3 +31,24 @@ test("session lock preserves existing behavior when Web Locks are unavailable", 
   assert.equal(lock.hasLock(), true);
   assert.equal(await lock.acquire(), true);
 });
+
+test("storage adapter removes malformed JSON and reports recovery", function () {
+  const values = new Map([["session", "{broken"]]);
+  const adapter = Storage.createAdapter({
+    localStorage: {
+      getItem: function getItem(key) {
+        return values.has(key) ? values.get(key) : null;
+      },
+      setItem: function setItem(key, value) {
+        values.set(key, value);
+      },
+      removeItem: function removeItem(key) {
+        values.delete(key);
+      },
+    },
+  });
+
+  assert.deepEqual(adapter.getJSON("session", { safe: true }), { safe: true });
+  assert.equal(adapter.hadReadError(), true);
+  assert.equal(values.has("session"), false);
+});

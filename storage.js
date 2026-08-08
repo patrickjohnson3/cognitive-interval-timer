@@ -5,16 +5,21 @@
     root.PomodoroStorage = factory();
   }
 })(typeof self !== "undefined" ? self : this, function makeStorage() {
-  function createAdapter() {
+  function createAdapter(env) {
+    const scope = env || {};
+    const persistentStore =
+      scope.localStorage || (typeof localStorage !== "undefined" ? localStorage : null);
     const memoryStore = new Map();
     let mode = "local";
+    let readError = false;
 
     function getText(key, fallback) {
       if (mode === "memory") {
         return memoryStore.has(key) ? memoryStore.get(key) : fallback;
       }
       try {
-        const value = localStorage.getItem(key);
+        if (!persistentStore) throw new Error("localStorage unavailable");
+        const value = persistentStore.getItem(key);
         return value == null ? fallback : value;
       } catch {
         mode = "memory";
@@ -27,7 +32,8 @@
       memoryStore.set(key, nextValue);
       if (mode === "memory") return false;
       try {
-        localStorage.setItem(key, nextValue);
+        if (!persistentStore) throw new Error("localStorage unavailable");
+        persistentStore.setItem(key, nextValue);
         return true;
       } catch {
         mode = "memory";
@@ -41,6 +47,15 @@
       try {
         return JSON.parse(raw);
       } catch {
+        readError = true;
+        memoryStore.delete(key);
+        if (mode === "local" && persistentStore) {
+          try {
+            persistentStore.removeItem(key);
+          } catch {
+            mode = "memory";
+          }
+        }
         return fallback;
       }
     }
@@ -56,6 +71,9 @@
       setJSON,
       mode: function currentMode() {
         return mode;
+      },
+      hadReadError: function hadReadError() {
+        return readError;
       },
     };
   }

@@ -45,6 +45,7 @@
       ui: {
         settingsDirty: false,
         storageWarning: false,
+        storageCorruption: false,
         sessionConflict: false,
       },
     };
@@ -125,7 +126,14 @@
       applySettingsSideEffects({ hydrateForm: false, activateDisplayModes: false });
       timer.startTicker();
       onStateChange();
-      if (appState.timer.status !== Core.STATUS.IDLE) ensureSessionAccess(function noop() {});
+      if (appState.timer.status !== Core.STATUS.IDLE) {
+        ensureSessionAccess(function noop() {});
+      } else if (sessionNeedsMigration) {
+        ensureSessionAccess(function persistMigratedIdleSession() {
+          onStateChange();
+          sessionLock.release();
+        });
+      }
     }
 
     function randomFrom(values) {
@@ -166,6 +174,8 @@
         : storage.getJSON(Core.STORAGE_KEYS.timer, null);
       appState.timer = Core.normalizeTimerState(storedTimer, appState.settings);
       lastSavedSession = sessionSnapshot();
+      appState.ui.storageCorruption =
+        typeof storage.hadReadError === "function" && storage.hadReadError();
     }
 
     function cloneStats(stats) {
