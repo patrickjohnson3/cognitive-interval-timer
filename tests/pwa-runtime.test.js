@@ -437,6 +437,20 @@ test("service worker runtime-caches only app-shell assets", async function () {
   );
 });
 
+test("service worker serves the current app shell without mixing network versions", async function () {
+  const cachedAsset = new Response("current app", { status: 200 });
+  const runtime = loadServiceWorkerRuntime({
+    cached: [["https://example.test/app.js", cachedAsset]],
+  });
+
+  const response = await runFetch(runtime, {
+    url: "https://example.test/app.js",
+  });
+
+  assert.equal(response, cachedAsset);
+  assert.deepEqual(runtime.fetchCalls, []);
+});
+
 test("service worker returns network response when cache write fails", async function () {
   const networkResponse = {
     ok: true,

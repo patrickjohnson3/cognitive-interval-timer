@@ -61,29 +61,35 @@ function offlineResponse(message) {
 }
 
 function fetchNavigation(request) {
-  return fetch(request)
-    .then(function useFreshNavigation(response) {
-      if (!response || !response.ok || response.type !== "basic") return response;
-      return cacheResponse(INDEX_URL, response);
-    })
-    .catch(function fallBackToCachedShell() {
-      return caches.match(INDEX_URL).then(function useCachedShell(cached) {
-        return cached || offlineResponse("Offline app shell unavailable.");
+  return caches.match(INDEX_URL).then(function useCurrentShell(cached) {
+    if (cached) return cached;
+    return fetch(request)
+      .then(function cacheInitialNavigation(response) {
+        if (!response || !response.ok || response.type !== "basic") return response;
+        return cacheResponse(INDEX_URL, response);
+      })
+      .catch(function navigationUnavailable() {
+        return offlineResponse("Offline app shell unavailable.");
       });
-    });
+  });
+}
+
+function fetchAppShellAsset(request) {
+  return caches.match(request).then(function useCurrentAsset(cached) {
+    if (cached) return cached;
+    return fetch(request)
+      .then(function cacheInitialAsset(response) {
+        return cacheResponse(request, response);
+      })
+      .catch(function assetUnavailable() {
+        return offlineResponse("Offline asset unavailable.");
+      });
+  });
 }
 
 function fetchAsset(request, requestUrl) {
-  return fetch(request)
-    .then(function useFreshAsset(response) {
-      if (!isAppShellRequest(requestUrl)) return response;
-      return cacheResponse(request, response);
-    })
-    .catch(function fallBackToCachedAsset() {
-      return caches.match(request).then(function useCachedAsset(cached) {
-        return cached || offlineResponse("Offline asset unavailable.");
-      });
-    });
+  if (isAppShellRequest(requestUrl)) return fetchAppShellAsset(request);
+  return fetch(request);
 }
 
 function pruneCurrentAppShellCache() {
