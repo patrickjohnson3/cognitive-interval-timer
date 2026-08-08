@@ -145,7 +145,6 @@
     }
 
     return {
-      updatePrimaryButton,
       setTagline,
       hydrateTheme,
       hydrateSettingsForm,

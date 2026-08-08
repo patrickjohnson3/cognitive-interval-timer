@@ -49,13 +49,10 @@
     let lastSavedTimer = null;
     let minimalModeHistoryActive = false;
     let wakeLockBeforeMinimalMode = null;
+    let wakeLockRequestId = 0;
     const fullscreenService = DisplayServices.createFullscreenService({
       documentRef: doc,
       onUnavailable: reconcileFullscreenUnavailable,
-    });
-    const wakeLockService = DisplayServices.createWakeLockService({
-      wakeLock: wakeLock,
-      onUnavailable: reconcileWakeLockUnavailable,
     });
     const timer =
       deps.timer ||
@@ -447,7 +444,17 @@
     }
 
     function applyWakeLockSetting(enabled) {
-      return wakeLockService.setEnabled(enabled);
+      const currentRequestId = ++wakeLockRequestId;
+      if (!wakeLock || typeof wakeLock.setEnabled !== "function") {
+        if (enabled) reconcileWakeLockUnavailable();
+        return Promise.resolve(false);
+      }
+      return Promise.resolve(wakeLock.setEnabled(enabled)).then(function reconcileWakeLock(result) {
+        if (currentRequestId === wakeLockRequestId && enabled && result === false) {
+          reconcileWakeLockUnavailable();
+        }
+        return result;
+      });
     }
 
     function bindMinimalModeHistory() {

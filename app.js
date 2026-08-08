@@ -68,7 +68,6 @@
     dom: dom,
   });
 
-  window.AppController = app.controller;
   app.controller.initialize();
 
   function hydrateAppVersion(node, versionInfo) {

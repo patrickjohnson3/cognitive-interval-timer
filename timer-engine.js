@@ -161,7 +161,6 @@
       skip,
       reset,
       resetToPhase,
-      enterPhase,
       setSuspended,
     };
   }
