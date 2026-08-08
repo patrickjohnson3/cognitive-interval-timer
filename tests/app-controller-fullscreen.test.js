@@ -552,6 +552,25 @@ test("Android fullscreen exit also exits minimal mode", function () {
   );
 });
 
+test("Android fullscreen exit does not immediately re-enter saved fullscreen", function () {
+  const ctx = setup();
+  ctx.dom.fields.fullscreen_enabled.checked = true;
+  ctx.dom.fields.minimal_mode_enabled.checked = true;
+  ctx.boundHandlers.onMinimalModeToggle(true);
+  const requestCountBeforeExit = ctx.fullscreenRequests.length;
+
+  ctx.boundHandlers.onFullscreenChange(false);
+
+  assert(
+    ctx.fullscreenRequests.length === requestCountBeforeExit,
+    "expected fullscreen exit not to request fullscreen again"
+  );
+  assert(
+    ctx.dom.fields.fullscreen_enabled.checked === false,
+    "expected fullscreen field to reflect the exited state"
+  );
+});
+
 test("exiting minimal mode restores current fullscreen form state", function () {
   const ctx = setup();
   global.document.documentElement.setAttribute("data-minimal-mode", "true");

@@ -388,7 +388,11 @@
     function onFullscreenChange(isFullscreen) {
       if (isFullscreen) return;
       if (doc.documentElement.hasAttribute("data-minimal-mode")) {
-        onExitMinimalMode();
+        if (dom.fields.fullscreen_enabled.checked) {
+          dom.fields.fullscreen_enabled.checked = false;
+          updateDraftFromForm();
+        }
+        onExitMinimalMode({ restoreFullscreen: false });
         return;
       }
       if (!dom.fields.fullscreen_enabled.checked) return;
@@ -409,11 +413,11 @@
       return applyWakeLockSetting(enabled);
     }
 
-    function onExitMinimalMode() {
+    function onExitMinimalMode(options) {
       if (!doc.documentElement.hasAttribute("data-minimal-mode")) return;
       dom.fields.minimal_mode_enabled.checked = false;
       updateDraftFromForm();
-      applyMinimalModeSetting(false);
+      applyMinimalModeSetting(false, null, options);
       onStateChange();
     }
 
@@ -541,7 +545,7 @@
     }
 
     function applyMinimalModeSetting(enabled, rawSettings, options) {
-      const config = Object.assign({ updateHistory: true }, options || {});
+      const config = Object.assign({ updateHistory: true, restoreFullscreen: true }, options || {});
       const settings = normalizeAppSettings(rawSettings || appState.draftSettings);
       if (enabled) {
         doc.documentElement.setAttribute("data-minimal-mode", "true");
@@ -553,7 +557,7 @@
       doc.documentElement.removeAttribute("data-minimal-mode");
       if (config.updateHistory) exitMinimalModeHistory();
       restoreWakeLockAfterMinimalMode();
-      return applyFullscreenSetting(settings.fullscreen_enabled);
+      return applyFullscreenSetting(config.restoreFullscreen && settings.fullscreen_enabled);
     }
 
     function saveSettings(rawSettings) {
