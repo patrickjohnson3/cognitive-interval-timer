@@ -129,6 +129,7 @@ Keep screen awake:
 - Uses the browser Screen Wake Lock API when available
 - Re-requests the wake lock when the page becomes visible again
 - Falls back silently on unsupported browsers
+- Does not disable minimal or fullscreen mode when a wake-lock request fails
 
 Minimal mode:
 
