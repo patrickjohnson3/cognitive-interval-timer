@@ -135,6 +135,7 @@ function loadPWA(options) {
   const nodes = {};
   const bodyChildren = [];
   const listeners = {};
+  const reloads = [];
   const slot = {
     id: "pwa-install-slot",
     hidden: true,
@@ -187,7 +188,9 @@ function loadPWA(options) {
         listeners["window:" + type] = handler;
       },
       location: {
-        reload: function reload() {},
+        reload: function reload() {
+          reloads.push(true);
+        },
       },
       matchMedia: function matchMedia(query) {
         return { matches: Boolean(config.displayModes && config.displayModes[query]) };
@@ -199,7 +202,7 @@ function loadPWA(options) {
   vm.runInNewContext(readProjectFile("pwa-prompts.js"), context, { filename: "pwa-prompts.js" });
   context.window.PomodoroPWAPrompts = context.PomodoroPWAPrompts;
   vm.runInNewContext(readProjectFile("pwa.js"), context, { filename: "pwa.js" });
-  return { bodyChildren, listeners, nodes, registration, slot };
+  return { bodyChildren, listeners, nodes, registration, reloads, slot };
 }
 
 test("PWA update prompt renders in settings slot and posts skip-waiting", async function () {
@@ -242,6 +245,17 @@ test("PWA update prompt renders in settings slot and posts skip-waiting", async 
     messages.length === 1 && messages[0].type === "SKIP_WAITING",
     "expected skip-waiting message"
   );
+
+  runtime.listeners["serviceWorker:controllerchange"]();
+  assert(runtime.reloads.length === 1, "expected accepted update to reload once");
+});
+
+test("first service worker control does not reload the app", function () {
+  const runtime = loadPWA();
+
+  runtime.listeners["serviceWorker:controllerchange"]();
+
+  assert(runtime.reloads.length === 0, "expected initial service worker control not to reload");
 });
 
 test("PWA update click tolerates a missing waiting worker", async function () {

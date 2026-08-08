@@ -5,6 +5,7 @@
   const pwaCopy = (content.UI_COPY && content.UI_COPY.pwa) || {};
   const prompts = promptFactory && promptFactory.create({ documentRef: document });
   let refreshing = false;
+  let updateRequested = false;
   let deferredInstallPrompt = null;
 
   if (!prompts) {
@@ -77,6 +78,7 @@
       ariaLabel: pwaCopy.updateAriaLabel || "Update app to the latest version",
       onUpdate: function updateApp() {
         if (!registration.waiting) return false;
+        updateRequested = true;
         registration.waiting.postMessage({ type: "SKIP_WAITING" });
         return true;
       },
@@ -85,7 +87,7 @@
 
   if (supportsServiceWorker) {
     navigator.serviceWorker.addEventListener("controllerchange", function reloadAfterUpdate() {
-      if (refreshing) return;
+      if (!updateRequested || refreshing) return;
       refreshing = true;
       window.location.reload();
     });
