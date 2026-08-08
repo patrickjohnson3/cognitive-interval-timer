@@ -216,6 +216,100 @@ async function settleLayout(client) {
   );
 }
 
+async function pressKey(client, key, code, virtualKeyCode, text) {
+  const params = {
+    key,
+    code,
+    windowsVirtualKeyCode: virtualKeyCode,
+    nativeVirtualKeyCode: virtualKeyCode,
+  };
+  if (text) {
+    params.text = text;
+    params.unmodifiedText = text;
+  }
+  await client.send(
+    "Input.dispatchKeyEvent",
+    Object.assign({ type: text ? "keyDown" : "rawKeyDown" }, params)
+  );
+  await client.send("Input.dispatchKeyEvent", Object.assign({ type: "keyUp" }, params));
+}
+
+async function assertInteractiveAccessibility(client) {
+  const fieldsOkay = await evaluateValue(
+    client,
+    `(() => {
+      const ids = ["prep", "focus", "recall", "break", "long_break", "blocks_per_ultradian"];
+      return ids.every((id) => {
+        const input = document.getElementById(id);
+        const description = input.getAttribute("aria-describedby");
+        return input.labels.length === 1 &&
+          input.labels[0].htmlFor === id &&
+          Boolean(description && document.getElementById(description)?.textContent.trim());
+      });
+    })()`
+  );
+  if (!fieldsOkay) throw new Error("Duration fields do not have explicit labels and units");
+
+  const tooltipOpened = await evaluateValue(
+    client,
+    `(() => {
+      const trigger = document.querySelector(".tip-trigger");
+      const bubble = trigger.closest(".tip-wrap").querySelector(".tip-bubble");
+      trigger.focus();
+      return document.activeElement === trigger && !bubble.hidden;
+    })()`
+  );
+  if (!tooltipOpened) throw new Error("Keyboard focus did not open the tooltip");
+  await pressKey(client, "Escape", "Escape", 27);
+  const tooltipDismissed = await evaluateValue(
+    client,
+    `(() => {
+      const trigger = document.querySelector(".tip-trigger");
+      const bubble = trigger.closest(".tip-wrap").querySelector(".tip-bubble");
+      return document.activeElement === trigger && bubble.hidden;
+    })()`
+  );
+  if (!tooltipDismissed) throw new Error("Escape did not dismiss the tooltip and preserve focus");
+
+  await evaluateValue(
+    client,
+    `(() => {
+      document.documentElement.setAttribute("data-minimal-mode", "true");
+      const reveal = document.getElementById("minimal-exit-reveal");
+      reveal.focus();
+      reveal.click();
+      return true;
+    })()`
+  );
+  await pressKey(client, "Tab", "Tab", 9);
+  const minimalActionReached = await evaluateValue(
+    client,
+    `document.activeElement?.id === "minimal-primary-action" &&
+      document.activeElement.getAttribute("aria-label") === "Start timer"`
+  );
+  if (!minimalActionReached) throw new Error("Minimal timer action is not the next keyboard stop");
+
+  await pressKey(client, "Enter", "Enter", 13, "\r");
+  await evaluateValue(
+    client,
+    "new Promise(function (resolve) { setTimeout(function () { resolve(true); }, 100); })"
+  );
+  const minimalActionWorked = await evaluateValue(
+    client,
+    `document.querySelector("#minimal-primary-action .control-label").textContent === "Pause"`
+  );
+  if (!minimalActionWorked) throw new Error("Minimal timer action did not start the timer");
+
+  await evaluateValue(
+    client,
+    `(() => {
+      document.getElementById("restart-minimal-block").click();
+      document.documentElement.removeAttribute("data-minimal-mode");
+      return true;
+    })()`
+  );
+}
+
 async function assertResponsiveUI(client) {
   await client.send("Emulation.setDeviceMetricsOverride", {
     width: 390,
@@ -243,6 +337,8 @@ async function assertResponsiveUI(client) {
     })()`
   );
   if (!portraitOkay) throw new Error("Rendered portrait layout or accessibility checks failed");
+
+  await assertInteractiveAccessibility(client);
 
   const minimalOkay = await evaluateValue(
     client,
