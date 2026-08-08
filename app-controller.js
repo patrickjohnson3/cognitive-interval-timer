@@ -181,11 +181,7 @@
     }
 
     function normalizeAppSettings(rawSettings) {
-      const normalized = Core.normalizeSettings(rawSettings);
-      if (normalized.fullscreen_enabled || normalized.minimal_mode_enabled) {
-        normalized.wake_lock_enabled = true;
-      }
-      return normalized;
+      return Core.normalizeSettings(rawSettings);
     }
 
     function quietModeIsEnabled() {
@@ -396,25 +392,10 @@
       if (dom.fields.wake_lock_enabled.checked) {
         dom.fields.wake_lock_enabled.checked = false;
       }
-      if (dom.fields.fullscreen_enabled.checked) {
-        dom.fields.fullscreen_enabled.checked = false;
-      }
-      if (dom.fields.minimal_mode_enabled.checked) {
-        dom.fields.minimal_mode_enabled.checked = false;
-      }
-      doc.documentElement.removeAttribute("data-minimal-mode");
-      exitMinimalModeHistory();
-      applyFullscreenSetting(false);
 
-      if (
-        appState.settings.wake_lock_enabled ||
-        appState.settings.fullscreen_enabled ||
-        appState.settings.minimal_mode_enabled
-      ) {
+      if (appState.settings.wake_lock_enabled) {
         appState.settings = Core.normalizeSettings(
           Object.assign({}, appState.settings, {
-            fullscreen_enabled: false,
-            minimal_mode_enabled: false,
             wake_lock_enabled: false,
           })
         );

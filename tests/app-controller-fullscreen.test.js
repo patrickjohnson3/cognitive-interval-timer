@@ -386,7 +386,7 @@ test("minimal mode toggle requests keep screen awake once", function () {
   );
 });
 
-test("saving fullscreen preserves keep screen awake field state", function () {
+test("saving fullscreen preserves the explicit wake lock preference", function () {
   const ctx = setup();
   ctx.app.controller.saveSettings({
     prep: 2,
@@ -405,7 +405,7 @@ test("saving fullscreen preserves keep screen awake field state", function () {
 
   const saved = ctx.stored[Core.STORAGE_KEYS.settings];
   assert(saved.fullscreen_enabled === true, "expected fullscreen setting to save");
-  assert(saved.wake_lock_enabled === true, "expected fullscreen to save wake lock preference");
+  assert(saved.wake_lock_enabled === false, "expected wake lock preference to remain explicit");
 });
 
 test("fullscreen rejection clears fullscreen field", async function () {
@@ -594,6 +594,38 @@ test("wake lock rejection clears wake lock field", async function () {
   assert(ctx.app.state.ui.settingsDirty === false, "expected rejected wake lock to avoid dirty UI");
 });
 
+test("wake lock rejection leaves fullscreen enabled", async function () {
+  const ctx = setup({ wakeLockResult: false });
+  ctx.dom.fields.fullscreen_enabled.checked = true;
+
+  await ctx.boundHandlers.onFullscreenToggle(true);
+  await flushPromises();
+
+  assert(
+    ctx.dom.fields.fullscreen_enabled.checked === true,
+    "expected fullscreen to remain enabled"
+  );
+  assert(ctx.dom.fields.wake_lock_enabled.checked === false, "expected wake lock field to clear");
+});
+
+test("wake lock rejection leaves minimal mode enabled", async function () {
+  const ctx = setup({ wakeLockResult: false });
+  ctx.dom.fields.minimal_mode_enabled.checked = true;
+
+  await ctx.boundHandlers.onMinimalModeToggle(true);
+  await flushPromises();
+
+  assert(
+    global.document.documentElement.hasAttribute("data-minimal-mode"),
+    "expected minimal mode to remain enabled"
+  );
+  assert(
+    ctx.dom.fields.minimal_mode_enabled.checked === true,
+    "expected minimal field to remain enabled"
+  );
+  assert(ctx.dom.fields.wake_lock_enabled.checked === false, "expected wake lock field to clear");
+});
+
 test("saved wake lock is cleared when request fails on startup", async function () {
   const ctx = setup({
     wakeLockResult: false,
@@ -612,7 +644,7 @@ test("saved wake lock is cleared when request fails on startup", async function 
   );
 });
 
-test("saving minimal mode preserves keep screen awake field state", function () {
+test("saving minimal mode preserves the explicit wake lock preference", function () {
   const ctx = setup();
   ctx.app.controller.saveSettings({
     prep: 2,
@@ -631,5 +663,5 @@ test("saving minimal mode preserves keep screen awake field state", function () 
 
   const saved = ctx.stored[Core.STORAGE_KEYS.settings];
   assert(saved.minimal_mode_enabled === true, "expected minimal mode setting to save");
-  assert(saved.wake_lock_enabled === true, "expected minimal mode to save wake lock preference");
+  assert(saved.wake_lock_enabled === false, "expected wake lock preference to remain explicit");
 });
