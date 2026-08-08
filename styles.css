@@ -688,9 +688,11 @@ select {
   justify-content: center;
   gap: var(--space-2);
   position: fixed;
-  left: 50%;
+  left: 0;
+  right: 0;
   bottom: calc(env(safe-area-inset-bottom, 0px) + 128px);
   width: min(320px, calc(100vw - (var(--space-5) * 2)));
+  margin-inline: auto;
   padding: var(--space-3);
   background: var(--panel-bg);
   border: 1px solid var(--border-subtle, var(--color-border));
@@ -698,7 +700,7 @@ select {
   box-shadow: var(--elevation-2);
   opacity: 0;
   pointer-events: none;
-  transform: translate(-50%, calc(100% + 96px));
+  transform: translateY(calc(100% + 96px));
   transition:
     opacity 120ms ease,
     transform 160ms ease;
@@ -707,10 +709,11 @@ select {
 .minimal-exit-reveal {
   position: fixed;
   bottom: calc(env(safe-area-inset-bottom, 0px) + 72px);
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
   width: 116px;
   height: 42px;
+  margin-inline: auto;
   padding: 0 var(--space-4);
   border-radius: 999px;
   display: inline-flex;
@@ -755,7 +758,7 @@ select {
 :root[data-minimal-mode="true"] .minimal-exit-wrap[data-open="true"] .minimal-exit-panel {
   opacity: 1;
   pointer-events: auto;
-  transform: translate(-50%, 0);
+  transform: translateY(0);
 }
 
 @media (hover: none) {

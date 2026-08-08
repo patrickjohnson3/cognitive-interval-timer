@@ -85,8 +85,9 @@ test("minimal mode exit panel uses bottom drawer layout", function () {
   const requiredSnippets = [
     "bottom: calc(env(safe-area-inset-bottom, 0px) + 128px);",
     "width: min(320px, calc(100vw - (var(--space-5) * 2)));",
+    "margin-inline: auto;",
     "pointer-events: none;",
-    "transform: translate(-50%, calc(100% + 96px));",
+    "transform: translateY(calc(100% + 96px));",
     "bottom: calc(env(safe-area-inset-bottom, 0px) + 72px);",
     "width: 116px;",
     "height: 42px;",
@@ -95,7 +96,7 @@ test("minimal mode exit panel uses bottom drawer layout", function () {
     "inset: 0;",
     ':root[data-minimal-mode="true"] .minimal-exit-wrap[data-open="true"] .minimal-exit-panel',
     "pointer-events: auto;",
-    "transform: translate(-50%, 0);",
+    "transform: translateY(0);",
     "@media (hover: none)",
     "opacity: 0.56;",
   ];
