@@ -421,6 +421,13 @@ label {
   color: var(--sidebar-label-color);
 }
 
+.cycle-field {
+  display: grid;
+  gap: var(--space-1);
+  font-size: var(--font-size-label);
+  color: var(--sidebar-label-color);
+}
+
 .long-break-row {
   gap: calc(var(--space-1) - 1px);
 }
@@ -429,6 +436,23 @@ label {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
+}
+
+.field-label label {
+  display: inline;
+}
+
+.duration-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.field-unit {
+  min-width: 3.35rem;
+  color: var(--text-tertiary, var(--sidebar-label-color));
+  font-size: 0.72rem;
 }
 
 .tip-wrap {

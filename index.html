@@ -214,9 +214,9 @@
               <div class="cycle-col">
                 <h3 class="cycle-col-heading">Work</h3>
 
-                <label>
+                <div class="cycle-field">
                   <span class="field-label">
-                    <span id="label-prep">Prep</span>
+                    <label id="label-prep" for="prep">Prep</label>
                     <span class="tip-wrap" data-tooltip-key="prepDefault">
                       <button type="button" class="tip-trigger" aria-describedby="prep-default-tip">
                         ?
@@ -227,11 +227,22 @@
                       </span>
                     </span>
                   </span>
-                  <input id="prep" type="number" min="0" max="60" step="1" required />
-                </label>
-                <label>
+                  <span class="duration-field">
+                    <input
+                      id="prep"
+                      type="number"
+                      min="0"
+                      max="60"
+                      step="1"
+                      aria-describedby="prep-unit"
+                      required
+                    />
+                    <span id="prep-unit" class="field-unit">minutes</span>
+                  </span>
+                </div>
+                <div class="cycle-field">
                   <span class="field-label">
-                    <span id="label-focus">Focus</span>
+                    <label id="label-focus" for="focus">Focus</label>
                     <span class="tip-wrap" data-tooltip-key="focusDefault">
                       <button
                         type="button"
@@ -246,11 +257,22 @@
                       </span>
                     </span>
                   </span>
-                  <input id="focus" type="number" min="1" max="180" step="1" required />
-                </label>
-                <label>
+                  <span class="duration-field">
+                    <input
+                      id="focus"
+                      type="number"
+                      min="1"
+                      max="180"
+                      step="1"
+                      aria-describedby="focus-unit"
+                      required
+                    />
+                    <span id="focus-unit" class="field-unit">minutes</span>
+                  </span>
+                </div>
+                <div class="cycle-field">
                   <span class="field-label">
-                    <span id="label-recall">Recall</span>
+                    <label id="label-recall" for="recall">Recall</label>
                     <span class="tip-wrap" data-tooltip-key="recallDefault">
                       <button
                         type="button"
@@ -265,16 +287,27 @@
                       </span>
                     </span>
                   </span>
-                  <input id="recall" type="number" min="0" max="30" step="1" required />
-                </label>
+                  <span class="duration-field">
+                    <input
+                      id="recall"
+                      type="number"
+                      min="0"
+                      max="30"
+                      step="1"
+                      aria-describedby="recall-unit"
+                      required
+                    />
+                    <span id="recall-unit" class="field-unit">minutes</span>
+                  </span>
+                </div>
               </div>
 
               <div class="cycle-col">
                 <h3 class="cycle-col-heading">Breaks</h3>
 
-                <label>
+                <div class="cycle-field">
                   <span class="field-label">
-                    <span id="label-break">Short Break</span>
+                    <label id="label-break" for="break">Short Break</label>
                     <span class="tip-wrap" data-tooltip-key="shortBreakDefault">
                       <button
                         type="button"
@@ -289,11 +322,22 @@
                       </span>
                     </span>
                   </span>
-                  <input id="break" type="number" min="1" max="60" step="1" required />
-                </label>
-                <label class="long-break-row">
+                  <span class="duration-field">
+                    <input
+                      id="break"
+                      type="number"
+                      min="1"
+                      max="60"
+                      step="1"
+                      aria-describedby="break-unit"
+                      required
+                    />
+                    <span id="break-unit" class="field-unit">minutes</span>
+                  </span>
+                </div>
+                <div class="cycle-field long-break-row">
                   <span class="field-label">
-                    <span id="label-long_break">Long Break</span>
+                    <label id="label-long_break" for="long_break">Long Break</label>
                     <span class="tip-wrap" data-tooltip-key="longBreakDefault">
                       <button
                         type="button"
@@ -308,11 +352,24 @@
                       </span>
                     </span>
                   </span>
-                  <input id="long_break" type="number" min="1" max="90" step="1" required />
-                </label>
-                <label>
+                  <span class="duration-field">
+                    <input
+                      id="long_break"
+                      type="number"
+                      min="1"
+                      max="90"
+                      step="1"
+                      aria-describedby="long-break-unit"
+                      required
+                    />
+                    <span id="long-break-unit" class="field-unit">minutes</span>
+                  </span>
+                </div>
+                <div class="cycle-field">
                   <span class="field-label">
-                    <span id="label-blocks">Focus Blocks Before Long Break</span>
+                    <label id="label-blocks" for="blocks_per_ultradian"
+                      >Focus Blocks Before Long Break</label
+                    >
                     <span class="tip-wrap" data-tooltip-key="blocksDefault">
                       <button
                         type="button"
@@ -327,15 +384,19 @@
                       </span>
                     </span>
                   </span>
-                  <input
-                    id="blocks_per_ultradian"
-                    type="number"
-                    min="1"
-                    max="8"
-                    step="1"
-                    required
-                  />
-                </label>
+                  <span class="duration-field">
+                    <input
+                      id="blocks_per_ultradian"
+                      type="number"
+                      min="1"
+                      max="8"
+                      step="1"
+                      aria-describedby="blocks-per-ultradian-unit"
+                      required
+                    />
+                    <span id="blocks-per-ultradian-unit" class="field-unit">blocks</span>
+                  </span>
+                </div>
               </div>
             </div>
           </section>
