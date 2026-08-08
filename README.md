@@ -102,6 +102,8 @@ eval "$(fnm env --shell bash)"
 
 In minimal mode, left-clicking or tapping the screen starts, pauses, and resumes the timer.
 
+The countdown freezes while the page is hidden or suspended. Returning to the app resumes from the stored remaining time rather than crediting unattended focus blocks.
+
 ### Keyboard shortcuts
 
 - `Space` - Start/Pause/Resume
