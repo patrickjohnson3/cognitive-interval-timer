@@ -41,6 +41,14 @@
     minimal_mode_enabled: false,
     wake_lock_enabled: false,
   };
+  const SETTING_FIELDS = Object.freeze(
+    Object.keys(DEFAULT_SETTINGS).map(function describeSetting(key) {
+      return Object.freeze({
+        key: key,
+        type: typeof DEFAULT_SETTINGS[key] === "boolean" ? "boolean" : "number",
+      });
+    })
+  );
 
   const STORAGE_KEYS = {
     settings: "better_pomodoro_settings_v1",
@@ -282,6 +290,7 @@
     PHASES,
     STATUS,
     DEFAULT_SETTINGS,
+    SETTING_FIELDS,
     STORAGE_KEYS,
     TICK_INTERVAL_MS,
     MAX_PHASE_TRANSITIONS_PER_TICK,

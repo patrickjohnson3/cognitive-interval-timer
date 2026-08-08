@@ -3,6 +3,15 @@ const Content = require("../content.js");
 const assert = require("node:assert/strict");
 const test = require("node:test");
 
+test("setting field metadata covers every normalized setting", function () {
+  assert.deepEqual(
+    Core.SETTING_FIELDS.map(function settingKey(descriptor) {
+      return descriptor.key;
+    }),
+    Object.keys(Core.DEFAULT_SETTINGS)
+  );
+});
+
 test("nextPhase chooses long_break after ultradian threshold", function () {
   const settings = Core.normalizeSettings({ blocks_per_ultradian: 2 });
   const stats = Core.normalizeStats({

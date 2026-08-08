@@ -5,7 +5,7 @@
     root.PomodoroUIControls = factory();
   }
 })(typeof self !== "undefined" ? self : this, function makeUIControls() {
-  function create(dom) {
+  function create(dom, settingFields) {
     function isInteractiveTarget(target) {
       if (!target) return false;
       const tag = target.tagName;
@@ -20,21 +20,11 @@
     }
 
     function readSettingsForm() {
-      return {
-        prep: dom.fields.prep.value,
-        focus: dom.fields.focus.value,
-        recall: dom.fields.recall.value,
-        break: dom.fields.break.value,
-        long_break: dom.fields.long_break.value,
-        blocks_per_ultradian: dom.fields.blocks_per_ultradian.value,
-        prep_enabled: dom.fields.prep_enabled.checked,
-        auto_start: dom.fields.auto_start.checked,
-        sound_enabled: dom.fields.sound_enabled.checked,
-        quiet_mode_enabled: dom.fields.quiet_mode_enabled.checked,
-        fullscreen_enabled: dom.fields.fullscreen_enabled.checked,
-        minimal_mode_enabled: dom.fields.minimal_mode_enabled.checked,
-        wake_lock_enabled: dom.fields.wake_lock_enabled.checked,
-      };
+      return settingFields.reduce(function collectSettings(settings, descriptor) {
+        const field = dom.fields[descriptor.key];
+        settings[descriptor.key] = descriptor.type === "boolean" ? field.checked : field.value;
+        return settings;
+      }, {});
     }
 
     function bindControls(handlers) {
@@ -73,12 +63,13 @@
         handlers.onThemeChange(event.target.value);
       });
 
-      bindNumberField(dom.fields.prep, handlers);
-      bindNumberField(dom.fields.focus, handlers);
-      bindNumberField(dom.fields.recall, handlers);
-      bindNumberField(dom.fields.break, handlers);
-      bindNumberField(dom.fields.long_break, handlers);
-      bindNumberField(dom.fields.blocks_per_ultradian, handlers);
+      settingFields
+        .filter(function isNumberField(descriptor) {
+          return descriptor.type === "number";
+        })
+        .forEach(function bindNumericSetting(descriptor) {
+          bindNumberField(dom.fields[descriptor.key], handlers);
+        });
       bindCheckbox(dom.fields.prep_enabled, function onPrepEnabledInput() {
         handlers.onSettingsInput(readSettingsForm());
       });

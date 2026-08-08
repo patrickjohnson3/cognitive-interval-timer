@@ -319,21 +319,9 @@
     }
 
     function sameSettings(a, b) {
-      return (
-        a.prep === b.prep &&
-        a.focus === b.focus &&
-        a.recall === b.recall &&
-        a.break === b.break &&
-        a.long_break === b.long_break &&
-        a.blocks_per_ultradian === b.blocks_per_ultradian &&
-        a.prep_enabled === b.prep_enabled &&
-        a.auto_start === b.auto_start &&
-        a.sound_enabled === b.sound_enabled &&
-        a.quiet_mode_enabled === b.quiet_mode_enabled &&
-        a.fullscreen_enabled === b.fullscreen_enabled &&
-        a.minimal_mode_enabled === b.minimal_mode_enabled &&
-        a.wake_lock_enabled === b.wake_lock_enabled
-      );
+      return Core.SETTING_FIELDS.every(function settingsMatch(descriptor) {
+        return a[descriptor.key] === b[descriptor.key];
+      });
     }
 
     function onSettingsInput(rawSettings) {

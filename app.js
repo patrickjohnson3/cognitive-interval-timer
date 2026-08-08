@@ -51,7 +51,7 @@
     AppConfig: AppConfig,
   });
 
-  const controls = UIControls.create(dom);
+  const controls = UIControls.create(dom, Core.SETTING_FIELDS);
 
   const app = AppController.create({
     Core: Core,
@@ -104,21 +104,10 @@
         restartMinimalBlock: byId("restart-minimal-block"),
         exitMinimalMode: byId("exit-minimal-mode"),
       },
-      fields: {
-        prep: byId("prep"),
-        focus: byId("focus"),
-        recall: byId("recall"),
-        break: byId("break"),
-        long_break: byId("long_break"),
-        blocks_per_ultradian: byId("blocks_per_ultradian"),
-        prep_enabled: byId("prep_enabled"),
-        auto_start: byId("auto_start"),
-        sound_enabled: byId("sound_enabled"),
-        quiet_mode_enabled: byId("quiet_mode_enabled"),
-        fullscreen_enabled: byId("fullscreen_enabled"),
-        minimal_mode_enabled: byId("minimal_mode_enabled"),
-        wake_lock_enabled: byId("wake_lock_enabled"),
-      },
+      fields: Core.SETTING_FIELDS.reduce(function collectSettingFields(fields, descriptor) {
+        fields[descriptor.key] = byId(descriptor.key);
+        return fields;
+      }, {}),
       copy: {
         phaseSettingsHeading: byId("label-phase-settings-heading"),
         blocks: byId("label-blocks"),

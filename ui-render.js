@@ -27,19 +27,11 @@
     }
 
     function hydrateSettingsForm(settings) {
-      dom.fields.prep.value = settings.prep;
-      dom.fields.focus.value = settings.focus;
-      dom.fields.recall.value = settings.recall;
-      dom.fields.break.value = settings.break;
-      dom.fields.long_break.value = settings.long_break;
-      dom.fields.blocks_per_ultradian.value = settings.blocks_per_ultradian;
-      dom.fields.prep_enabled.checked = settings.prep_enabled;
-      dom.fields.auto_start.checked = settings.auto_start;
-      dom.fields.sound_enabled.checked = settings.sound_enabled;
-      dom.fields.quiet_mode_enabled.checked = settings.quiet_mode_enabled;
-      dom.fields.fullscreen_enabled.checked = settings.fullscreen_enabled;
-      dom.fields.minimal_mode_enabled.checked = settings.minimal_mode_enabled;
-      dom.fields.wake_lock_enabled.checked = settings.wake_lock_enabled;
+      Core.SETTING_FIELDS.forEach(function hydrateSetting(descriptor) {
+        const field = dom.fields[descriptor.key];
+        if (descriptor.type === "boolean") field.checked = settings[descriptor.key];
+        else field.value = settings[descriptor.key];
+      });
     }
 
     function buildView(state) {

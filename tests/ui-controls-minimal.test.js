@@ -1,4 +1,5 @@
 const UIControls = require("../ui-controls.js");
+const Core = require("../core.js");
 const assert = require("node:assert/strict");
 const test = require("node:test");
 
@@ -184,7 +185,7 @@ function bindWithBrowserStubs(options) {
     global.window.TouchEvent = function TouchEvent() {};
   }
 
-  UIControls.create(dom).bindControls(handlers);
+  UIControls.create(dom, Core.SETTING_FIELDS).bindControls(handlers);
   return { calls, dom, documentElement, documentListeners, windowListeners };
 }
 
