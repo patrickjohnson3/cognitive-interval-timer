@@ -716,6 +716,7 @@ select {
 
 .minimal-exit-panel {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: var(--space-2);
   position: fixed;
@@ -735,6 +736,10 @@ select {
   transition:
     opacity 120ms ease,
     transform 160ms ease;
+}
+
+.minimal-primary-action {
+  flex-basis: 100%;
 }
 
 .minimal-exit-panel[hidden] {

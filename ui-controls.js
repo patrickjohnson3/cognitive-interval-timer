@@ -63,6 +63,13 @@
           else dom.controls.restartMinimalBlock.focus();
         }
       );
+      dom.controls.minimalPrimaryAction.addEventListener(
+        "click",
+        function onMinimalPrimaryActionClick(event) {
+          if (event && event.stopPropagation) event.stopPropagation();
+          handlers.onPrimaryAction();
+        }
+      );
       dom.controls.restartMinimalBlock.addEventListener(
         "click",
         function onRestartMinimalBlockClick(event) {

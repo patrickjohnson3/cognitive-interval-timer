@@ -55,6 +55,7 @@ function createDeps() {
     },
     controls: {
       start: controlButtonNode(),
+      minimalPrimaryAction: controlButtonNode(),
       activateDisplayModes: { hidden: true },
     },
     theme: { value: "dark" },
@@ -175,6 +176,8 @@ test("primary button shows Start before timer has started", function () {
     deps.dom.controls.start.attributes["aria-label"] === "Start timer",
     "expected Start aria label"
   );
+  assert.equal(deps.dom.controls.minimalPrimaryAction.label.textContent, "Start");
+  assert.equal(deps.dom.controls.minimalPrimaryAction.attributes["aria-label"], "Start timer");
 });
 
 test("saved display activation control reflects availability", function () {

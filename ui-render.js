@@ -147,11 +147,16 @@
     }
 
     function updatePrimaryButton(vm) {
-      const icon = dom.controls.start.querySelector(".control-icon");
-      const label = dom.controls.start.querySelector(".control-label");
+      updateActionButton(dom.controls.start, vm);
+      updateActionButton(dom.controls.minimalPrimaryAction, vm);
+    }
+
+    function updateActionButton(button, vm) {
+      const icon = button.querySelector(".control-icon");
+      const label = button.querySelector(".control-label");
       icon.textContent = vm.primaryButtonIcon;
       label.textContent = vm.primaryButtonText;
-      dom.controls.start.setAttribute("aria-label", vm.primaryButtonAriaLabel);
+      button.setAttribute("aria-label", vm.primaryButtonAriaLabel);
     }
 
     return {

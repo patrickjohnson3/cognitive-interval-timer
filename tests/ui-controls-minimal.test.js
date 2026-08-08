@@ -16,6 +16,7 @@ function createDom() {
       exitMinimalModeWrap: eventTargetNode({ id: "minimal-exit-wrap" }),
       exitMinimalModeReveal: eventTargetNode({ id: "minimal-exit-reveal" }),
       exitMinimalModePanel: eventTargetNode({ id: "minimal-exit-panel", tagName: "DIV" }),
+      minimalPrimaryAction: eventTargetNode({ id: "minimal-primary-action" }),
       restartMinimalBlock: eventTargetNode({ id: "restart-minimal-block" }),
       exitMinimalMode: eventTargetNode({ id: "exit-minimal-mode" }),
     },
@@ -237,6 +238,18 @@ test("primary action button triggers primary action handler", function () {
   ctx.dom.controls.start.listeners.click();
 
   assert(ctx.calls.includes("primary"), "expected primary action handler");
+});
+
+test("minimal primary action uses the primary action handler", function () {
+  const ctx = bindWithBrowserStubs();
+  ctx.dom.controls.minimalPrimaryAction.listeners.click({
+    stopPropagation: function stopPropagation() {
+      ctx.calls.push("stop-propagation");
+    },
+  });
+
+  assert(ctx.calls.includes("primary"), "expected minimal primary action handler");
+  assert(ctx.calls.includes("stop-propagation"), "expected minimal action not to bubble");
 });
 
 test("fullscreen checkbox triggers fullscreen handler and dirty settings handler", function () {
