@@ -202,6 +202,10 @@
     );
     const from = timer.phase;
 
+    if (timer.status === STATUS.IDLE) {
+      timer.focusBlockNumber = Math.max(1, Number(timer.focusBlockNumber) || 1);
+    }
+
     if (to === PHASE.RECALL && config.creditFocus) {
       stats.focusBlocksToday += 1;
       stats.focusBlocksSinceLong += 1;

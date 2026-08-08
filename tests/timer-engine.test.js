@@ -48,6 +48,23 @@ test("reset returns timer to idle primary-action state", function () {
   assert(ctx.phaseChanges.length === 0, "expected reset not to announce phase change");
 });
 
+test("skipping before start initializes a one-based focus block", function () {
+  [true, false].forEach(function eachAutoStart(autoStart) {
+    const ctx = createTimerContext();
+    ctx.state.settings.auto_start = autoStart;
+    ctx.timer.reset();
+
+    ctx.timer.skip();
+
+    assert(ctx.state.timer.focusBlockNumber === 1, "expected first focus block after idle skip");
+    assert(ctx.state.timer.phase === Core.PHASE.FOCUS, "expected idle prep to skip to focus");
+    assert(
+      ctx.state.timer.status === (autoStart ? Core.STATUS.RUNNING : Core.STATUS.PAUSED),
+      "expected skip to respect auto-start"
+    );
+  });
+});
+
 test("suspension discards hidden elapsed time", function () {
   const ctx = createTimerContext();
   ctx.timer.setSuspended(true);
