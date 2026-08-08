@@ -225,7 +225,15 @@
 
     function tapFeedback() {
       if (quietModeIsEnabled()) return;
-      haptics.tap();
+      safelyRunFeedback(haptics.tap);
+    }
+
+    function safelyRunFeedback(feedback) {
+      try {
+        return feedback();
+      } catch {
+        return false;
+      }
     }
 
     function start() {
@@ -308,10 +316,10 @@
 
     function onPhaseChange(payload) {
       if (!quietModeIsEnabled()) {
-        haptics.phaseChange();
+        safelyRunFeedback(haptics.phaseChange);
       }
       if (!quietModeIsEnabled() && appState.settings.sound_enabled) {
-        audio.playPhaseChime();
+        safelyRunFeedback(audio.playPhaseChime);
       }
       showPhaseTransition(payload);
       announce.announce(

@@ -202,9 +202,11 @@ function setup(options) {
     },
     haptics: {
       tap: function tap() {
+        if (config.feedbackThrows) throw new Error("haptics unavailable");
         hapticCalls.push("tap");
       },
       phaseChange: function phaseChange() {
+        if (config.feedbackThrows) throw new Error("haptics unavailable");
         hapticCalls.push("phase");
       },
     },
@@ -358,6 +360,15 @@ test("phase changes trigger phase haptic feedback", function () {
     ctx.transitionCalls.includes("Focus complete. Recall starts now."),
     "expected readable phase transition"
   );
+});
+
+test("optional feedback failures do not interrupt phase handling", function () {
+  const ctx = setup({ feedbackThrows: true });
+
+  assert.doesNotThrow(function handlePhase() {
+    ctx.app.onPhaseChange({ from: Core.PHASE.FOCUS, to: Core.PHASE.RECALL });
+  });
+  assert.equal(ctx.transitionCalls.length, 1);
 });
 
 test("initial phase start does not show completion transition", function () {

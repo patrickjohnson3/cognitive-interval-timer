@@ -16,7 +16,11 @@
 
     function vibrate(pattern) {
       if (!nav || typeof nav.vibrate !== "function") return false;
-      return Boolean(nav.vibrate(pattern));
+      try {
+        return Boolean(nav.vibrate(pattern));
+      } catch {
+        return false;
+      }
     }
 
     function tap() {
