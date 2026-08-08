@@ -1,5 +1,14 @@
 # TODO
 
+## Phase-Aware Suspended Time
+
+- Continue freezing Prep, Focus, and Recall while the app is hidden or suspended.
+- Let Short Break and Long Break continue against a persisted wall-clock deadline so users can
+  step away from the screen.
+- If a break expires while suspended, return to Focus in a paused state when the app resumes.
+- Never auto-start or credit a focus block while the app is hidden.
+- Defer notification permissions until the lifecycle behavior is proven useful.
+
 ## Restore Display Modes At Startup
 
 - Explore restoring saved Minimal Mode and Fullscreen preferences when the app launches.
