@@ -62,3 +62,27 @@ test("reports unsupported browser without throwing", async function () {
   assert(wakeLock.isSupported() === false, "expected unsupported wake lock");
   assert(enabled === false, "expected unsupported enable to resolve false");
 });
+
+test("releases a pending lock that resolves after wake lock is disabled", async function () {
+  let resolveRequest = null;
+  const lock = createLock();
+  const wakeLock = WakeLock.createController({
+    document: { visibilityState: "visible", addEventListener: function addEventListener() {} },
+    navigator: {
+      wakeLock: {
+        request: function request() {
+          return new Promise(function waitForLock(resolve) {
+            resolveRequest = resolve;
+          });
+        },
+      },
+    },
+  });
+
+  const pendingEnable = wakeLock.setEnabled(true);
+  await wakeLock.setEnabled(false);
+  resolveRequest(lock);
+
+  assert((await pendingEnable) === false, "expected stale enable request to report disabled");
+  assert(lock.released === true, "expected stale lock to be released immediately");
+});

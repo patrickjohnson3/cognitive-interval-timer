@@ -11,6 +11,7 @@
     const doc = scope.document || (typeof document !== "undefined" ? document : null);
     let wakeLock = null;
     let wanted = false;
+    let requestId = 0;
 
     function isSupported() {
       return Boolean(nav && nav.wakeLock && typeof nav.wakeLock.request === "function");
@@ -28,9 +29,19 @@
       if (doc && doc.visibilityState === "hidden") return Promise.resolve(false);
       if (wakeLock) return Promise.resolve(true);
 
+      const currentRequestId = ++requestId;
+
       return nav.wakeLock
         .request("screen")
         .then(function onLock(lock) {
+          if (!wanted || currentRequestId !== requestId) {
+            if (!lock || typeof lock.release !== "function") return false;
+            return Promise.resolve(lock.release())
+              .catch(function ignoreStaleReleaseError() {})
+              .then(function staleLockReleased() {
+                return false;
+              });
+          }
           wakeLock = lock;
           rememberRelease(lock);
           return true;
@@ -42,6 +53,7 @@
     }
 
     function releaseLock() {
+      requestId += 1;
       const lock = wakeLock;
       wakeLock = null;
       if (!lock || typeof lock.release !== "function") return Promise.resolve(false);
