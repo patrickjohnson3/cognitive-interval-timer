@@ -1,32 +1,10 @@
 (function initCore(root, factory) {
   if (typeof module === "object" && module.exports) {
-    module.exports = factory(require("./content.js"));
+    module.exports = factory();
   } else {
-    root.PomodoroCore = factory(root.PomodoroContent || {});
+    root.PomodoroCore = factory();
   }
-})(typeof self !== "undefined" ? self : this, function makeCore(Content) {
-  const phaseOrder =
-    Array.isArray(Content.PHASE_ORDER) && Content.PHASE_ORDER.length > 0
-      ? Content.PHASE_ORDER.slice()
-      : ["prep", "focus", "recall", "break", "long_break"];
-
-  const PHASE_CONFIG = Content.PHASE_CONFIG || {
-    prep: { displayName: "Prep", shortHint: "Prepare", longHint: "", durationKey: "prep" },
-    focus: { displayName: "Focus", shortHint: "Focus", longHint: "", durationKey: "focus" },
-    recall: { displayName: "Recall", shortHint: "Recall", longHint: "", durationKey: "recall" },
-    break: { displayName: "Short Break", shortHint: "Break", longHint: "", durationKey: "break" },
-    long_break: {
-      displayName: "Long Break",
-      shortHint: "Long Break",
-      longHint: "",
-      durationKey: "long_break",
-    },
-  };
-
-  const PHASES = phaseOrder.filter(function keepPhase(key) {
-    return Boolean(PHASE_CONFIG[key]);
-  });
-
+})(typeof self !== "undefined" ? self : this, function makeCore() {
   const PHASE = Object.freeze({
     PREP: "prep",
     FOCUS: "focus",
@@ -34,6 +12,13 @@
     SHORT_BREAK: "break",
     LONG_BREAK: "long_break",
   });
+  const PHASES = Object.freeze([
+    PHASE.PREP,
+    PHASE.FOCUS,
+    PHASE.RECALL,
+    PHASE.SHORT_BREAK,
+    PHASE.LONG_BREAK,
+  ]);
 
   const STATUS = Object.freeze({
     IDLE: "idle",
@@ -66,18 +51,6 @@
 
   const TICK_INTERVAL_MS = 250;
   const MAX_PHASE_TRANSITIONS_PER_TICK = 1000;
-
-  const STATE_HINTS = toPhaseMap("shortHint");
-  const STATE_LONG_HINTS = toPhaseMap("longHint");
-
-  function toPhaseMap(prop) {
-    const out = {};
-    PHASES.forEach(function eachPhase(phase) {
-      const cfg = PHASE_CONFIG[phase] || {};
-      out[phase] = cfg[prop] || "";
-    });
-    return out;
-  }
 
   function clampInt(value, fallback, min, max) {
     const num = Number(value);
@@ -165,8 +138,7 @@
   }
 
   function phaseDurationSec(phase, settings) {
-    const key = (PHASE_CONFIG[phase] && PHASE_CONFIG[phase].durationKey) || phase;
-    const minutes = Number(settings[key] || 0);
+    const minutes = Number(settings[phase] || 0);
     return Math.max(0, minutes * 60);
   }
 
@@ -211,13 +183,6 @@
 
   function isValidTransition(from, to, stats, settings) {
     return canTransition(from, to, { stats: stats, settings: settings });
-  }
-
-  function stateLabel(phase) {
-    const cfg = PHASE_CONFIG[phase];
-    return cfg && cfg.displayName
-      ? cfg.displayName
-      : phase.charAt(0).toUpperCase() + phase.slice(1);
   }
 
   function formatTime(seconds) {
@@ -312,13 +277,10 @@
     PHASE,
     PHASES,
     STATUS,
-    PHASE_CONFIG,
     DEFAULT_SETTINGS,
     STORAGE_KEYS,
     TICK_INTERVAL_MS,
     MAX_PHASE_TRANSITIONS_PER_TICK,
-    STATE_HINTS,
-    STATE_LONG_HINTS,
     normalizeSettings,
     normalizeStats,
     dateKey,
@@ -328,7 +290,6 @@
     normalizeTimerState,
     nextPhase,
     isValidTransition,
-    stateLabel,
     formatTime,
     transitionToPhase,
     advanceTimerByElapsed,

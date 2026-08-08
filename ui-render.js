@@ -12,6 +12,7 @@
     const dom = deps.dom;
     const uiCopy = Content.UI_COPY || {};
     const labels = uiCopy.labels || {};
+    const phaseConfig = Content.PHASE_CONFIG || {};
     const themeColors = AppConfig.themeColors || { dark: "#0f172a", light: "#f5f7f9" };
 
     function setTagline(text) {
@@ -48,14 +49,16 @@
       const primaryActionIcons = labels.primaryActionIcons || {};
       const primaryActionAriaLabels = labels.primaryActionAriaLabels || {};
       const changed = [];
+      const phaseCopy = phaseConfig[state.timer.phase] || {};
+      const phaseLabel = phaseCopy.displayName || String(state.timer.phase || "");
       if (state.ui.sessionFlags.changedAutoStart) changed.push(labels.autoStart || "Auto-Start");
       if (state.ui.sessionFlags.changedSound) changed.push(labels.sound || "Sound");
 
       return {
-        stateText: Core.stateLabel(state.timer.phase),
+        stateText: phaseLabel,
         timeText: Core.formatTime(state.timer.remainingSec),
-        hintText: Core.STATE_HINTS[state.timer.phase] || "",
-        longHintText: Core.STATE_LONG_HINTS[state.timer.phase] || "",
+        hintText: phaseCopy.shortHint || "",
+        longHintText: phaseCopy.longHint || "",
         todayText:
           (labels.focusBlocksTodayPrefix || "today: ") +
           state.stats.focusBlocksToday +
@@ -106,7 +109,7 @@
         titleText: sessionStarted
           ? Core.formatTime(state.timer.remainingSec) +
             (labels.documentTitleSeparator || " - ") +
-            Core.stateLabel(state.timer.phase) +
+            phaseLabel +
             " | " +
             (labels.documentTitleBase || "Cognitive Interval Timer")
           : labels.documentTitleBase || "Cognitive Interval Timer",

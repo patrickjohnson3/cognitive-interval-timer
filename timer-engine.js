@@ -25,7 +25,6 @@
         hooks.onPhaseChange({
           from: null,
           to: state.timer.phase,
-          label: Core.stateLabel(state.timer.phase),
           reason: "initial_start",
         });
       }
@@ -88,7 +87,6 @@
       hooks.onPhaseChange({
         from: from,
         to: phase,
-        label: Core.stateLabel(phase),
         reason: nextConfig.reason,
       });
       hooks.onStateChange();
@@ -144,7 +142,6 @@
         hooks.onPhaseChange({
           from: event.from,
           to: event.to,
-          label: Core.stateLabel(event.to),
           reason: "timer",
         });
       });

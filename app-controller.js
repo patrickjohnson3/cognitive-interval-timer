@@ -266,14 +266,21 @@
         audio.playPhaseChime();
       }
       showPhaseTransition(payload);
-      announce.announce(a11y.formatAnnouncement("phase_started", { label: payload.label }));
+      announce.announce(
+        a11y.formatAnnouncement("phase_started", { label: phaseLabel(payload.to) })
+      );
     }
 
     function showPhaseTransition(payload) {
       if (!payload || !payload.from || !announce.showTransition) return;
-      const from = Core.stateLabel(payload.from);
-      const to = payload.label || Core.stateLabel(payload.to);
+      const from = phaseLabel(payload.from);
+      const to = phaseLabel(payload.to);
       announce.showTransition(from + " complete. " + to + " starts now.");
+    }
+
+    function phaseLabel(phase) {
+      const config = Content.PHASE_CONFIG && Content.PHASE_CONFIG[phase];
+      return (config && config.displayName) || String(phase || "");
     }
 
     function applyStaticCopy() {
@@ -292,7 +299,7 @@
         if (!dom.copy.phaseLabels[phase]) return;
         const contentPhaseConfig = Content.PHASE_CONFIG && Content.PHASE_CONFIG[phase];
         dom.copy.phaseLabels[phase].textContent =
-          (contentPhaseConfig && contentPhaseConfig.settingsLabel) || Core.stateLabel(phase);
+          (contentPhaseConfig && contentPhaseConfig.settingsLabel) || phaseLabel(phase);
       });
     }
 

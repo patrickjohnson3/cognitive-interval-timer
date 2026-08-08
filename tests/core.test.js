@@ -1,4 +1,5 @@
 const Core = require("../core.js");
+const Content = require("../content.js");
 const assert = require("node:assert/strict");
 const test = require("node:test");
 
@@ -140,18 +141,10 @@ test("advanceTimerByElapsed follows a full two-block cycle into long break", fun
   assert(timer.focusBlockNumber === 2, "expected second block to remain active through long break");
 });
 
-test("stateLabel maps all phases to configured display names", function () {
-  Core.PHASES.forEach(function eachPhase(phase) {
-    const expected = Core.PHASE_CONFIG[phase].displayName;
-    const actual = Core.stateLabel(phase);
-    assert(actual === expected, "expected " + phase + " label " + expected + ", got " + actual);
-  });
-});
-
 test("all phases have short and long guidance text", function () {
   Core.PHASES.forEach(function eachPhase(phase) {
-    const shortHint = Core.STATE_HINTS[phase];
-    const longHint = Core.STATE_LONG_HINTS[phase];
+    const shortHint = Content.PHASE_CONFIG[phase].shortHint;
+    const longHint = Content.PHASE_CONFIG[phase].longHint;
     assert(
       typeof shortHint === "string" && shortHint.trim().length > 0,
       "missing short hint for " + phase

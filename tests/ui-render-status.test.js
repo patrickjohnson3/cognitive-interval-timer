@@ -58,14 +58,9 @@ function createDeps() {
       RUNNING: "running",
       PAUSED: "paused",
     },
-    stateLabel: function stateLabel() {
-      return "Focus";
-    },
     formatTime: function formatTime() {
       return "00:10";
     },
-    STATE_HINTS: { focus: "One task." },
-    STATE_LONG_HINTS: { focus: "Long hint." },
   };
 
   const storage = {
@@ -75,6 +70,13 @@ function createDeps() {
   };
 
   const Content = {
+    PHASE_CONFIG: {
+      focus: {
+        displayName: "Focus",
+        shortHint: "One task.",
+        longHint: "Long hint.",
+      },
+    },
     UI_COPY: {
       labels: {
         documentTitleBase: "Cognitive Interval Timer",
