@@ -151,3 +151,59 @@ test("display mode service owns minimal fullscreen wake lock and history state",
   assert(events.includes("wake:false"));
   assert(events.includes("minimal:external-exit"));
 });
+
+test("stale minimal history removal does not exit a newer minimal session", async function () {
+  const listeners = {};
+  const states = [];
+  const replacements = [];
+  const doc = {
+    fullscreenElement: {},
+    documentElement: {},
+    exitFullscreen: function exitFullscreen() {
+      doc.fullscreenElement = null;
+      return Promise.resolve();
+    },
+  };
+  const service = DisplayServices.createDisplayModeService({
+    documentRef: doc,
+    windowRef: {
+      history: {
+        pushState: function pushState(state) {
+          states.push(state);
+        },
+        replaceState: function replaceState(state) {
+          replacements.push(state);
+        },
+        back: function back() {},
+      },
+      addEventListener: function addEventListener(type, handler) {
+        listeners[type] = handler;
+      },
+    },
+    wakeLock: {
+      isSupported: function isSupported() {
+        return true;
+      },
+      setEnabled: function setEnabled() {
+        return Promise.resolve(true);
+      },
+    },
+    onMinimalModeChange: function onMinimalModeChange() {},
+    onMinimalModeExited: function onMinimalModeExited() {},
+    onFullscreenExited: function onFullscreenExited() {},
+    onFullscreenUnavailable: function onFullscreenUnavailable() {},
+    onWakeLockUnavailable: function onWakeLockUnavailable() {},
+  });
+
+  service.bind();
+  await service.setMinimalMode(true, { fullscreen_enabled: true, wake_lock_enabled: false });
+  await service.setMinimalMode(false, { fullscreen_enabled: true, wake_lock_enabled: false });
+  doc.fullscreenElement = {};
+  await service.setMinimalMode(true, { fullscreen_enabled: true, wake_lock_enabled: false });
+
+  listeners.popstate({ state: states[0] });
+
+  assert.equal(service.isMinimalModeActive(), true);
+  assert.equal(replacements.length, 1);
+  assert.equal(replacements[0].minimalModeToken, states[1].minimalModeToken);
+});

@@ -71,6 +71,7 @@ function createBrowserFixture(options) {
   const windowRef = {
     history: {
       pushState: config.pushState || function pushState() {},
+      replaceState: config.replaceState || function replaceState() {},
       back: config.back || function back() {},
     },
     addEventListener: function addEventListener(type, handler) {

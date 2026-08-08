@@ -81,19 +81,41 @@
     });
     let minimalModeActive = false;
     let minimalModeHistoryActive = false;
+    let minimalModeHistoryToken = null;
+    let nextMinimalModeHistoryToken = 1;
+    const pendingHistoryExitTokens = new Set();
     let minimalPreferences = null;
     let wakeLockBeforeMinimalMode = null;
     let wakeLockRequestId = 0;
 
     function bind() {
       if (!win || typeof win.addEventListener !== "function") return;
-      win.addEventListener("popstate", function onPopState() {
+      win.addEventListener("popstate", function onPopState(event) {
+        const poppedToken = event && event.state && event.state.minimalModeToken;
+        if (
+          minimalModeActive &&
+          poppedToken &&
+          pendingHistoryExitTokens.has(poppedToken) &&
+          poppedToken !== minimalModeHistoryToken
+        ) {
+          pendingHistoryExitTokens.delete(poppedToken);
+          if (typeof win.history.replaceState === "function") {
+            win.history.replaceState(
+              { appState: "minimal-mode", minimalModeToken: minimalModeHistoryToken },
+              ""
+            );
+          }
+          return;
+        }
         if (!minimalModeActive) {
           minimalModeHistoryActive = false;
+          minimalModeHistoryToken = null;
+          pendingHistoryExitTokens.clear();
           return;
         }
 
         minimalModeHistoryActive = false;
+        minimalModeHistoryToken = null;
         exitMinimalMode({ updateHistory: false });
         onMinimalModeExited();
       });
@@ -190,22 +212,33 @@
     function enterMinimalModeHistory() {
       if (minimalModeHistoryActive || !canUseHistory()) return;
       try {
-        win.history.pushState({ appState: "minimal-mode" }, "");
+        minimalModeHistoryToken = nextMinimalModeHistoryToken;
+        nextMinimalModeHistoryToken += 1;
+        win.history.pushState(
+          { appState: "minimal-mode", minimalModeToken: minimalModeHistoryToken },
+          ""
+        );
         minimalModeHistoryActive = true;
       } catch {
         minimalModeHistoryActive = false;
+        minimalModeHistoryToken = null;
       }
     }
 
     function exitMinimalModeHistory() {
       if (!minimalModeHistoryActive || !canUseHistory()) {
         minimalModeHistoryActive = false;
+        minimalModeHistoryToken = null;
         return;
       }
+      const exitingToken = minimalModeHistoryToken;
       minimalModeHistoryActive = false;
+      minimalModeHistoryToken = null;
+      pendingHistoryExitTokens.add(exitingToken);
       try {
         win.history.back();
       } catch {
+        pendingHistoryExitTokens.delete(exitingToken);
         // The visible state has still exited minimal mode.
       }
     }
