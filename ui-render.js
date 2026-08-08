@@ -18,6 +18,31 @@
       dom.tagline.textContent = text;
     }
 
+    function hydrateStaticContent() {
+      const uiCopy = Content.UI_COPY;
+      dom.copy.phaseSettingsHeading.textContent = uiCopy.phaseSettingsHeading;
+      dom.copy.blocks.textContent = uiCopy.blocksBeforeLongBreak;
+      dom.copy.prepEnabled.textContent = uiCopy.startWithPrep;
+      dom.copy.autoStart.textContent = uiCopy.autoStartNext;
+      dom.copy.soundEnabled.textContent = uiCopy.soundOnPhaseChange;
+      dom.copy.quietModeEnabled.textContent = uiCopy.quietMode;
+      dom.copy.fullscreenEnabled.textContent = uiCopy.fullscreenMode;
+      dom.copy.minimalModeEnabled.textContent = uiCopy.minimalMode;
+      dom.copy.wakeLockEnabled.textContent = uiCopy.keepScreenAwake;
+
+      Core.PHASES.forEach(function hydratePhaseLabel(phase) {
+        dom.copy.phaseLabels[phase].textContent = phaseConfig[phase].displayName;
+      });
+
+      document.querySelectorAll("[data-tooltip-key]").forEach(function hydrateTooltip(wrapper) {
+        const copy = uiCopy.tooltips[wrapper.getAttribute("data-tooltip-key")];
+        const bubble = wrapper.querySelector(".tip-bubble");
+        wrapper.querySelector(".tip-trigger").setAttribute("aria-label", copy.triggerLabel);
+        bubble.querySelector("strong").textContent = copy.heading;
+        bubble.querySelector("span").textContent = copy.body;
+      });
+    }
+
     function hydrateTheme(theme) {
       document.documentElement.setAttribute("data-theme", theme);
       const themeColor = document.getElementById("theme-color-meta");
@@ -113,6 +138,7 @@
 
     return {
       setTagline,
+      hydrateStaticContent,
       hydrateTheme,
       hydrateSettingsForm,
       setDisplayActivationAvailable,

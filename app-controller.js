@@ -84,7 +84,7 @@
     function initialize() {
       hydrateFromStorage();
       syncStorageWarning();
-      applyStaticCopy();
+      render.hydrateStaticContent();
       a11y.applyAriaDefaults(doc);
       render.setTagline(randomFrom(Content.SITE_TAGLINES));
       render.hydrateSettingsForm(appState.settings);
@@ -275,43 +275,6 @@
     function phaseLabel(phase) {
       const config = Content.PHASE_CONFIG && Content.PHASE_CONFIG[phase];
       return (config && config.displayName) || String(phase || "");
-    }
-
-    function applyStaticCopy() {
-      dom.copy.phaseSettingsHeading.textContent = Content.UI_COPY.phaseSettingsHeading;
-      dom.copy.blocks.textContent = Content.UI_COPY.blocksBeforeLongBreak;
-      dom.copy.prepEnabled.textContent = Content.UI_COPY.startWithPrep;
-      dom.copy.autoStart.textContent = Content.UI_COPY.autoStartNext;
-      dom.copy.soundEnabled.textContent = Content.UI_COPY.soundOnPhaseChange;
-      dom.copy.quietModeEnabled.textContent = Content.UI_COPY.quietMode;
-      dom.copy.fullscreenEnabled.textContent = Content.UI_COPY.fullscreenMode;
-      dom.copy.minimalModeEnabled.textContent = Content.UI_COPY.minimalMode;
-      dom.copy.wakeLockEnabled.textContent = Content.UI_COPY.keepScreenAwake;
-      applyTooltipCopy();
-
-      Core.PHASES.forEach(function eachPhase(phase) {
-        if (!dom.copy.phaseLabels[phase]) return;
-        dom.copy.phaseLabels[phase].textContent = phaseLabel(phase);
-      });
-    }
-
-    function applyTooltipCopy() {
-      if (!doc.querySelectorAll) return;
-      const tooltips = Content.UI_COPY.tooltips || {};
-      const wrappers = doc.querySelectorAll("[data-tooltip-key]");
-      wrappers.forEach(function eachTooltip(wrapper) {
-        const copy = tooltips[wrapper.getAttribute("data-tooltip-key")];
-        if (!copy) return;
-
-        const trigger = wrapper.querySelector(".tip-trigger");
-        const bubble = wrapper.querySelector(".tip-bubble");
-        const heading = bubble && bubble.querySelector("strong");
-        const body = bubble && bubble.querySelector("span");
-
-        if (trigger) trigger.setAttribute("aria-label", copy.triggerLabel);
-        if (heading) heading.textContent = copy.heading;
-        if (body) body.textContent = copy.body;
-      });
     }
 
     function sameSettings(a, b) {

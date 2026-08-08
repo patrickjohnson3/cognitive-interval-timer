@@ -11,6 +11,9 @@ function resetDocument() {
     documentElement: {
       setAttribute: function setAttribute() {},
     },
+    querySelectorAll: function querySelectorAll() {
+      return [];
+    },
     getElementById: function getElementById(id) {
       return this.nodes[id] || null;
     },
@@ -29,6 +32,20 @@ function createDeps() {
     focusBlockBadge: textNode(),
     focusBlockContext: textNode(),
     dirtyIndicator: textNode(),
+    copy: {
+      phaseSettingsHeading: textNode(),
+      blocks: textNode(),
+      prepEnabled: textNode(),
+      autoStart: textNode(),
+      soundEnabled: textNode(),
+      quietModeEnabled: textNode(),
+      fullscreenEnabled: textNode(),
+      minimalModeEnabled: textNode(),
+      wakeLockEnabled: textNode(),
+      phaseLabels: {
+        focus: textNode(),
+      },
+    },
     controls: {
       start: controlButtonNode(),
       activateDisplayModes: { hidden: true },
@@ -159,6 +176,26 @@ test("saved display activation control reflects availability", function () {
   assert.equal(deps.dom.controls.activateDisplayModes.hidden, false);
   render.setDisplayActivationAvailable(false);
   assert.equal(deps.dom.controls.activateDisplayModes.hidden, true);
+});
+
+test("static UI copy is hydrated by the renderer", function () {
+  const deps = createDeps();
+  deps.Core.PHASES = ["focus"];
+  deps.Content.UI_COPY.phaseSettingsHeading = "Cycle Structure";
+  deps.Content.UI_COPY.blocksBeforeLongBreak = "Blocks";
+  deps.Content.UI_COPY.startWithPrep = "Prep enabled";
+  deps.Content.UI_COPY.autoStartNext = "Auto-start";
+  deps.Content.UI_COPY.soundOnPhaseChange = "Sound";
+  deps.Content.UI_COPY.quietMode = "Quiet";
+  deps.Content.UI_COPY.fullscreenMode = "Fullscreen";
+  deps.Content.UI_COPY.minimalMode = "Minimal";
+  deps.Content.UI_COPY.keepScreenAwake = "Awake";
+  const render = UIRender.create(deps);
+
+  render.hydrateStaticContent();
+
+  assert.equal(deps.dom.copy.phaseSettingsHeading.textContent, "Cycle Structure");
+  assert.equal(deps.dom.copy.phaseLabels.focus.textContent, "Focus");
 });
 
 test("hydrateTheme updates browser theme color", function () {

@@ -150,6 +150,7 @@ function setup(options) {
 
   const render = {
     setTagline: function setTagline() {},
+    hydrateStaticContent: function hydrateStaticContent() {},
     hydrateTheme: function hydrateTheme() {},
     hydrateSettingsForm: function hydrateSettingsForm(settings) {
       Object.keys(settings).forEach(function eachSetting(key) {
