@@ -12,6 +12,15 @@
     const render = deps.render;
     const controls = deps.controls;
     const storage = deps.storage;
+    const sessionLock = deps.sessionLock || {
+      acquire: function acquire() {
+        return Promise.resolve(true);
+      },
+      release: function release() {},
+      hasLock: function hasLock() {
+        return true;
+      },
+    };
     const audio = deps.audio;
     const haptics = deps.haptics || {
       tap: function noopTap() {},
@@ -36,11 +45,13 @@
       ui: {
         settingsDirty: false,
         storageWarning: false,
+        sessionConflict: false,
       },
     };
 
     let lastSavedStats = null;
     let lastSavedTimer = null;
+    let sessionActionPending = null;
     const displayModes = DisplayServices.createDisplayModeService({
       documentRef: doc,
       windowRef: deps.windowRef,
@@ -114,6 +125,7 @@
       applySettingsSideEffects({ hydrateForm: false, activateDisplayModes: false });
       timer.startTicker();
       onStateChange();
+      if (appState.timer.status !== Core.STATUS.IDLE) ensureSessionAccess(function noop() {});
     }
 
     function randomFrom(values) {
@@ -195,12 +207,14 @@
     }
 
     function persistStatsIfChanged() {
+      if (!sessionLock.hasLock()) return;
       if (sameStats(lastSavedStats, appState.stats)) return;
       syncStorageWarning(storage.setJSON(Core.STORAGE_KEYS.stats, appState.stats));
       lastSavedStats = cloneStats(appState.stats);
     }
 
     function persistTimerIfChanged() {
+      if (!sessionLock.hasLock()) return;
       const snapshot = timerSnapshot(appState.timer);
       if (sameTimerSnapshot(lastSavedTimer, snapshot)) return;
       syncStorageWarning(storage.setJSON(Core.STORAGE_KEYS.timer, snapshot));
@@ -217,23 +231,63 @@
     }
 
     function start() {
-      tapFeedback();
-      timer.start();
+      return ensureSessionAccess(function startTimer() {
+        tapFeedback();
+        timer.start();
+      });
     }
 
     function pause() {
-      tapFeedback();
-      timer.pause();
+      return ensureSessionAccess(function pauseTimer() {
+        tapFeedback();
+        timer.pause();
+      });
     }
 
     function skip() {
-      tapFeedback();
-      timer.skip();
+      return ensureSessionAccess(function skipTimer() {
+        tapFeedback();
+        timer.skip();
+      });
     }
 
     function reset() {
-      tapFeedback();
-      timer.reset();
+      return ensureSessionAccess(function resetTimer() {
+        tapFeedback();
+        timer.reset();
+        sessionLock.release();
+      });
+    }
+
+    function ensureSessionAccess(action) {
+      if (sessionLock.hasLock()) {
+        appState.ui.sessionConflict = false;
+        action();
+        return Promise.resolve(true);
+      }
+      if (sessionActionPending) return sessionActionPending;
+
+      sessionActionPending = sessionLock
+        .acquire()
+        .then(function sessionAccessResolved(acquired) {
+          sessionActionPending = null;
+          appState.ui.sessionConflict = !acquired;
+          syncTimerSuspension();
+          if (!acquired) {
+            render.render(appState);
+            return false;
+          }
+          action();
+          return true;
+        })
+        .catch(function sessionAccessFailed() {
+          sessionActionPending = null;
+          appState.ui.sessionConflict = true;
+          syncTimerSuspension();
+          render.render(appState);
+          return false;
+        });
+      return sessionActionPending;
     }
 
     function onPrimaryAction() {
@@ -447,13 +501,28 @@
     function bindTimerVisibility() {
       if (!doc || typeof doc.addEventListener !== "function" || !timer.setSuspended) return;
       function syncTimerVisibility() {
-        timer.setSuspended(doc.visibilityState === "hidden");
+        const activeSessionWithoutLock =
+          appState.timer.status !== Core.STATUS.IDLE && !sessionLock.hasLock();
+        timer.setSuspended(doc.visibilityState === "hidden" || activeSessionWithoutLock);
       }
       doc.addEventListener("visibilitychange", syncTimerVisibility);
       syncTimerVisibility();
     }
 
+    function syncTimerSuspension() {
+      const hidden = doc && doc.visibilityState === "hidden";
+      const activeSessionWithoutLock =
+        appState.timer.status !== Core.STATUS.IDLE && !sessionLock.hasLock();
+      timer.setSuspended(hidden || activeSessionWithoutLock);
+    }
+
     function saveSettings(rawSettings) {
+      return ensureSessionAccess(function saveSessionSettings() {
+        saveSettingsWithAccess(rawSettings);
+      });
+    }
+
+    function saveSettingsWithAccess(rawSettings) {
       const previousSettings = appState.settings;
       const oldPhaseDuration = Core.phaseDurationSec(appState.timer.phase, previousSettings);
       const elapsedInPhase = Math.max(0, oldPhaseDuration - appState.timer.remainingSec);
@@ -478,15 +547,18 @@
     }
 
     function restoreDefaults() {
-      appState.settings = Core.normalizeSettings(Core.DEFAULT_SETTINGS);
-      appState.draftSettings = Object.assign({}, appState.settings);
-      persistSettings(appState.settings);
+      return ensureSessionAccess(function restoreSessionDefaults() {
+        appState.settings = Core.normalizeSettings(Core.DEFAULT_SETTINGS);
+        appState.draftSettings = Object.assign({}, appState.settings);
+        persistSettings(appState.settings);
 
-      appState.ui.settingsDirty = false;
+        appState.ui.settingsDirty = false;
 
-      applySettingsSideEffects();
-      timer.reset();
-      announce.flashMessage(a11y.formatAnnouncement("defaults_restored"));
+        applySettingsSideEffects();
+        timer.reset();
+        sessionLock.release();
+        announce.flashMessage(a11y.formatAnnouncement("defaults_restored"));
+      });
     }
 
     function setTheme(nextTheme) {

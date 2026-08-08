@@ -60,7 +60,73 @@
     };
   }
 
+  function createSessionLock(env) {
+    const scope = env || {};
+    const nav = scope.navigator || (typeof navigator !== "undefined" ? navigator : null);
+    const locks = nav && nav.locks;
+    const lockName = scope.name || "cognitive-interval-timer-session";
+    let held = false;
+    let pending = null;
+    let releaseHeldLock = null;
+
+    function isSupported() {
+      return Boolean(locks && typeof locks.request === "function");
+    }
+
+    function hasLock() {
+      return held || !isSupported();
+    }
+
+    function acquire() {
+      if (hasLock()) return Promise.resolve(true);
+      if (pending) return pending;
+
+      let resolveAcquisition;
+      pending = new Promise(function captureAcquisition(resolve) {
+        resolveAcquisition = resolve;
+      });
+      Promise.resolve()
+        .then(function requestSessionLock() {
+          return locks.request(lockName, { ifAvailable: true }, function holdSessionLock(lock) {
+            pending = null;
+            if (!lock) {
+              resolveAcquisition(false);
+              return false;
+            }
+
+            held = true;
+            resolveAcquisition(true);
+            return new Promise(function waitForRelease(release) {
+              releaseHeldLock = release;
+            });
+          });
+        })
+        .catch(function acquisitionFailed() {
+          pending = null;
+          resolveAcquisition(false);
+        });
+      return pending;
+    }
+
+    function release() {
+      if (!held || !releaseHeldLock) return false;
+      held = false;
+      const release = releaseHeldLock;
+      releaseHeldLock = null;
+      release();
+      return true;
+    }
+
+    return {
+      acquire,
+      release,
+      hasLock,
+      isSupported,
+    };
+  }
+
   return {
     createAdapter,
+    createSessionLock,
   };
 });

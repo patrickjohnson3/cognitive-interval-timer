@@ -66,6 +66,7 @@
       unsavedChanges: "Unsaved Changes",
       allSettingsSaved: "All Settings Saved",
       storageUnavailable: "Settings are not being saved in this browser.",
+      sessionInUse: "Another window is using this timer session.",
       documentTitleSeparator: appConfig.documentTitleSeparator || " - ",
       documentTitleBase: appConfig.name || "Cognitive Interval Timer",
       primaryActionIcons: {

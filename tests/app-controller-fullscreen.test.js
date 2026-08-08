@@ -194,6 +194,7 @@ function setup(options) {
         return config.storageMode || "local";
       },
     },
+    sessionLock: config.sessionLock,
     audio: {
       playPhaseChime: function playPhaseChime() {
         audioCalls.push("phase");
@@ -253,6 +254,27 @@ test("primary action starts before timer has started", function () {
 
   assert(ctx.timerCalls.includes("start"), "expected primary action to start timer");
   assert(ctx.hapticCalls.includes("tap"), "expected primary action haptic tap");
+});
+
+test("a second client cannot mutate an active timer session", async function () {
+  const ctx = setup({
+    sessionLock: {
+      hasLock: function hasLock() {
+        return false;
+      },
+      acquire: function acquire() {
+        return Promise.resolve(false);
+      },
+      release: function release() {},
+    },
+  });
+
+  ctx.boundHandlers.onPrimaryAction();
+  await Promise.resolve();
+  await Promise.resolve();
+
+  assert(!ctx.timerCalls.includes("start"), "expected timer start to be denied");
+  assert.equal(ctx.app.state.ui.sessionConflict, true);
 });
 
 test("document visibility freezes and resynchronizes the timer clock", function () {

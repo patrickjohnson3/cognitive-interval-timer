@@ -107,11 +107,13 @@
             " " +
             labels.focusBlockSessionSuffix
           : labels.focusBlockReady.replace(/\s+/g, " "),
-        dirtyText: state.ui.storageWarning
-          ? labels.storageUnavailable
-          : state.ui.settingsDirty
-            ? labels.unsavedChanges
-            : labels.allSettingsSaved,
+        dirtyText: state.ui.sessionConflict
+          ? labels.sessionInUse
+          : state.ui.storageWarning
+            ? labels.storageUnavailable
+            : state.ui.settingsDirty
+              ? labels.unsavedChanges
+              : labels.allSettingsSaved,
         primaryButtonIcon: labels.primaryActionIcons[statusKey],
         primaryButtonText: labels.primaryActionLabels[statusKey],
         primaryButtonAriaLabel: labels.primaryActionAriaLabels[statusKey],

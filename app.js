@@ -38,6 +38,7 @@
   const dom = createDOM();
   hydrateAppVersion(dom.appVersion, AppVersion);
   const storage = Storage.createAdapter();
+  const sessionLock = Storage.createSessionLock();
   const audio = Audio.createEngine();
   const haptics = Haptics.createController();
   const wakeLock = WakeLock.createController();
@@ -61,6 +62,7 @@
     controls: controls,
     TimerEngine: TimerEngine,
     storage: storage,
+    sessionLock: sessionLock,
     audio: audio,
     haptics: haptics,
     wakeLock: wakeLock,
