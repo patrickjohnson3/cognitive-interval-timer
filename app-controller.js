@@ -89,6 +89,7 @@
       render.setTagline(randomFrom(Content.SITE_TAGLINES));
       render.hydrateSettingsForm(appState.settings);
       render.hydrateTheme(appState.theme);
+      render.setDisplayActivationAvailable(savedDisplayModeNeedsActivation());
 
       controls.bindControls({
         onPrimaryAction,
@@ -103,6 +104,7 @@
         onFullscreenChange,
         onMinimalModeToggle,
         onWakeLockToggle,
+        onActivateDisplayModes,
         onExitMinimalMode,
       });
 
@@ -396,6 +398,26 @@
 
     function onWakeLockToggle(enabled) {
       return applyWakeLockSetting(enabled);
+    }
+
+    function savedDisplayModeNeedsActivation() {
+      return Boolean(
+        appState.settings.fullscreen_enabled ||
+        appState.settings.minimal_mode_enabled ||
+        appState.settings.wake_lock_enabled
+      );
+    }
+
+    function onActivateDisplayModes() {
+      render.setDisplayActivationAvailable(false);
+      if (appState.settings.minimal_mode_enabled) {
+        onMinimalModeToggle(true);
+      } else if (appState.settings.fullscreen_enabled) {
+        onFullscreenToggle(true);
+      } else {
+        onWakeLockToggle(appState.settings.wake_lock_enabled);
+      }
+      onSettingsInput(controls.readSettingsForm());
     }
 
     function onExitMinimalMode(options) {

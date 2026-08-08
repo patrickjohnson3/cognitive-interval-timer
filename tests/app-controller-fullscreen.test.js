@@ -20,6 +20,9 @@ function createNode(value) {
 
 function createDom() {
   return {
+    controls: {
+      activateDisplayModes: createNode(),
+    },
     copy: {
       phaseSettingsHeading: createNode(),
       blocks: createNode(),
@@ -154,6 +157,9 @@ function setup(options) {
         if (typeof settings[key] === "boolean") dom.fields[key].checked = settings[key];
         else dom.fields[key].value = String(settings[key]);
       });
+    },
+    setDisplayActivationAvailable: function setDisplayActivationAvailable(available) {
+      dom.controls.activateDisplayModes.hidden = !available;
     },
     render: function render() {},
   };
@@ -475,6 +481,18 @@ test("saved fullscreen remains a preference without activating on startup", asyn
     ctx.stored[Core.STORAGE_KEYS.settings].fullscreen_enabled === true,
     "expected saved fullscreen preference to remain stored"
   );
+});
+
+test("saved fullscreen can be activated with a user action", function () {
+  const ctx = setup({
+    storedSettings: Core.normalizeSettings({ fullscreen_enabled: true }),
+  });
+  assert.equal(ctx.dom.controls.activateDisplayModes.hidden, false);
+
+  ctx.boundHandlers.onActivateDisplayModes();
+
+  assert(ctx.fullscreenRequests.includes(true));
+  assert.equal(ctx.dom.controls.activateDisplayModes.hidden, true);
 });
 
 test("saved minimal mode remains a preference without activating on startup", function () {

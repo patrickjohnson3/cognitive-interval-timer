@@ -31,6 +31,7 @@ function createDeps() {
     dirtyIndicator: textNode(),
     controls: {
       start: controlButtonNode(),
+      activateDisplayModes: { hidden: true },
     },
     theme: { value: "dark" },
     tagline: textNode(),
@@ -146,6 +147,15 @@ test("primary button shows Start before timer has started", function () {
     deps.dom.controls.start.attributes["aria-label"] === "Start timer",
     "expected Start aria label"
   );
+});
+
+test("saved display activation control reflects availability", function () {
+  const deps = createDeps();
+  const render = UIRender.create(deps);
+  render.setDisplayActivationAvailable(true);
+  assert.equal(deps.dom.controls.activateDisplayModes.hidden, false);
+  render.setDisplayActivationAvailable(false);
+  assert.equal(deps.dom.controls.activateDisplayModes.hidden, true);
 });
 
 test("hydrateTheme updates browser theme color", function () {

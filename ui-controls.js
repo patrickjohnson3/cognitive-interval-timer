@@ -38,6 +38,7 @@
       });
 
       dom.controls.defaults.addEventListener("click", handlers.onRestoreDefaults);
+      dom.controls.activateDisplayModes.addEventListener("click", handlers.onActivateDisplayModes);
       dom.controls.exitMinimalModeReveal.addEventListener(
         "click",
         function onMinimalRevealClick(event) {

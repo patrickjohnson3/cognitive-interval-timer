@@ -375,4 +375,5 @@ test("display settings explain their immediate and saved behavior", function () 
   const html = readProjectFile("index.html");
   assert(html.includes("These switches apply immediately."));
   assert(html.includes("Save settings to remember them after refresh."));
+  assert(html.includes('id="activate-display-modes"'));
 });

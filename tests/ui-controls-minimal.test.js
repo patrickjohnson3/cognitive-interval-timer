@@ -39,6 +39,7 @@ function createDom() {
       reset: createNode({ id: "reset" }),
       save: createNode({ id: "save" }),
       defaults: createNode({ id: "defaults" }),
+      activateDisplayModes: createNode({ id: "activate-display-modes" }),
       exitMinimalModeWrap: createNode({ id: "minimal-exit-wrap" }),
       exitMinimalModeReveal: createNode({ id: "minimal-exit-reveal" }),
       exitMinimalModePanel: createNode({ id: "minimal-exit-panel", tagName: "DIV" }),
@@ -161,6 +162,9 @@ function bindWithBrowserStubs(options) {
     onWakeLockToggle: function onWakeLockToggle(enabled) {
       calls.push("wake-lock:" + enabled);
     },
+    onActivateDisplayModes: function onActivateDisplayModes() {
+      calls.push("activate-display");
+    },
     onExitMinimalMode: function onExitMinimalMode() {
       calls.push("exit-minimal");
     },
@@ -196,6 +200,13 @@ test("minimal mode checkbox triggers minimal handler and dirty settings handler"
 
   assert(ctx.calls.includes("minimal:true"), "expected minimal mode toggle handler");
   assert(ctx.calls.includes("settings"), "expected settings dirty handler");
+});
+
+test("saved display activation button invokes its handler", function () {
+  const ctx = bindWithBrowserStubs();
+  ctx.dom.controls.activateDisplayModes.listeners.click();
+
+  assert(ctx.calls.includes("activate-display"));
 });
 
 test("minimal reveal click opens panel without bubbling", function () {

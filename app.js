@@ -98,6 +98,7 @@
         reset: byId("reset"),
         save: byId("save"),
         defaults: byId("defaults"),
+        activateDisplayModes: byId("activate-display-modes"),
         exitMinimalModeWrap: byId("minimal-exit-wrap"),
         exitMinimalModeReveal: byId("minimal-exit-reveal"),
         exitMinimalModePanel: byId("minimal-exit-panel"),

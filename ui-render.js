@@ -34,6 +34,10 @@
       });
     }
 
+    function setDisplayActivationAvailable(available) {
+      dom.controls.activateDisplayModes.hidden = !available;
+    }
+
     function buildView(state) {
       const statusKey = state.timer.status;
       const sessionStarted = statusKey !== Core.STATUS.IDLE;
@@ -134,6 +138,7 @@
       setTagline,
       hydrateTheme,
       hydrateSettingsForm,
+      setDisplayActivationAvailable,
       render,
     };
   }
