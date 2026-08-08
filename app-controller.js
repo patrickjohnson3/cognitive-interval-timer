@@ -30,6 +30,7 @@
       timer: {
         status: Core.STATUS.IDLE,
         phase: Core.PHASE.FOCUS,
+        focusBlockNumber: 0,
         remainingSec: 0,
         lastTickMs: null,
       },

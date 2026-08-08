@@ -254,6 +254,9 @@
       if (to === "long_break") {
         stats.focusBlocksSinceLong = 0;
       }
+      if (to === PHASE.FOCUS && (from === PHASE.SHORT_BREAK || from === PHASE.LONG_BREAK)) {
+        timer.focusBlockNumber = Math.max(1, Number(timer.focusBlockNumber) + 1 || 1);
+      }
 
       timer.phase = to;
       timer.remainingSec = phaseDurationSec(to, settings);

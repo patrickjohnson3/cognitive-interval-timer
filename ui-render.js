@@ -66,14 +66,14 @@
           " / " +
           state.settings.blocks_per_ultradian,
         focusBlockText: sessionStarted
-          ? (labels.focusBlockPrefix || "Focus Block ") + (state.stats.focusBlocksToday + 1)
+          ? (labels.focusBlockPrefix || "Focus Block ") + state.timer.focusBlockNumber
           : labels.focusBlockReady || "Focus Block\nReady",
         focusBlockContextText: sessionStarted
           ? labels.focusBlockSessionSuffix || "of session"
           : labels.focusBlockReadyContext || "Ready to begin session.",
         focusBlockAriaLabel: sessionStarted
           ? (labels.focusBlockPrefix || "Focus Block ") +
-            (state.stats.focusBlocksToday + 1) +
+            state.timer.focusBlockNumber +
             " " +
             (labels.focusBlockSessionSuffix || "of session")
           : (labels.focusBlockReady || "Focus Block Ready").replace(/\s+/g, " "),

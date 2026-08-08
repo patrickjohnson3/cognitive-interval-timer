@@ -29,6 +29,7 @@ function createTimerContext() {
     timer: {
       status: Core.STATUS.RUNNING,
       phase: Core.PHASE.FOCUS,
+      focusBlockNumber: 1,
       remainingSec: 30,
       lastTickMs: Date.now(),
     },
@@ -54,6 +55,7 @@ test("reset returns timer to idle primary-action state", function () {
   ctx.timer.reset();
 
   assert(ctx.state.timer.status === Core.STATUS.IDLE, "expected reset timer to become idle");
+  assert(ctx.state.timer.focusBlockNumber === 0, "expected reset to clear active block number");
   assert(ctx.state.timer.phase === Core.PHASE.PREP, "expected reset to return to initial phase");
   assert(ctx.stateChanges.length === 1, "expected reset to notify state change");
   assert(ctx.phaseChanges.length === 0, "expected reset not to announce phase change");

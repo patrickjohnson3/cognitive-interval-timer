@@ -20,6 +20,7 @@
       state.stats = Core.rolloverStats(state.stats, Core.dateKey());
 
       if (state.timer.status === Core.STATUS.IDLE) {
+        state.timer.focusBlockNumber = 1;
         hooks.onPhaseChange({
           from: null,
           to: state.timer.phase,
@@ -47,6 +48,7 @@
       state.stats = Core.rolloverStats(state.stats, Core.dateKey());
       state.timer.status = Core.STATUS.IDLE;
       state.timer.lastTickMs = null;
+      state.timer.focusBlockNumber = 0;
       state.timer.phase = phase;
       state.timer.remainingSec = Core.phaseDurationSec(phase, state.settings);
       hooks.onStateChange();
@@ -85,6 +87,12 @@
       }
       if (phase === Core.PHASE.LONG_BREAK) {
         state.stats.focusBlocksSinceLong = 0;
+      }
+      if (
+        phase === Core.PHASE.FOCUS &&
+        (from === Core.PHASE.SHORT_BREAK || from === Core.PHASE.LONG_BREAK)
+      ) {
+        state.timer.focusBlockNumber = Math.max(1, Number(state.timer.focusBlockNumber) + 1 || 1);
       }
 
       state.timer.phase = phase;

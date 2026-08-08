@@ -122,6 +122,7 @@ function baseState() {
   return {
     timer: {
       phase: "focus",
+      focusBlockNumber: 0,
       remainingSec: 10,
       status: "idle",
     },
@@ -237,6 +238,7 @@ test("primary button shows Resume after timer is paused", function () {
   const render = UIRender.create(deps);
   const state = baseState();
   state.timer.status = "paused";
+  state.timer.focusBlockNumber = 1;
   render.render(state);
   assert(deps.dom.controls.start.icon.textContent === "▶", "expected Resume icon");
   assert(
@@ -254,6 +256,7 @@ test("focus block badge uses one-based display after timer has started", functio
   const render = UIRender.create(deps);
   const state = baseState();
   state.timer.status = "paused";
+  state.timer.focusBlockNumber = 1;
   render.render(state);
   assert(
     deps.dom.focusBlockBadge.textContent === "Focus Block 1",
@@ -269,11 +272,25 @@ test("focus block badge uses one-based display after timer has started", functio
   );
 });
 
+test("focus block badge displays the active session block instead of daily completions", function () {
+  const deps = createDeps();
+  const render = UIRender.create(deps);
+  const state = baseState();
+  state.timer.status = "paused";
+  state.timer.focusBlockNumber = 2;
+  state.stats.focusBlocksToday = 7;
+
+  render.render(state);
+
+  assert(deps.dom.focusBlockBadge.textContent === "Focus Block 2", "expected active block number");
+});
+
 test("primary button shows Pause while timer is running", function () {
   const deps = createDeps();
   const render = UIRender.create(deps);
   const state = baseState();
   state.timer.status = "running";
+  state.timer.focusBlockNumber = 1;
   render.render(state);
   assert(deps.dom.controls.start.icon.textContent === "⏸", "expected Pause icon");
   assert(
@@ -291,6 +308,7 @@ test("document title includes timer after timer has started", function () {
   const render = UIRender.create(deps);
   const state = baseState();
   state.timer.status = "paused";
+  state.timer.focusBlockNumber = 1;
   render.render(state);
   assert(
     document.title === "00:10 - Focus | Cognitive Interval Timer",

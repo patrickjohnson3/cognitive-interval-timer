@@ -50,7 +50,12 @@ test("advanceTimerByElapsed transitions and credits focus completion", function 
     prep: 1,
     blocks_per_ultradian: 2,
   });
-  const timer = { status: Core.STATUS.RUNNING, phase: "focus", remainingSec: 10 };
+  const timer = {
+    status: Core.STATUS.RUNNING,
+    phase: "focus",
+    focusBlockNumber: 1,
+    remainingSec: 10,
+  };
   const stats = Core.normalizeStats({
     dateKey: Core.dateKey(),
     focusBlocksToday: 0,
@@ -89,7 +94,12 @@ test("advanceTimerByElapsed handles large elapsed time without dropping transiti
     blocks_per_ultradian: 2,
   });
 
-  const timer = { status: Core.STATUS.RUNNING, phase: "focus", remainingSec: 1 };
+  const timer = {
+    status: Core.STATUS.RUNNING,
+    phase: "focus",
+    focusBlockNumber: 1,
+    remainingSec: 1,
+  };
   const stats = Core.normalizeStats({
     dateKey: Core.dateKey(),
     focusBlocksToday: 0,
@@ -111,7 +121,12 @@ test("advanceTimerByElapsed follows a full two-block cycle into long break", fun
     blocks_per_ultradian: 2,
     auto_start: true,
   });
-  let timer = { status: Core.STATUS.RUNNING, phase: "prep", remainingSec: 1 };
+  let timer = {
+    status: Core.STATUS.RUNNING,
+    phase: "prep",
+    focusBlockNumber: 1,
+    remainingSec: 1,
+  };
   let stats = Core.normalizeStats({
     dateKey: Core.dateKey(),
     focusBlocksToday: 0,
@@ -137,6 +152,7 @@ test("advanceTimerByElapsed follows a full two-block cycle into long break", fun
   );
   assert(stats.focusBlocksToday === 2, "expected two completed focus blocks");
   assert(stats.focusBlocksSinceLong === 0, "expected long break to reset since-long counter");
+  assert(timer.focusBlockNumber === 2, "expected second block to remain active through long break");
 });
 
 test("stateLabel maps all phases to configured display names", function () {
