@@ -162,6 +162,145 @@ async function launchChrome(url, userDataDir) {
   return { chrome, devToolsUrl };
 }
 
+async function evaluateValue(client, expression) {
+  const result = await client.send("Runtime.evaluate", {
+    expression,
+    awaitPromise: true,
+    returnByValue: true,
+  });
+  if (result.exceptionDetails) {
+    const exception = result.exceptionDetails.exception;
+    const details =
+      (exception && exception.description) || result.exceptionDetails.text || "unknown error";
+    throw new Error("Browser evaluation failed: " + details);
+  }
+  return result.result && result.result.value;
+}
+
+async function evaluateAfterNavigation(client, expression) {
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    try {
+      return await evaluateValue(client, expression);
+    } catch (err) {
+      if (!/context was destroyed|Cannot find context/i.test(err.message)) throw err;
+      await new Promise(function waitForReplacementContext(resolve) {
+        setTimeout(resolve, 100);
+      });
+    }
+  }
+  throw new Error("Page execution context did not stabilize");
+}
+
+async function waitForPageReady(client) {
+  for (let attempt = 0; attempt < 50; attempt += 1) {
+    try {
+      const ready = await evaluateValue(
+        client,
+        'document.readyState === "complete" && "serviceWorker" in navigator'
+      );
+      if (ready) return;
+    } catch (err) {
+      if (!/context was destroyed|Cannot find context/i.test(err.message)) throw err;
+    }
+    await new Promise(function waitForPage(resolve) {
+      setTimeout(resolve, 100);
+    });
+  }
+  throw new Error("App page did not become service-worker ready");
+}
+
+async function settleLayout(client) {
+  await evaluateValue(
+    client,
+    "new Promise(function (resolve) { requestAnimationFrame(function () { resolve(true); }); })"
+  );
+}
+
+async function assertResponsiveUI(client) {
+  await client.send("Emulation.setDeviceMetricsOverride", {
+    width: 390,
+    height: 844,
+    deviceScaleFactor: 1,
+    mobile: true,
+    screenOrientation: { type: "portraitPrimary", angle: 0 },
+  });
+  await settleLayout(client);
+
+  const portraitOkay = await evaluateValue(
+    client,
+    `(() => {
+      const buttons = Array.from(document.querySelectorAll(".controls button"));
+      const longHint = getComputedStyle(document.querySelector(".long-hint"));
+      const hiddenFocusable = Array.from(document.querySelectorAll('[aria-hidden="true"]')).some(
+        (node) => node.querySelector("button, input, select, textarea, a[href], [tabindex]:not([tabindex='-1'])")
+      );
+      return document.documentElement.scrollWidth <= window.innerWidth &&
+        buttons.every((button) => button.getBoundingClientRect().height >= 48) &&
+        parseFloat(longHint.lineHeight) / parseFloat(longHint.fontSize) >= 1.5 &&
+        !hiddenFocusable &&
+        Boolean(document.getElementById("label-timer-flow-settings")) &&
+        Boolean(document.getElementById("label-display-settings"));
+    })()`
+  );
+  if (!portraitOkay) throw new Error("Rendered portrait layout or accessibility checks failed");
+
+  const minimalOkay = await evaluateValue(
+    client,
+    `(() => {
+      document.documentElement.setAttribute("data-minimal-mode", "true");
+      const panel = document.querySelector(".panel");
+      const handle = document.getElementById("minimal-exit-reveal");
+      const state = getComputedStyle(document.getElementById("state"));
+      const time = getComputedStyle(document.getElementById("time"));
+      const hint = getComputedStyle(document.getElementById("hint"));
+      const handleRect = handle.getBoundingClientRect();
+      return panel.getBoundingClientRect().height >= window.innerHeight &&
+        Math.abs(handleRect.left + handleRect.width / 2 - window.innerWidth / 2) < 1 &&
+        parseFloat(time.fontSize) > parseFloat(hint.fontSize) &&
+        parseFloat(hint.fontSize) > parseFloat(state.fontSize);
+    })()`
+  );
+  if (!minimalOkay) throw new Error("Rendered minimal-mode layout checks failed");
+  await evaluateValue(
+    client,
+    'document.documentElement.removeAttribute("data-minimal-mode"); true'
+  );
+
+  await client.send("Emulation.setDeviceMetricsOverride", {
+    width: 844,
+    height: 390,
+    deviceScaleFactor: 1,
+    mobile: true,
+    screenOrientation: { type: "landscapePrimary", angle: 90 },
+  });
+  await settleLayout(client);
+
+  const landscapeOkay = await evaluateValue(
+    client,
+    `(() => {
+      const columns = getComputedStyle(document.querySelector(".main")).gridTemplateColumns
+        .split(" ")
+        .filter(Boolean);
+      return matchMedia("(orientation: landscape)").matches &&
+        columns.length === 2 &&
+        document.documentElement.scrollWidth <= window.innerWidth;
+    })()`
+  );
+  if (!landscapeOkay) throw new Error("Rendered short-landscape layout checks failed");
+
+  const themesOkay = await evaluateValue(
+    client,
+    `(() => {
+      document.documentElement.setAttribute("data-theme", "light");
+      const lightScheme = getComputedStyle(document.documentElement).colorScheme;
+      document.documentElement.setAttribute("data-theme", "dark");
+      const darkScheme = getComputedStyle(document.documentElement).colorScheme;
+      return lightScheme === "light" && darkScheme === "dark";
+    })()`
+  );
+  if (!themesOkay) throw new Error("Rendered theme application checks failed");
+}
+
 async function main() {
   const server = await startServer();
   const port = server.address().port;
@@ -174,7 +313,7 @@ async function main() {
     .replace(/\/devtools\/browser\/.*$/, "");
   const targets = await httpJSON(debugBaseUrl + "/json/list");
   const page = targets.find(function isPage(target) {
-    return target.type === "page";
+    return target.type === "page" && target.url === appUrl;
   });
   if (!page) throw new Error("Unable to find Chrome page target");
 
@@ -182,10 +321,12 @@ async function main() {
   try {
     await client.send("Page.enable");
     await client.send("Network.enable");
-    await client.send("Runtime.evaluate", {
-      expression: "navigator.serviceWorker.ready.then(function () { return true; })",
-      awaitPromise: true,
-    });
+    await waitForPageReady(client);
+    await evaluateAfterNavigation(
+      client,
+      "navigator.serviceWorker.ready.then(function () { return true; })"
+    );
+    await assertResponsiveUI(client);
     await client.send("Page.navigate", { url: appUrl });
     await new Promise(function waitForController(resolve) {
       setTimeout(resolve, 1000);
