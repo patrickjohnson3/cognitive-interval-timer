@@ -80,6 +80,10 @@ function setup(options) {
     },
     exitFullscreen: function exitFullscreen() {
       fullscreenRequests.push(false);
+      if (config.rejectFullscreenExit) {
+        return Promise.reject(new Error("fullscreen exit unavailable"));
+      }
+      browser.document.fullscreenElement = null;
       return Promise.resolve();
     },
     pushState: function pushState(state, title) {
@@ -501,6 +505,17 @@ test("fullscreen rejection clears fullscreen field", async function () {
     ctx.app.state.ui.settingsDirty === true,
     "expected auto-enabled wake lock to remain unsaved"
   );
+});
+
+test("fullscreen exit rejection restores the actual enabled field", async function () {
+  const ctx = setup({ rejectFullscreenExit: true });
+  global.document.fullscreenElement = global.document.documentElement;
+  ctx.dom.fields.fullscreen_enabled.checked = false;
+
+  await ctx.boundHandlers.onFullscreenToggle(false);
+
+  assert.equal(ctx.dom.fields.fullscreen_enabled.checked, true);
+  assert.equal(ctx.app.state.draftSettings.fullscreen_enabled, true);
 });
 
 test("saved fullscreen remains a preference without activating on startup", async function () {

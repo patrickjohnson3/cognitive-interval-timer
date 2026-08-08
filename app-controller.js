@@ -412,7 +412,12 @@
         updateDraftFromForm();
         displayModes.setWakeLock(true);
       }
-      return displayModes.setFullscreen(enabled);
+      return displayModes.setFullscreen(enabled).then(function reconcileFullscreenResult(actual) {
+        if (Boolean(actual) === Boolean(enabled)) return actual;
+        render.setSettingField("fullscreen_enabled", Boolean(actual));
+        onSettingsInput(controls.readSettingsForm());
+        return actual;
+      });
     }
 
     function onFullscreenChange(isFullscreen) {
