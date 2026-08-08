@@ -200,6 +200,9 @@
     if (!timer || !stats || !settings) {
       throw new Error("transitionToPhase requires timer, settings, and stats");
     }
+    if (!PHASES.includes(timer.phase) || !PHASES.includes(to)) {
+      throw new Error("transitionToPhase requires known phases");
+    }
     const config = Object.assign(
       { autoStart: settings.auto_start, creditFocus: false },
       options || {}
@@ -231,6 +234,9 @@
   function advanceTimerByElapsed(timer, elapsedSec, settings, stats, options) {
     if (!timer || !settings || !stats) {
       throw new Error("advanceTimerByElapsed requires timer, settings, and stats");
+    }
+    if (!PHASES.includes(timer.phase)) {
+      throw new Error("advanceTimerByElapsed requires a known timer phase");
     }
     const config = Object.assign(
       {

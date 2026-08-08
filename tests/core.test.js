@@ -79,6 +79,27 @@ test("advanceTimerByElapsed requires explicit state objects", function () {
   assert(threw === true, "expected missing timer to throw");
 });
 
+test("timer mutations reject unknown phases", function () {
+  const settings = Core.normalizeSettings(null);
+  const stats = Core.normalizeStats(null);
+  const timer = {
+    status: Core.STATUS.RUNNING,
+    phase: Core.PHASE.FOCUS,
+    focusBlockNumber: 1,
+    remainingSec: 10,
+  };
+
+  assert.throws(function transitionToUnknownPhase() {
+    Core.transitionToPhase(timer, stats, settings, "unknown");
+  }, /known phases/);
+  assert.equal(timer.phase, Core.PHASE.FOCUS);
+
+  timer.phase = "unknown";
+  assert.throws(function advanceUnknownPhase() {
+    Core.advanceTimerByElapsed(timer, 1, settings, stats);
+  }, /known timer phase/);
+});
+
 test("advanceTimerByElapsed handles large elapsed time without dropping transitions", function () {
   const settings = Core.normalizeSettings({
     prep: 1,

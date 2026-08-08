@@ -63,6 +63,17 @@ test("reset returns timer to idle primary-action state", function () {
   assert(ctx.phaseChanges.length === 0, "expected reset not to announce phase change");
 });
 
+test("resetToPhase rejects unknown phases before mutating state", function () {
+  const ctx = createTimerContext();
+  const original = Object.assign({}, ctx.state.timer);
+
+  assert.throws(function resetToUnknownPhase() {
+    ctx.timer.resetToPhase("unknown");
+  }, /known phase/);
+  assert.deepEqual(ctx.state.timer, original);
+  assert.equal(ctx.stateChanges.length, 0);
+});
+
 test("skipping before start initializes a one-based focus block", function () {
   [true, false].forEach(function eachAutoStart(autoStart) {
     const ctx = createTimerContext();

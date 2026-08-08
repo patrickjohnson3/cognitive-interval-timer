@@ -54,6 +54,9 @@
     }
 
     function resetToPhase(phase) {
+      if (!Core.PHASES.includes(phase)) {
+        throw new Error("resetToPhase requires a known phase");
+      }
       state.stats = Core.rolloverStats(state.stats, Core.dateKey());
       state.timer.status = Core.STATUS.IDLE;
       state.timer.lastTickMs = null;
