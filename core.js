@@ -162,7 +162,10 @@
       status,
       phase,
       focusBlockNumber: status === STATUS.IDLE ? 0 : clampInt(input.focusBlockNumber, 1, 1, 100000),
-      remainingSec: Number.isFinite(remaining) && remaining >= 0 ? remaining : defaultRemaining,
+      remainingSec:
+        Number.isFinite(remaining) && remaining >= 0
+          ? Math.min(remaining, defaultRemaining)
+          : defaultRemaining,
       lastTickMs: null,
     };
   }

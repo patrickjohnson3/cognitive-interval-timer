@@ -193,3 +193,18 @@ test("normalizeTimerState restores a persisted timer without elapsed wall time",
   assert(timer.remainingSec === 77, "expected remaining time to restore unchanged");
   assert(timer.lastTickMs === null, "expected a fresh wall-clock anchor");
 });
+
+test("normalizeTimerState bounds corrupted remaining time to the phase duration", function () {
+  const settings = Core.normalizeSettings({ focus: 25 });
+  const timer = Core.normalizeTimerState(
+    {
+      status: Core.STATUS.PAUSED,
+      phase: Core.PHASE.FOCUS,
+      focusBlockNumber: 1,
+      remainingSec: 999999,
+    },
+    settings
+  );
+
+  assert.equal(timer.remainingSec, 25 * 60);
+});
