@@ -181,16 +181,8 @@
     return initialPhase(settings);
   }
 
-  function canTransition(from, to, context) {
-    return resolvePhaseTransition(from, context) === to;
-  }
-
   function nextPhase(current, stats, settings) {
     return resolvePhaseTransition(current, { stats: stats, settings: settings });
-  }
-
-  function isValidTransition(from, to, stats, settings) {
-    return canTransition(from, to, { stats: stats, settings: settings });
   }
 
   function formatTime(seconds) {
@@ -302,7 +294,6 @@
     phaseDurationSec,
     normalizeTimerState,
     nextPhase,
-    isValidTransition,
     formatTime,
     transitionToPhase,
     advanceTimerByElapsed,

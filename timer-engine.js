@@ -57,37 +57,16 @@
     function skip() {
       const from = state.timer.phase;
       const to = Core.nextPhase(from, state.stats, state.settings);
-      if (!Core.isValidTransition(from, to, state.stats, state.settings)) return;
-      enterPhase(to, {
-        reason: "skip",
+      Core.transitionToPhase(state.timer, state.stats, state.settings, to, {
         autoStart: state.settings.auto_start,
         creditFocus: false,
       });
-    }
-
-    function enterPhase(phase, options) {
-      const nextConfig = Object.assign(
-        {
-          reason: "transition",
-          autoStart: state.settings.auto_start,
-          creditFocus: false,
-        },
-        options || {}
-      );
-
-      const from = state.timer.phase;
-      const isResetLike = nextConfig.reason === "reset" || nextConfig.reason === "init";
-      if (!isResetLike && !Core.isValidTransition(from, phase, state.stats, state.settings)) {
-        return;
-      }
-
-      Core.transitionToPhase(state.timer, state.stats, state.settings, phase, nextConfig);
       state.timer.lastTickMs = state.timer.status === Core.STATUS.RUNNING ? Date.now() : null;
 
       hooks.onPhaseChange({
         from: from,
-        to: phase,
-        reason: nextConfig.reason,
+        to: to,
+        reason: "skip",
       });
       hooks.onStateChange();
     }
