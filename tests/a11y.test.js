@@ -42,3 +42,15 @@ test("phase transitions use only the dedicated live announcer", function () {
   assert(!transition.includes("aria-live"));
   assert(html.includes('id="live-announcer" class="sr-only" aria-live="polite"'));
 });
+
+test("document headings do not skip hierarchy levels", function () {
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const levels = Array.from(html.matchAll(/<h([1-6])\b/g), function headingLevel(match) {
+    return Number(match[1]);
+  });
+
+  assert.equal(levels[0], 1);
+  levels.slice(1).forEach(function verifyHeadingLevel(level, index) {
+    assert(level <= levels[index] + 1, "heading level skipped after heading " + (index + 1));
+  });
+});
