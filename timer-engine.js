@@ -93,23 +93,32 @@
     }
 
     function tick() {
-      if (suspended || state.timer.status !== Core.STATUS.RUNNING) return;
-
+      const previousDateKey = state.stats.dateKey;
       state.stats = Core.rolloverStats(state.stats, Core.dateKey());
+      const statsRolledOver = state.stats.dateKey !== previousDateKey;
+      if (suspended || state.timer.status !== Core.STATUS.RUNNING) {
+        if (statsRolledOver) hooks.onStateChange();
+        return;
+      }
+
       const now = Date.now();
       if (state.timer.lastTickMs == null) {
         state.timer.lastTickMs = now;
+        if (statsRolledOver) hooks.onStateChange();
         return;
       }
 
       const elapsedSec = (now - state.timer.lastTickMs) / 1000;
-      if (elapsedSec <= 0) return;
+      if (elapsedSec <= 0) {
+        if (statsRolledOver) hooks.onStateChange();
+        return;
+      }
       state.timer.lastTickMs = now;
       const previousDisplaySecond = Math.floor(state.timer.remainingSec);
 
       if (state.timer.remainingSec > elapsedSec) {
         state.timer.remainingSec -= elapsedSec;
-        if (Math.floor(state.timer.remainingSec) !== previousDisplaySecond) {
+        if (statsRolledOver || Math.floor(state.timer.remainingSec) !== previousDisplaySecond) {
           hooks.onStateChange();
         }
         return;

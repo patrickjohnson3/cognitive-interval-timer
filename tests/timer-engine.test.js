@@ -101,3 +101,27 @@ test("ordinary ticks render only when the displayed second changes", function ()
     global.setInterval = originalSetInterval;
   }
 });
+
+test("idle ticker rolls daily statistics over at midnight", function () {
+  const ctx = createTimerContext();
+  const originalSetInterval = global.setInterval;
+  let tick = null;
+  global.setInterval = function captureTicker(callback) {
+    tick = callback;
+    return 1;
+  };
+
+  try {
+    ctx.state.timer.status = Core.STATUS.IDLE;
+    ctx.state.stats.dateKey = "2000-01-01";
+    ctx.state.stats.focusBlocksToday = 5;
+    ctx.timer.startTicker();
+    tick();
+
+    assert.equal(ctx.state.stats.dateKey, Core.dateKey());
+    assert.equal(ctx.state.stats.focusBlocksToday, 0);
+    assert.equal(ctx.stateChanges.length, 1);
+  } finally {
+    global.setInterval = originalSetInterval;
+  }
+});
