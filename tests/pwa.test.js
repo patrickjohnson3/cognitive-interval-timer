@@ -261,8 +261,8 @@ test("service worker caches the app shell", function () {
   assert(serviceWorker.includes("cacheOptionalAsset"), "missing optional asset cache helper");
   assert(serviceWorker.includes("function appShellAssetUrl"), "missing scope-aware asset helper");
   assert(
-    serviceWorker.includes(".addAll(REQUIRED_APP_SHELL.map(appShellAssetUrl))"),
-    "required shell should remain strict and scope-aware"
+    serviceWorker.includes("REQUIRED_APP_SHELL.map(function fetchRequiredAsset"),
+    "required shell responses should be validated before caching"
   );
 });
 

@@ -23,15 +23,49 @@ const APP_SHELL_URLS = APP_SHELL.map(appShellAssetUrl);
 const APP_SHELL_URL_SET = new Set(APP_SHELL_URLS);
 const INDEX_URL = appShellAssetUrl("./index.html");
 
+function expectedContentTypes(requestUrl) {
+  const pathname = new URL(requestUrl, serviceWorkerBaseUrl()).pathname.toLowerCase();
+  if (pathname.endsWith("/") || pathname.endsWith(".html")) return ["text/html"];
+  if (pathname.endsWith(".js")) return ["text/javascript", "application/javascript"];
+  if (pathname.endsWith(".css")) return ["text/css"];
+  if (pathname.endsWith(".webmanifest")) return ["application/manifest+json", "application/json"];
+  if (pathname.endsWith(".png")) return ["image/png"];
+  if (pathname.endsWith(".svg")) return ["image/svg+xml"];
+  return [];
+}
+
+function responseIsValidAppShellAsset(requestUrl, response) {
+  if (!response || !response.ok || response.status !== 200 || response.type !== "basic") {
+    return false;
+  }
+  const expected = expectedContentTypes(requestUrl);
+  if (expected.length === 0) return false;
+  const contentType = response.headers && response.headers.get("content-type");
+  if (!contentType) return false;
+  const normalized = contentType.toLowerCase();
+  return expected.some(function contentTypeMatches(type) {
+    return normalized.includes(type);
+  });
+}
+
+function fetchAppShellResponse(request) {
+  const requestUrl = request.url || request;
+  return fetch(request).then(function validateAppShellResponse(response) {
+    if (!responseIsValidAppShellAsset(requestUrl, response)) {
+      throw new Error("Invalid app-shell response for " + requestUrl);
+    }
+    return response;
+  });
+}
+
 function isAppShellRequest(requestUrl) {
   return APP_SHELL_URL_SET.has(requestUrl.href);
 }
 
 function cacheOptionalAsset(cache, asset) {
   const assetUrl = appShellAssetUrl(asset);
-  return fetch(assetUrl)
+  return fetchAppShellResponse(assetUrl)
     .then(function cacheOptionalResponse(response) {
-      if (!response || !response.ok) return false;
       return cache.put(assetUrl, response).then(function optionalCached() {
         return true;
       });
@@ -42,7 +76,10 @@ function cacheOptionalAsset(cache, asset) {
 }
 
 function cacheResponse(cacheKey, response) {
-  if (!response || response.status !== 200 || response.type !== "basic") return response;
+  const requestUrl = cacheKey.url || cacheKey;
+  if (!responseIsValidAppShellAsset(requestUrl, response)) {
+    return Promise.reject(new Error("Refusing invalid app-shell response for " + requestUrl));
+  }
   const responseCopy = response.clone();
   return caches
     .open(CACHE_NAME)
@@ -63,9 +100,8 @@ function offlineResponse(message) {
 function fetchNavigation(request) {
   return caches.match(INDEX_URL).then(function useCurrentShell(cached) {
     if (cached) return cached;
-    return fetch(request)
+    return fetchAppShellResponse(request)
       .then(function cacheInitialNavigation(response) {
-        if (!response || !response.ok || response.type !== "basic") return response;
         return cacheResponse(INDEX_URL, response);
       })
       .catch(function navigationUnavailable() {
@@ -77,7 +113,7 @@ function fetchNavigation(request) {
 function fetchAppShellAsset(request) {
   return caches.match(request).then(function useCurrentAsset(cached) {
     if (cached) return cached;
-    return fetch(request)
+    return fetchAppShellResponse(request)
       .then(function cacheInitialAsset(response) {
         return cacheResponse(request, response);
       })
@@ -112,8 +148,21 @@ function pruneCurrentAppShellCache() {
 self.addEventListener("install", function installServiceWorker(event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function cacheAppShell(cache) {
-      return cache
-        .addAll(REQUIRED_APP_SHELL.map(appShellAssetUrl))
+      return Promise.all(
+        REQUIRED_APP_SHELL.map(function fetchRequiredAsset(asset) {
+          const assetUrl = appShellAssetUrl(asset);
+          return fetchAppShellResponse(assetUrl).then(function pairRequiredResponse(response) {
+            return { assetUrl, response };
+          });
+        })
+      )
+        .then(function cacheRequiredAssets(entries) {
+          return Promise.all(
+            entries.map(function cacheRequiredEntry(entry) {
+              return cache.put(entry.assetUrl, entry.response);
+            })
+          );
+        })
         .then(function cacheOptionalShellAssets() {
           return Promise.all(
             OPTIONAL_APP_SHELL.map(function eachOptionalAsset(asset) {

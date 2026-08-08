@@ -35,6 +35,14 @@ function loadServiceWorkerRuntime(options) {
         ok: true,
         status: 200,
         type: "basic",
+        headers: {
+          get: function getHeader() {
+            const url = request.url || request;
+            if (String(url).endsWith(".js")) return "text/javascript";
+            if (String(url).endsWith(".json")) return "application/json";
+            return "text/html";
+          },
+        },
         clone: function clone() {
           return this;
         },
@@ -456,6 +464,11 @@ test("service worker returns network response when cache write fails", async fun
     ok: true,
     status: 200,
     type: "basic",
+    headers: {
+      get: function getHeader() {
+        return "text/javascript";
+      },
+    },
     clone: function clone() {
       return this;
     },
@@ -472,6 +485,33 @@ test("service worker returns network response when cache write fails", async fun
   });
 
   assert(response === networkResponse, "expected network response despite cache write failure");
+});
+
+test("service worker rejects malformed app-shell responses", async function () {
+  const runtime = loadServiceWorkerRuntime({
+    fetchResponse: function fetchResponse() {
+      return {
+        ok: true,
+        status: 200,
+        type: "basic",
+        headers: {
+          get: function getHeader() {
+            return "text/html";
+          },
+        },
+        clone: function clone() {
+          return this;
+        },
+      };
+    },
+  });
+
+  const response = await runFetch(runtime, {
+    url: "https://example.test/app.js",
+  });
+
+  assert.equal(response.status, 503);
+  assert.deepEqual(runtime.cacheWrites, []);
 });
 
 test("service worker falls back to cached shell for offline navigation", async function () {
