@@ -689,7 +689,7 @@ select {
   gap: var(--space-2);
   position: fixed;
   left: 50%;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 68px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 128px);
   width: min(320px, calc(100vw - (var(--space-5) * 2)));
   padding: var(--space-3);
   background: var(--panel-bg);
@@ -706,17 +706,19 @@ select {
 
 .minimal-exit-reveal {
   position: fixed;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 72px);
   left: 50%;
   transform: translateX(-50%);
-  width: 72px;
-  height: 44px;
-  padding: 0;
+  min-width: 96px;
+  height: 42px;
+  padding: 0 var(--space-4);
   border-radius: 999px;
-  font-size: 0.68rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   color: var(--text-tertiary, var(--sidebar-label-color));
-  background: transparent;
-  opacity: 0;
+  background: var(--theme-row-bg);
+  opacity: 0.44;
   transition:
     opacity 140ms ease,
     color 140ms ease,
@@ -738,7 +740,7 @@ select {
 :root[data-minimal-mode="true"] .minimal-exit-wrap:hover .minimal-exit-reveal,
 :root[data-minimal-mode="true"] .minimal-exit-wrap:focus-within .minimal-exit-reveal,
 :root[data-minimal-mode="true"] .minimal-exit-wrap[data-open="true"] .minimal-exit-reveal {
-  opacity: 0.85;
+  opacity: 0.92;
 }
 
 :root[data-minimal-mode="true"] .minimal-exit-wrap:hover .minimal-exit-reveal,
@@ -755,7 +757,7 @@ select {
 
 @media (hover: none) {
   :root[data-minimal-mode="true"] .minimal-exit-reveal {
-    opacity: 0.32;
+    opacity: 0.56;
   }
 }
 
