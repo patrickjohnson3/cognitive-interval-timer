@@ -1,108 +1,76 @@
 const UIControls = require("../ui-controls.js");
 const Core = require("../core.js");
+const { createBrowserFixture, eventTargetNode } = require("./helpers/dom.js");
 const assert = require("node:assert/strict");
 const test = require("node:test");
-
-function createNode(options) {
-  const config = options || {};
-  const listeners = {};
-  const attrs = {};
-
-  return {
-    id: config.id || "",
-    tagName: config.tagName || "BUTTON",
-    type: config.type || "button",
-    value: config.value || "",
-    checked: Boolean(config.checked),
-    isContentEditable: false,
-    listeners,
-    focusCount: 0,
-    addEventListener: function addEventListener(type, handler) {
-      listeners[type] = handler;
-    },
-    focus: function focus() {
-      this.focusCount += 1;
-    },
-    blur: function blur() {
-      this.blurCount = (this.blurCount || 0) + 1;
-    },
-    checkValidity: function checkValidity() {
-      return true;
-    },
-    getAttribute: function getAttribute(name) {
-      return attrs[name];
-    },
-    setAttribute: function setAttribute(name, value) {
-      attrs[name] = String(value);
-    },
-    closest: function closest(selector) {
-      return selector === "#" + this.id ? this : null;
-    },
-  };
-}
 
 function createDom() {
   return {
     controls: {
-      start: createNode({ id: "start" }),
-      skip: createNode({ id: "skip" }),
-      reset: createNode({ id: "reset" }),
-      save: createNode({ id: "save" }),
-      defaults: createNode({ id: "defaults" }),
-      activateDisplayModes: createNode({ id: "activate-display-modes" }),
-      exitMinimalModeWrap: createNode({ id: "minimal-exit-wrap" }),
-      exitMinimalModeReveal: createNode({ id: "minimal-exit-reveal" }),
-      exitMinimalModePanel: createNode({ id: "minimal-exit-panel", tagName: "DIV" }),
-      restartMinimalBlock: createNode({ id: "restart-minimal-block" }),
-      exitMinimalMode: createNode({ id: "exit-minimal-mode" }),
+      start: eventTargetNode({ id: "start" }),
+      skip: eventTargetNode({ id: "skip" }),
+      reset: eventTargetNode({ id: "reset" }),
+      save: eventTargetNode({ id: "save" }),
+      defaults: eventTargetNode({ id: "defaults" }),
+      activateDisplayModes: eventTargetNode({ id: "activate-display-modes" }),
+      exitMinimalModeWrap: eventTargetNode({ id: "minimal-exit-wrap" }),
+      exitMinimalModeReveal: eventTargetNode({ id: "minimal-exit-reveal" }),
+      exitMinimalModePanel: eventTargetNode({ id: "minimal-exit-panel", tagName: "DIV" }),
+      restartMinimalBlock: eventTargetNode({ id: "restart-minimal-block" }),
+      exitMinimalMode: eventTargetNode({ id: "exit-minimal-mode" }),
     },
-    theme: createNode({ id: "theme", tagName: "SELECT", value: "dark" }),
+    theme: eventTargetNode({ id: "theme", tagName: "SELECT", value: "dark" }),
     fields: {
-      prep: createNode({ id: "prep", tagName: "INPUT", type: "number", value: "2" }),
-      focus: createNode({ id: "focus", tagName: "INPUT", type: "number", value: "45" }),
-      recall: createNode({ id: "recall", tagName: "INPUT", type: "number", value: "3" }),
-      break: createNode({ id: "break", tagName: "INPUT", type: "number", value: "15" }),
-      long_break: createNode({ id: "long_break", tagName: "INPUT", type: "number", value: "25" }),
-      blocks_per_ultradian: createNode({
+      prep: eventTargetNode({ id: "prep", tagName: "INPUT", type: "number", value: "2" }),
+      focus: eventTargetNode({ id: "focus", tagName: "INPUT", type: "number", value: "45" }),
+      recall: eventTargetNode({ id: "recall", tagName: "INPUT", type: "number", value: "3" }),
+      break: eventTargetNode({ id: "break", tagName: "INPUT", type: "number", value: "15" }),
+      long_break: eventTargetNode({
+        id: "long_break",
+        tagName: "INPUT",
+        type: "number",
+        value: "25",
+      }),
+      blocks_per_ultradian: eventTargetNode({
         id: "blocks_per_ultradian",
         tagName: "INPUT",
         type: "number",
         value: "2",
       }),
-      prep_enabled: createNode({
+      prep_enabled: eventTargetNode({
         id: "prep_enabled",
         tagName: "INPUT",
         type: "checkbox",
         checked: true,
       }),
-      auto_start: createNode({
+      auto_start: eventTargetNode({
         id: "auto_start",
         tagName: "INPUT",
         type: "checkbox",
         checked: true,
       }),
-      sound_enabled: createNode({
+      sound_enabled: eventTargetNode({
         id: "sound_enabled",
         tagName: "INPUT",
         type: "checkbox",
         checked: true,
       }),
-      quiet_mode_enabled: createNode({
+      quiet_mode_enabled: eventTargetNode({
         id: "quiet_mode_enabled",
         tagName: "INPUT",
         type: "checkbox",
       }),
-      fullscreen_enabled: createNode({
+      fullscreen_enabled: eventTargetNode({
         id: "fullscreen_enabled",
         tagName: "INPUT",
         type: "checkbox",
       }),
-      minimal_mode_enabled: createNode({
+      minimal_mode_enabled: eventTargetNode({
         id: "minimal_mode_enabled",
         tagName: "INPUT",
         type: "checkbox",
       }),
-      wake_lock_enabled: createNode({
+      wake_lock_enabled: eventTargetNode({
         id: "wake_lock_enabled",
         tagName: "INPUT",
         type: "checkbox",
@@ -114,20 +82,10 @@ function createDom() {
 function bindWithBrowserStubs(options) {
   const config = options || {};
   const dom = createDom();
-  const windowListeners = {};
-  const documentListeners = {};
-  const documentElement = {
-    attrs: {},
-    hasAttribute: function hasAttribute(name) {
-      return Object.prototype.hasOwnProperty.call(this.attrs, name);
-    },
-    setAttribute: function setAttribute(name, value) {
-      this.attrs[name] = String(value);
-    },
-    removeAttribute: function removeAttribute(name) {
-      delete this.attrs[name];
-    },
-  };
+  const browser = createBrowserFixture({
+    pointerEvents: config.pointerEvents !== false,
+    touchEvents: config.touchEvents,
+  });
   const calls = [];
   const handlers = {
     onStart: function onStart() {
@@ -180,27 +138,11 @@ function bindWithBrowserStubs(options) {
     },
   };
 
-  global.document = {
-    documentElement,
-    fullscreenElement: null,
-    addEventListener: function addEventListener(type, handler) {
-      documentListeners[type] = handler;
-    },
-  };
-  global.window = {
-    addEventListener: function addEventListener(type, handler) {
-      windowListeners[type] = handler;
-    },
-  };
-  if (config.pointerEvents !== false) {
-    global.window.PointerEvent = function PointerEvent() {};
-  }
-  if (config.touchEvents) {
-    global.window.TouchEvent = function TouchEvent() {};
-  }
+  global.document = browser.document;
+  global.window = browser.window;
 
   UIControls.create(dom, Core.SETTING_FIELDS).bindControls(handlers);
-  return { calls, dom, documentElement, documentListeners, windowListeners };
+  return Object.assign({ calls, dom }, browser);
 }
 
 test("minimal mode checkbox triggers minimal handler and dirty settings handler", function () {
@@ -331,19 +273,19 @@ test("wake lock checkbox triggers wake lock handler and dirty settings handler",
 test("Escape closes an open minimal panel before exiting minimal mode", function () {
   const ctx = bindWithBrowserStubs();
   ctx.dom.controls.exitMinimalModeReveal.listeners.click({});
-  ctx.windowListeners.keydown({ key: "Escape", target: createNode({ tagName: "BODY" }) });
+  ctx.windowListeners.keydown({ key: "Escape", target: eventTargetNode({ tagName: "BODY" }) });
 
   assert(!ctx.calls.includes("exit-minimal"), "expected first Escape to close the disclosure");
   assert.equal(ctx.dom.controls.exitMinimalModeReveal.focusCount, 1);
 
-  ctx.windowListeners.keydown({ key: "Escape", target: createNode({ tagName: "BODY" }) });
+  ctx.windowListeners.keydown({ key: "Escape", target: eventTargetNode({ tagName: "BODY" }) });
 
   assert(ctx.calls.includes("exit-minimal"), "expected Escape to exit minimal mode");
 });
 
 test("Escape dismisses a focused tooltip before other Escape actions", function () {
   const ctx = bindWithBrowserStubs();
-  const trigger = createNode({ tagName: "BUTTON" });
+  const trigger = eventTargetNode({ tagName: "BUTTON" });
   trigger.closest = function closest(selector) {
     return selector === ".tip-wrap" ? {} : null;
   };
@@ -357,7 +299,7 @@ test("Escape dismisses a focused tooltip before other Escape actions", function 
 
 test("timer shortcuts do not intercept native button keyboard actions", function () {
   const ctx = bindWithBrowserStubs();
-  const button = createNode({ tagName: "BUTTON" });
+  const button = eventTargetNode({ tagName: "BUTTON" });
   let prevented = false;
 
   [" ", "s", "r"].forEach(function eachShortcut(key) {
@@ -384,7 +326,7 @@ test("clicking screen in minimal mode toggles start pause without pointer events
   ctx.documentElement.setAttribute("data-minimal-mode", "true");
   ctx.windowListeners.click({
     button: 0,
-    target: createNode({ id: "timer-panel", tagName: "DIV" }),
+    target: eventTargetNode({ id: "timer-panel", tagName: "DIV" }),
   });
 
   assert(ctx.calls.includes("shortcut:toggle"), "expected minimal click to toggle timer");
@@ -397,7 +339,7 @@ test("pointer release in minimal mode toggles start pause", function () {
     button: 0,
     cancelable: true,
     preventDefault: function preventDefault() {},
-    target: createNode({ id: "timer-panel", tagName: "DIV" }),
+    target: eventTargetNode({ id: "timer-panel", tagName: "DIV" }),
   });
 
   assert(ctx.calls.includes("shortcut:toggle"), "expected minimal pointerup to toggle timer");
@@ -409,7 +351,7 @@ test("touch release in minimal mode toggles start pause without pointer events",
   ctx.windowListeners.touchend({
     cancelable: true,
     preventDefault: function preventDefault() {},
-    target: createNode({ id: "timer-panel", tagName: "DIV" }),
+    target: eventTargetNode({ id: "timer-panel", tagName: "DIV" }),
   });
 
   assert(ctx.calls.includes("shortcut:toggle"), "expected minimal touchend to toggle timer");
@@ -425,7 +367,7 @@ test("clicking outside open minimal panel closes it without toggling timer", fun
     preventDefault: function preventDefault() {
       ctx.calls.push("prevent-default");
     },
-    target: createNode({ id: "timer-panel", tagName: "DIV" }),
+    target: eventTargetNode({ id: "timer-panel", tagName: "DIV" }),
   });
 
   assert(
@@ -441,7 +383,7 @@ test("clicking outside open minimal panel closes it without toggling timer", fun
 
 test("pointer release closes open minimal panel without toggling timer", function () {
   const ctx = bindWithBrowserStubs();
-  const target = createNode({ id: "timer-panel", tagName: "DIV" });
+  const target = eventTargetNode({ id: "timer-panel", tagName: "DIV" });
   ctx.documentElement.setAttribute("data-minimal-mode", "true");
   ctx.dom.controls.exitMinimalModeWrap.setAttribute("data-open", "true");
   ctx.windowListeners.pointerup({ button: 0, target });
@@ -477,7 +419,7 @@ test("restarting from minimal panel resets without toggling timer", function () 
 
 test("clicking exit panel in minimal mode does not toggle timer", function () {
   const ctx = bindWithBrowserStubs();
-  const exitTarget = createNode({ id: "minimal-exit-wrap" });
+  const exitTarget = eventTargetNode({ id: "minimal-exit-wrap" });
   ctx.documentElement.setAttribute("data-minimal-mode", "true");
   ctx.windowListeners.pointerup({ button: 0, target: exitTarget });
 

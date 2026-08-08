@@ -1,6 +1,7 @@
 const AppController = require("../app-controller.js");
 const Core = require("../core.js");
 const Content = require("../content.js");
+const { createBrowserFixture, eventTargetNode } = require("./helpers/dom.js");
 const assert = require("node:assert/strict");
 const test = require("node:test");
 
@@ -10,51 +11,43 @@ function flushPromises() {
   });
 }
 
-function createNode(value) {
-  return {
-    textContent: "",
-    value: value == null ? "" : String(value),
-    checked: false,
-  };
-}
-
 function createDom() {
   return {
     controls: {
-      activateDisplayModes: createNode(),
+      activateDisplayModes: eventTargetNode(),
     },
     copy: {
-      phaseSettingsHeading: createNode(),
-      blocks: createNode(),
-      prepEnabled: createNode(),
-      autoStart: createNode(),
-      soundEnabled: createNode(),
-      quietModeEnabled: createNode(),
-      fullscreenEnabled: createNode(),
-      minimalModeEnabled: createNode(),
-      wakeLockEnabled: createNode(),
+      phaseSettingsHeading: eventTargetNode(),
+      blocks: eventTargetNode(),
+      prepEnabled: eventTargetNode(),
+      autoStart: eventTargetNode(),
+      soundEnabled: eventTargetNode(),
+      quietModeEnabled: eventTargetNode(),
+      fullscreenEnabled: eventTargetNode(),
+      minimalModeEnabled: eventTargetNode(),
+      wakeLockEnabled: eventTargetNode(),
       phaseLabels: {
-        prep: createNode(),
-        focus: createNode(),
-        recall: createNode(),
-        break: createNode(),
-        long_break: createNode(),
+        prep: eventTargetNode(),
+        focus: eventTargetNode(),
+        recall: eventTargetNode(),
+        break: eventTargetNode(),
+        long_break: eventTargetNode(),
       },
     },
     fields: {
-      prep: createNode(2),
-      focus: createNode(45),
-      recall: createNode(3),
-      break: createNode(15),
-      long_break: createNode(25),
-      blocks_per_ultradian: createNode(2),
-      prep_enabled: createNode(),
-      auto_start: createNode(),
-      sound_enabled: createNode(),
-      quiet_mode_enabled: createNode(),
-      fullscreen_enabled: createNode(),
-      minimal_mode_enabled: createNode(),
-      wake_lock_enabled: createNode(),
+      prep: eventTargetNode({ value: 2 }),
+      focus: eventTargetNode({ value: 45 }),
+      recall: eventTargetNode({ value: 3 }),
+      break: eventTargetNode({ value: 15 }),
+      long_break: eventTargetNode({ value: 25 }),
+      blocks_per_ultradian: eventTargetNode({ value: 2 }),
+      prep_enabled: eventTargetNode(),
+      auto_start: eventTargetNode(),
+      sound_enabled: eventTargetNode(),
+      quiet_mode_enabled: eventTargetNode(),
+      fullscreen_enabled: eventTargetNode(),
+      minimal_mode_enabled: eventTargetNode(),
+      wake_lock_enabled: eventTargetNode(),
     },
   };
 }
@@ -77,39 +70,26 @@ function setup(options) {
   const audioCalls = [];
   const transitionCalls = [];
   const historyCalls = [];
-  const windowListeners = {};
-  const documentListeners = {};
-
-  global.document = {
-    fullscreenElement: null,
-    visibilityState: "visible",
-    documentElement: {
-      attrs: {},
-      setAttribute: function setAttribute(name, value) {
-        this.attrs[name] = String(value);
-      },
-      removeAttribute: function removeAttribute(name) {
-        delete this.attrs[name];
-      },
-      hasAttribute: function hasAttribute(name) {
-        return Object.prototype.hasOwnProperty.call(this.attrs, name);
-      },
-      requestFullscreen: function requestFullscreen() {
-        fullscreenRequests.push(true);
-        if (config.rejectFullscreen) {
-          return Promise.reject(new Error("fullscreen unavailable"));
-        }
-        return Promise.resolve();
-      },
+  const browser = createBrowserFixture({
+    requestFullscreen: function requestFullscreen() {
+      fullscreenRequests.push(true);
+      if (config.rejectFullscreen) {
+        return Promise.reject(new Error("fullscreen unavailable"));
+      }
+      return Promise.resolve();
     },
     exitFullscreen: function exitFullscreen() {
       fullscreenRequests.push(false);
       return Promise.resolve();
     },
-    addEventListener: function addEventListener(type, handler) {
-      documentListeners[type] = handler;
+    pushState: function pushState(state, title) {
+      historyCalls.push({ type: "pushState", state, title });
     },
-  };
+    back: function back() {
+      historyCalls.push({ type: "back" });
+    },
+  });
+  global.document = browser.document;
 
   const controls = {
     bindControls: function bindControls(handlers) {
@@ -134,20 +114,6 @@ function setup(options) {
     },
     focusMinimalModeReveal: function focusMinimalModeReveal() {},
     focusPrimaryAction: function focusPrimaryAction() {},
-  };
-
-  const windowRef = {
-    history: {
-      pushState: function pushState(state, title) {
-        historyCalls.push({ type: "pushState", state, title });
-      },
-      back: function back() {
-        historyCalls.push({ type: "back" });
-      },
-    },
-    addEventListener: function addEventListener(type, handler) {
-      windowListeners[type] = handler;
-    },
   };
 
   const render = {
@@ -260,7 +226,7 @@ function setup(options) {
       },
     },
     dom,
-    windowRef,
+    windowRef: browser.window,
   });
 
   app.controller.initialize();
@@ -276,8 +242,8 @@ function setup(options) {
     audioCalls,
     transitionCalls,
     historyCalls,
-    windowListeners,
-    documentListeners,
+    windowListeners: browser.windowListeners,
+    documentListeners: browser.documentListeners,
   };
 }
 

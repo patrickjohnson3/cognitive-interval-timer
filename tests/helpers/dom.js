@@ -1,10 +1,91 @@
-function textNode() {
+function eventTargetNode(options) {
+  const config = options || {};
+  const attributes = {};
+  const listeners = {};
+
   return {
+    id: config.id || "",
+    tagName: config.tagName || "BUTTON",
+    type: config.type || "button",
     textContent: "",
-    attributes: {},
-    setAttribute: function setAttribute(name, value) {
-      this.attributes[name] = String(value);
+    value: config.value == null ? "" : String(config.value),
+    checked: Boolean(config.checked),
+    hidden: Boolean(config.hidden),
+    isContentEditable: false,
+    attributes,
+    attrs: attributes,
+    listeners,
+    focusCount: 0,
+    addEventListener: function addEventListener(type, handler) {
+      listeners[type] = handler;
     },
+    focus: function focus() {
+      this.focusCount += 1;
+    },
+    blur: function blur() {
+      this.blurCount = (this.blurCount || 0) + 1;
+    },
+    checkValidity: function checkValidity() {
+      return true;
+    },
+    getAttribute: function getAttribute(name) {
+      return attributes[name];
+    },
+    setAttribute: function setAttribute(name, value) {
+      attributes[name] = String(value);
+    },
+    removeAttribute: function removeAttribute(name) {
+      delete attributes[name];
+    },
+    hasAttribute: function hasAttribute(name) {
+      return Object.prototype.hasOwnProperty.call(attributes, name);
+    },
+    closest: function closest(selector) {
+      return selector === "#" + this.id ? this : null;
+    },
+  };
+}
+
+function textNode() {
+  return eventTargetNode({ tagName: "SPAN" });
+}
+
+function createBrowserFixture(options) {
+  const config = options || {};
+  const documentListeners = {};
+  const windowListeners = {};
+  const documentElement = eventTargetNode({ tagName: "HTML" });
+  if (config.requestFullscreen) documentElement.requestFullscreen = config.requestFullscreen;
+
+  const documentRef = {
+    activeElement: null,
+    documentElement,
+    fullscreenElement: null,
+    visibilityState: config.visibilityState || "visible",
+    addEventListener: function addEventListener(type, handler) {
+      documentListeners[type] = handler;
+    },
+  };
+  if (config.exitFullscreen) documentRef.exitFullscreen = config.exitFullscreen;
+
+  const windowRef = {
+    history: {
+      pushState: config.pushState || function pushState() {},
+      back: config.back || function back() {},
+    },
+    addEventListener: function addEventListener(type, handler) {
+      windowListeners[type] = handler;
+    },
+  };
+  if (config.pointerEvents) windowRef.PointerEvent = function PointerEvent() {};
+  if (config.touchEvents) windowRef.TouchEvent = function TouchEvent() {};
+
+  return {
+    document: documentRef,
+    window: windowRef,
+    documentElement,
+    documentListeners,
+    windowListeners,
   };
 }
 
@@ -55,7 +136,9 @@ function createElementFactory(nodes) {
 }
 
 module.exports = {
+  createBrowserFixture,
   controlButtonNode,
   createElementFactory,
+  eventTargetNode,
   textNode,
 };
