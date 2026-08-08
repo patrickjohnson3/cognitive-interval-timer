@@ -136,6 +136,7 @@ Minimal mode:
 - Centers the phase name, timer, and phase tagline, with an unobtrusive controls handle and brief phase-transition messages
 - Requests fullscreen when enabled
 - Can be exited with `Esc` or the bottom controls drawer
+- Saved Minimal Mode and Fullscreen preferences do not automatically activate when the app starts; browser user activation is required
 
 PWA install/offline behavior:
 
