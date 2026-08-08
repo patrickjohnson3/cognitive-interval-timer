@@ -175,7 +175,9 @@ function setup(options) {
         timerCalls.push("pause");
       },
       skip: function skip() {},
-      reset: function reset() {},
+      reset: function reset() {
+        timerCalls.push("reset");
+      },
       resetToPhase: function resetToPhase(phase) {
         timerCalls.push("resetToPhase:" + phase);
       },
@@ -369,6 +371,7 @@ test("primary action pauses while timer is running", function () {
 
   assert(ctx.timerCalls.includes("pause"), "expected primary action to pause timer");
   assert(ctx.hapticCalls.includes("tap"), "expected pause haptic tap");
+  assert(ctx.announcementCalls.includes("timer_paused"));
 });
 
 test("primary action resumes while timer is paused", function () {
@@ -378,6 +381,15 @@ test("primary action resumes while timer is paused", function () {
 
   assert(ctx.timerCalls.includes("start"), "expected primary action to resume timer");
   assert(ctx.hapticCalls.includes("tap"), "expected resume haptic tap");
+  assert(ctx.announcementCalls.includes("timer_resumed"));
+});
+
+test("restart announces the reset timer state", function () {
+  const ctx = setup();
+  ctx.boundHandlers.onReset();
+
+  assert(ctx.timerCalls.includes("reset"));
+  assert(ctx.announcementCalls.includes("block_restarted"));
 });
 
 test("phase changes trigger phase haptic feedback", function () {

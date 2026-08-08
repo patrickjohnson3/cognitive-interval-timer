@@ -47,6 +47,15 @@
       if (type === "wake_lock_request_failed") {
         return announcements.wakeLockRequestFailed || "The screen could not be kept awake.";
       }
+      if (type === "timer_paused") {
+        return announcements.timerPaused || "Timer paused.";
+      }
+      if (type === "timer_resumed") {
+        return announcements.timerResumed || "Timer resumed.";
+      }
+      if (type === "block_restarted") {
+        return announcements.blockRestarted || "Block restarted.";
+      }
       return "";
     }
 

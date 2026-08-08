@@ -62,3 +62,11 @@ test("platform failures have readable announcements", function () {
   assert.match(a11y.formatAnnouncement("wake_lock_unavailable"), /not supported/);
   assert.match(a11y.formatAnnouncement("wake_lock_request_failed"), /could not be kept awake/);
 });
+
+test("timer actions have concise status announcements", function () {
+  const a11y = A11y.create({ Content });
+
+  assert.equal(a11y.formatAnnouncement("timer_paused"), "Timer paused.");
+  assert.equal(a11y.formatAnnouncement("timer_resumed"), "Timer resumed.");
+  assert.equal(a11y.formatAnnouncement("block_restarted"), "Block restarted.");
+});

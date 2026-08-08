@@ -96,6 +96,9 @@
       wakeLockUnavailable: "Keep Screen Awake is not supported in this browser.",
       wakeLockRequestFailed:
         "The screen could not be kept awake. Minimal and fullscreen modes remain available.",
+      timerPaused: "Timer paused.",
+      timerResumed: "Timer resumed.",
+      blockRestarted: "Block restarted.",
     },
     pwa: {
       installCopy: "Install for offline use.",

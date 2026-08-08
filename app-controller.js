@@ -253,15 +253,19 @@
 
     function start() {
       return ensureSessionAccess(function startTimer() {
+        const wasPaused = appState.timer.status === Core.STATUS.PAUSED;
         tapFeedback();
         timer.start();
+        if (wasPaused) announce.announce(a11y.formatAnnouncement("timer_resumed"));
       });
     }
 
     function pause() {
       return ensureSessionAccess(function pauseTimer() {
+        const wasRunning = appState.timer.status === Core.STATUS.RUNNING;
         tapFeedback();
         timer.pause();
+        if (wasRunning) announce.announce(a11y.formatAnnouncement("timer_paused"));
       });
     }
 
@@ -277,6 +281,7 @@
         tapFeedback();
         timer.reset();
         sessionLock.release();
+        announce.announce(a11y.formatAnnouncement("block_restarted"));
       });
     }
 
