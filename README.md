@@ -138,7 +138,7 @@ PWA install/offline behavior:
 - Browsers that support install prompts can show an in-settings `Install` card.
 - On iOS, the app shows in-settings guidance to use Share, then Add to Home Screen.
 - Installed or previously opened sessions can load the cached app shell offline.
-- In installed display modes, a waiting service worker shows `A newer version is ready.` with an `Update` button; clicking it activates the update and reloads.
+- In a browser tab or installed PWA, a waiting service worker shows `A newer version is ready.` with an `Update` button; clicking it activates the update and reloads.
 - Offline support covers local app assets. User settings and stats still persist in `localStorage`.
 
 Phase (minutes):
