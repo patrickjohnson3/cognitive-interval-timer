@@ -55,10 +55,21 @@
         const promptEvent = deferredInstallPrompt;
         deferredInstallPrompt = null;
         removeInstallCard();
-        promptEvent.prompt();
-        promptEvent.userChoice.catch(function ignoreInstallChoiceError() {});
+        try {
+          promptEvent.prompt();
+          Promise.resolve(promptEvent.userChoice)
+            .catch(function ignoreInstallChoiceError() {})
+            .then(focusSettingsAfterInstallPrompt);
+        } catch {
+          focusSettingsAfterInstallPrompt();
+        }
       },
     });
+  }
+
+  function focusSettingsAfterInstallPrompt() {
+    const themeControl = document.getElementById("theme");
+    if (themeControl && typeof themeControl.focus === "function") themeControl.focus();
   }
 
   function showIOSInstallGuidance() {

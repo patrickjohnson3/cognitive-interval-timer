@@ -32,6 +32,9 @@
       const copy = doc.createElement("p");
       copy.className = "pwa-prompt-copy";
       copy.textContent = copyText;
+      copy.setAttribute("role", "status");
+      copy.setAttribute("aria-live", "polite");
+      copy.setAttribute("aria-atomic", "true");
 
       card.appendChild(copy);
       return card;

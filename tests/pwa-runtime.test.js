@@ -163,6 +163,13 @@ function loadPWA(options) {
     },
   };
   nodes[slot.id] = slot;
+  nodes.theme = {
+    id: "theme",
+    focusCount: 0,
+    focus: function focus() {
+      this.focusCount += 1;
+    },
+  };
 
   const registration = config.registration || {};
   const navigatorRef = {
@@ -260,6 +267,8 @@ test("PWA update prompt renders in settings slot and posts skip-waiting", async 
     card.children[0].textContent === "A newer version is ready.",
     "expected update prompt copy"
   );
+  assert.equal(card.children[0].attributes.role, "status");
+  assert.equal(card.children[0].attributes["aria-live"], "polite");
   assert(button && button.textContent === "Update", "expected update button");
 
   button.listeners.click();
@@ -390,6 +399,24 @@ test("PWA unsupported browser renders a visible status card", async function () 
     card.children[0].textContent === "Offline support is unavailable in this browser.",
     "expected unsupported browser copy"
   );
+});
+
+test("install prompt returns focus to settings after the browser choice", async function () {
+  let promptCalls = 0;
+  const runtime = loadPWA();
+  runtime.listeners["window:beforeinstallprompt"]({
+    preventDefault: function preventDefault() {},
+    prompt: function prompt() {
+      promptCalls += 1;
+    },
+    userChoice: Promise.resolve({ outcome: "dismissed" }),
+  });
+
+  runtime.nodes["pwa-install-button"].listeners.click();
+  await flushPromises();
+
+  assert.equal(promptCalls, 1);
+  assert.equal(runtime.nodes.theme.focusCount, 1);
 });
 
 test("service worker deletes only this app's old caches", async function () {
