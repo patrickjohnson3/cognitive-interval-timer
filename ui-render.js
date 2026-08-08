@@ -62,6 +62,19 @@
       dom.controls.activateDisplayModes.hidden = !available;
     }
 
+    function setSettingField(key, value) {
+      const descriptor = Core.SETTING_FIELDS.find(function findSetting(candidate) {
+        return candidate.key === key;
+      });
+      if (descriptor.type === "boolean") dom.fields[key].checked = value;
+      else dom.fields[key].value = value;
+    }
+
+    function setMinimalModeActive(active) {
+      if (active) document.documentElement.setAttribute("data-minimal-mode", "true");
+      else document.documentElement.removeAttribute("data-minimal-mode");
+    }
+
     function buildView(state) {
       const statusKey = state.timer.status;
       const sessionStarted = statusKey !== Core.STATUS.IDLE;
@@ -142,6 +155,8 @@
       hydrateTheme,
       hydrateSettingsForm,
       setDisplayActivationAvailable,
+      setSettingField,
+      setMinimalModeActive,
       render,
     };
   }

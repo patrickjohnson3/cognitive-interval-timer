@@ -65,7 +65,6 @@
     haptics: haptics,
     wakeLock: wakeLock,
     a11y: a11y,
-    dom: dom,
   });
 
   app.controller.initialize();

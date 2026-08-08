@@ -9,7 +9,13 @@ function resetDocument() {
     title: "",
     nodes: {},
     documentElement: {
-      setAttribute: function setAttribute() {},
+      attrs: {},
+      setAttribute: function setAttribute(name, value) {
+        this.attrs[name] = String(value);
+      },
+      removeAttribute: function removeAttribute(name) {
+        delete this.attrs[name];
+      },
     },
     querySelectorAll: function querySelectorAll() {
       return [];
@@ -176,6 +182,21 @@ test("saved display activation control reflects availability", function () {
   assert.equal(deps.dom.controls.activateDisplayModes.hidden, false);
   render.setDisplayActivationAvailable(false);
   assert.equal(deps.dom.controls.activateDisplayModes.hidden, true);
+});
+
+test("renderer owns display field and minimal-mode DOM updates", function () {
+  const deps = createDeps();
+  deps.Core.SETTING_FIELDS = [{ key: "wake_lock_enabled", type: "boolean" }];
+  const render = UIRender.create(deps);
+
+  render.setSettingField("wake_lock_enabled", true);
+  render.setMinimalModeActive(true);
+
+  assert.equal(deps.dom.fields.wake_lock_enabled.checked, true);
+  assert.equal(global.document.documentElement.attrs["data-minimal-mode"], "true");
+
+  render.setMinimalModeActive(false);
+  assert.equal(global.document.documentElement.attrs["data-minimal-mode"], undefined);
 });
 
 test("static UI copy is hydrated by the renderer", function () {

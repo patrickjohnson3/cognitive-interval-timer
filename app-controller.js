@@ -19,9 +19,7 @@
     };
     const wakeLock = deps.wakeLock;
     const a11y = deps.a11y;
-    const dom = deps.dom;
     const doc = deps.documentRef || document;
-    const win = deps.windowRef || (typeof window !== "undefined" ? window : null);
 
     const appState = {
       settings: Core.normalizeSettings(null),
@@ -43,12 +41,15 @@
 
     let lastSavedStats = null;
     let lastSavedTimer = null;
-    let minimalModeHistoryActive = false;
-    let wakeLockBeforeMinimalMode = null;
-    let wakeLockRequestId = 0;
-    const fullscreenService = DisplayServices.createFullscreenService({
+    const displayModes = DisplayServices.createDisplayModeService({
       documentRef: doc,
-      onUnavailable: reconcileFullscreenUnavailable,
+      windowRef: deps.windowRef,
+      wakeLock: wakeLock,
+      onMinimalModeChange: renderMinimalModeState,
+      onMinimalModeExited: reconcileMinimalModeExited,
+      onFullscreenExited: reconcileFullscreenExited,
+      onFullscreenUnavailable: reconcileFullscreenUnavailable,
+      onWakeLockUnavailable: reconcileWakeLockUnavailable,
     });
     const timer =
       deps.timer ||
@@ -108,7 +109,7 @@
         onExitMinimalMode,
       });
 
-      bindMinimalModeHistory();
+      displayModes.bind();
       bindTimerVisibility();
       applySettingsSideEffects({ hydrateForm: false, activateDisplayModes: false });
       timer.startTicker();
@@ -312,12 +313,14 @@
         appState.draftSettings = Object.assign({}, appState.settings);
       }
       if (!config.activateDisplayModes) {
-        applyWakeLockSetting(appState.settings.wake_lock_enabled);
+        displayModes.setWakeLock(appState.settings.wake_lock_enabled);
       } else if (appState.settings.minimal_mode_enabled) {
-        applyMinimalModeSetting(true, appState.settings);
+        displayModes.setMinimalMode(true, appState.settings);
+      } else if (displayModes.isMinimalModeActive()) {
+        displayModes.setMinimalMode(false, appState.settings);
       } else {
-        applyWakeLockSetting(appState.settings.wake_lock_enabled);
-        applyMinimalModeSetting(false, appState.settings);
+        displayModes.setWakeLock(appState.settings.wake_lock_enabled);
+        displayModes.setFullscreen(appState.settings.fullscreen_enabled);
       }
 
       const initialPhase = Core.initialPhase(appState.settings);
@@ -334,39 +337,31 @@
 
     function onFullscreenToggle(enabled) {
       if (enabled) {
-        dom.fields.wake_lock_enabled.checked = true;
+        render.setSettingField("wake_lock_enabled", true);
         updateDraftFromForm();
-        applyWakeLockSetting(true);
+        displayModes.setWakeLock(true);
       }
-      return applyFullscreenSetting(enabled);
+      return displayModes.setFullscreen(enabled);
     }
 
     function onFullscreenChange(isFullscreen) {
-      if (isFullscreen) return;
-      if (doc.documentElement.hasAttribute("data-minimal-mode")) {
-        if (dom.fields.fullscreen_enabled.checked) {
-          dom.fields.fullscreen_enabled.checked = false;
-          updateDraftFromForm();
-        }
-        onExitMinimalMode({ restoreFullscreen: false });
-        return;
-      }
-      if (!dom.fields.fullscreen_enabled.checked) return;
-      dom.fields.fullscreen_enabled.checked = false;
-      onSettingsInput(controls.readSettingsForm());
+      displayModes.handleFullscreenChange(isFullscreen);
     }
 
     function onMinimalModeToggle(enabled) {
+      let wakeLockBeforeMinimal = null;
       if (enabled) {
-        rememberWakeLockBeforeMinimalMode();
-        dom.fields.wake_lock_enabled.checked = true;
+        wakeLockBeforeMinimal = controls.readSettingsForm().wake_lock_enabled;
+        render.setSettingField("wake_lock_enabled", true);
         updateDraftFromForm();
       }
-      return applyMinimalModeSetting(enabled);
+      return displayModes.setMinimalMode(enabled, appState.draftSettings, {
+        wakeLockBeforeMinimal: wakeLockBeforeMinimal,
+      });
     }
 
     function onWakeLockToggle(enabled) {
-      return applyWakeLockSetting(enabled);
+      return displayModes.setWakeLock(enabled);
     }
 
     function savedDisplayModeNeedsActivation() {
@@ -390,17 +385,33 @@
     }
 
     function onExitMinimalMode(options) {
-      if (!doc.documentElement.hasAttribute("data-minimal-mode")) return;
-      dom.fields.minimal_mode_enabled.checked = false;
+      if (!displayModes.isMinimalModeActive()) return;
+      render.setSettingField("minimal_mode_enabled", false);
+      displayModes.setMinimalMode(false, appState.draftSettings, options);
       updateDraftFromForm();
-      applyMinimalModeSetting(false, null, options);
       onStateChange();
     }
 
+    function renderMinimalModeState(active, restoredWakeLock) {
+      render.setMinimalModeActive(active);
+      if (!active) render.setSettingField("wake_lock_enabled", restoredWakeLock);
+    }
+
+    function reconcileMinimalModeExited() {
+      render.setSettingField("minimal_mode_enabled", false);
+      updateDraftFromForm();
+      onStateChange();
+    }
+
+    function reconcileFullscreenExited() {
+      const settings = controls.readSettingsForm();
+      if (!settings.fullscreen_enabled) return;
+      render.setSettingField("fullscreen_enabled", false);
+      onSettingsInput(controls.readSettingsForm());
+    }
+
     function reconcileFullscreenUnavailable() {
-      if (dom.fields.fullscreen_enabled.checked) {
-        dom.fields.fullscreen_enabled.checked = false;
-      }
+      render.setSettingField("fullscreen_enabled", false);
 
       if (appState.settings.fullscreen_enabled) {
         appState.settings = Core.normalizeSettings(
@@ -414,9 +425,7 @@
     }
 
     function reconcileWakeLockUnavailable() {
-      if (dom.fields.wake_lock_enabled.checked) {
-        dom.fields.wake_lock_enabled.checked = false;
-      }
+      render.setSettingField("wake_lock_enabled", false);
 
       if (appState.settings.wake_lock_enabled) {
         appState.settings = Core.normalizeSettings(
@@ -431,43 +440,6 @@
       onStateChange();
     }
 
-    function applyFullscreenSetting(enabled) {
-      return fullscreenService.setEnabled(enabled);
-    }
-
-    function applyWakeLockSetting(enabled) {
-      const currentRequestId = ++wakeLockRequestId;
-      if (!wakeLock || typeof wakeLock.setEnabled !== "function") {
-        if (enabled) reconcileWakeLockUnavailable();
-        return Promise.resolve(false);
-      }
-      return Promise.resolve(wakeLock.setEnabled(enabled)).then(function reconcileWakeLock(result) {
-        const unsupported =
-          typeof wakeLock.isSupported === "function" && wakeLock.isSupported() === false;
-        if (currentRequestId === wakeLockRequestId && enabled && result === false && unsupported) {
-          reconcileWakeLockUnavailable();
-        }
-        return result;
-      });
-    }
-
-    function bindMinimalModeHistory() {
-      if (!win || typeof win.addEventListener !== "function") return;
-      win.addEventListener("popstate", function onMinimalModePopState() {
-        if (!doc.documentElement.hasAttribute("data-minimal-mode")) {
-          minimalModeHistoryActive = false;
-          return;
-        }
-
-        minimalModeHistoryActive = false;
-        dom.fields.minimal_mode_enabled.checked = false;
-        restoreWakeLockAfterMinimalMode();
-        updateDraftFromForm();
-        applyMinimalModeSetting(false, null, { updateHistory: false });
-        onStateChange();
-      });
-    }
-
     function bindTimerVisibility() {
       if (!doc || typeof doc.addEventListener !== "function" || !timer.setSuspended) return;
       function syncTimerVisibility() {
@@ -475,67 +447,6 @@
       }
       doc.addEventListener("visibilitychange", syncTimerVisibility);
       syncTimerVisibility();
-    }
-
-    function canUseHistory() {
-      return (
-        win &&
-        win.history &&
-        typeof win.history.pushState === "function" &&
-        typeof win.history.back === "function"
-      );
-    }
-
-    function enterMinimalModeHistory() {
-      if (minimalModeHistoryActive || !canUseHistory()) return;
-      try {
-        win.history.pushState({ appState: "minimal-mode" }, "");
-        minimalModeHistoryActive = true;
-      } catch {
-        minimalModeHistoryActive = false;
-      }
-    }
-
-    function exitMinimalModeHistory() {
-      if (!minimalModeHistoryActive || !canUseHistory()) {
-        minimalModeHistoryActive = false;
-        return;
-      }
-      minimalModeHistoryActive = false;
-      try {
-        win.history.back();
-      } catch {
-        // If history cleanup fails, the visible app state has still exited minimal mode.
-      }
-    }
-
-    function rememberWakeLockBeforeMinimalMode() {
-      if (doc.documentElement.hasAttribute("data-minimal-mode")) return;
-      wakeLockBeforeMinimalMode = Boolean(dom.fields.wake_lock_enabled.checked);
-    }
-
-    function restoreWakeLockAfterMinimalMode() {
-      if (wakeLockBeforeMinimalMode === null) return;
-      dom.fields.wake_lock_enabled.checked = wakeLockBeforeMinimalMode;
-      updateDraftFromForm();
-      applyWakeLockSetting(wakeLockBeforeMinimalMode);
-      wakeLockBeforeMinimalMode = null;
-    }
-
-    function applyMinimalModeSetting(enabled, rawSettings, options) {
-      const config = Object.assign({ updateHistory: true, restoreFullscreen: true }, options || {});
-      const settings = Core.normalizeSettings(rawSettings || appState.draftSettings);
-      if (enabled) {
-        doc.documentElement.setAttribute("data-minimal-mode", "true");
-        if (config.updateHistory) enterMinimalModeHistory();
-        applyWakeLockSetting(true);
-        return applyFullscreenSetting(true);
-      }
-
-      doc.documentElement.removeAttribute("data-minimal-mode");
-      if (config.updateHistory) exitMinimalModeHistory();
-      restoreWakeLockAfterMinimalMode();
-      return applyFullscreenSetting(config.restoreFullscreen && settings.fullscreen_enabled);
     }
 
     function saveSettings(rawSettings) {

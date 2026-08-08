@@ -162,6 +162,14 @@ function setup(options) {
     setDisplayActivationAvailable: function setDisplayActivationAvailable(available) {
       dom.controls.activateDisplayModes.hidden = !available;
     },
+    setSettingField: function setSettingField(key, value) {
+      if (typeof value === "boolean") dom.fields[key].checked = value;
+      else dom.fields[key].value = String(value);
+    },
+    setMinimalModeActive: function setMinimalModeActive(active) {
+      if (active) global.document.documentElement.setAttribute("data-minimal-mode", "true");
+      else global.document.documentElement.removeAttribute("data-minimal-mode");
+    },
     render: function render() {},
   };
 
@@ -615,9 +623,9 @@ test("Android fullscreen exit does not immediately re-enter saved fullscreen", f
 
 test("exiting minimal mode restores current fullscreen form state", function () {
   const ctx = setup();
-  global.document.documentElement.setAttribute("data-minimal-mode", "true");
   ctx.dom.fields.fullscreen_enabled.checked = true;
   ctx.dom.fields.minimal_mode_enabled.checked = true;
+  ctx.boundHandlers.onMinimalModeToggle(true);
 
   ctx.boundHandlers.onExitMinimalMode();
 
