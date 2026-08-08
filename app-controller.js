@@ -122,7 +122,7 @@
 
     function hydrateFromStorage() {
       const storedSettings = storage.getJSON(Core.STORAGE_KEYS.settings, Core.DEFAULT_SETTINGS);
-      appState.settings = normalizeAppSettings(storedSettings);
+      appState.settings = Core.normalizeSettings(storedSettings);
       appState.draftSettings = Object.assign({}, appState.settings);
 
       const storedStats = storage.getJSON(Core.STORAGE_KEYS.stats, {
@@ -204,10 +204,6 @@
       if (sameTimerSnapshot(lastSavedTimer, snapshot)) return;
       syncStorageWarning(storage.setJSON(Core.STORAGE_KEYS.timer, snapshot));
       lastSavedTimer = snapshot;
-    }
-
-    function normalizeAppSettings(rawSettings) {
-      return Core.normalizeSettings(rawSettings);
     }
 
     function quietModeIsEnabled() {
@@ -325,7 +321,7 @@
     }
 
     function onSettingsInput(rawSettings) {
-      const normalized = normalizeAppSettings(rawSettings);
+      const normalized = Core.normalizeSettings(rawSettings);
       appState.draftSettings = normalized;
       appState.ui.settingsDirty =
         !rawNumericSettingsAreValid(rawSettings, normalized) ||
@@ -565,7 +561,7 @@
 
     function applyMinimalModeSetting(enabled, rawSettings, options) {
       const config = Object.assign({ updateHistory: true, restoreFullscreen: true }, options || {});
-      const settings = normalizeAppSettings(rawSettings || appState.draftSettings);
+      const settings = Core.normalizeSettings(rawSettings || appState.draftSettings);
       if (enabled) {
         doc.documentElement.setAttribute("data-minimal-mode", "true");
         if (config.updateHistory) enterMinimalModeHistory();
@@ -583,7 +579,7 @@
       const previousSettings = appState.settings;
       const oldPhaseDuration = Core.phaseDurationSec(appState.timer.phase, previousSettings);
       const elapsedInPhase = Math.max(0, oldPhaseDuration - appState.timer.remainingSec);
-      const next = normalizeAppSettings(rawSettings);
+      const next = Core.normalizeSettings(rawSettings);
       appState.draftSettings = Object.assign({}, next);
 
       appState.settings = next;
@@ -604,7 +600,7 @@
     }
 
     function restoreDefaults() {
-      appState.settings = normalizeAppSettings(Core.DEFAULT_SETTINGS);
+      appState.settings = Core.normalizeSettings(Core.DEFAULT_SETTINGS);
       appState.draftSettings = Object.assign({}, appState.settings);
       persistSettings(appState.settings);
 
@@ -630,7 +626,7 @@
     }
 
     function updateDraftFromForm() {
-      appState.draftSettings = normalizeAppSettings(controls.readSettingsForm());
+      appState.draftSettings = Core.normalizeSettings(controls.readSettingsForm());
       appState.ui.settingsDirty = !sameSettings(appState.draftSettings, appState.settings);
     }
   }
