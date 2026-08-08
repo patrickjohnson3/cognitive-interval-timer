@@ -112,7 +112,7 @@
 
       bindMinimalModeHistory();
       bindTimerVisibility();
-      applySettingsSideEffects({ hydrateForm: false });
+      applySettingsSideEffects({ hydrateForm: false, activateDisplayModes: false });
       timer.startTicker();
       onStateChange();
     }
@@ -348,12 +348,17 @@
     }
 
     function applySettingsSideEffects(options) {
-      const config = Object.assign({ hydrateForm: true, correctPrepPhase: false }, options || {});
+      const config = Object.assign(
+        { hydrateForm: true, correctPrepPhase: false, activateDisplayModes: true },
+        options || {}
+      );
       if (config.hydrateForm) {
         render.hydrateSettingsForm(appState.settings);
         appState.draftSettings = Object.assign({}, appState.settings);
       }
-      if (appState.settings.minimal_mode_enabled) {
+      if (!config.activateDisplayModes) {
+        applyWakeLockSetting(appState.settings.wake_lock_enabled);
+      } else if (appState.settings.minimal_mode_enabled) {
         applyMinimalModeSetting(true, appState.settings);
       } else {
         applyWakeLockSetting(appState.settings.wake_lock_enabled);

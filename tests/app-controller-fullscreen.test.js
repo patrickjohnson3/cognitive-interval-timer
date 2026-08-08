@@ -446,21 +446,37 @@ test("fullscreen rejection clears fullscreen field", async function () {
   );
 });
 
-test("saved fullscreen is cleared when fullscreen request fails on startup", async function () {
+test("saved fullscreen remains a preference without activating on startup", async function () {
   const ctx = setup({
     rejectFullscreen: true,
     storedSettings: Core.normalizeSettings({ fullscreen_enabled: true, wake_lock_enabled: true }),
   });
 
   await flushPromises();
-  assert(ctx.fullscreenRequests.includes(true), "expected saved fullscreen to request fullscreen");
+  assert(ctx.fullscreenRequests.length === 0, "expected no startup fullscreen request");
   assert(
-    ctx.dom.fields.fullscreen_enabled.checked === false,
-    "expected fullscreen checkbox to clear"
+    ctx.dom.fields.fullscreen_enabled.checked === true,
+    "expected saved fullscreen preference to remain checked"
   );
   assert(
-    ctx.stored[Core.STORAGE_KEYS.settings].fullscreen_enabled === false,
-    "expected saved fullscreen to clear"
+    ctx.stored[Core.STORAGE_KEYS.settings].fullscreen_enabled === true,
+    "expected saved fullscreen preference to remain stored"
+  );
+});
+
+test("saved minimal mode remains a preference without activating on startup", function () {
+  const ctx = setup({
+    storedSettings: Core.normalizeSettings({ minimal_mode_enabled: true }),
+  });
+
+  assert(
+    !global.document.documentElement.hasAttribute("data-minimal-mode"),
+    "expected minimal mode not to activate on startup"
+  );
+  assert(ctx.fullscreenRequests.length === 0, "expected no startup fullscreen request");
+  assert(
+    ctx.dom.fields.minimal_mode_enabled.checked === true,
+    "expected saved minimal mode preference to remain checked"
   );
 });
 
