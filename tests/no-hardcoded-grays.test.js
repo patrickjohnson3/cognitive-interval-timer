@@ -1,20 +1,7 @@
 const fs = require("fs");
 const path = require("path");
-
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
-
-function test(name, fn) {
-  try {
-    fn();
-    console.log("PASS", name);
-  } catch (err) {
-    console.error("FAIL", name);
-    console.error("  " + err.message);
-    process.exitCode = 1;
-  }
-}
+const assert = require("node:assert/strict");
+const test = require("node:test");
 
 function stripThemeTokenBlocks(css) {
   return css
@@ -37,7 +24,3 @@ test("no hardcoded hex grays outside theme token declarations", function () {
   const matches = merged.match(/#[0-9a-fA-F]{6}/g) || [];
   assert(matches.length === 0, "found hardcoded hex colors: " + matches.join(", "));
 });
-
-if (!process.exitCode) {
-  console.log("All tests passed.");
-}

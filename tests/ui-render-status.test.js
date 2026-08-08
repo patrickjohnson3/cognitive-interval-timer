@@ -1,34 +1,24 @@
 const UIRender = require("../ui-render.js");
 const AppConfig = require("../app-config.js");
 const { controlButtonNode, textNode } = require("./helpers/dom.js");
+const assert = require("node:assert/strict");
+const test = require("node:test");
 
-global.document = {
-  title: "",
-  nodes: {},
-  documentElement: {
-    setAttribute: function setAttribute() {},
-  },
-  getElementById: function getElementById(id) {
-    return this.nodes[id] || null;
-  },
-};
-
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
-
-function test(name, fn) {
-  try {
-    fn();
-    console.log("PASS", name);
-  } catch (err) {
-    console.error("FAIL", name);
-    console.error("  " + err.message);
-    process.exitCode = 1;
-  }
+function resetDocument() {
+  global.document = {
+    title: "",
+    nodes: {},
+    documentElement: {
+      setAttribute: function setAttribute() {},
+    },
+    getElementById: function getElementById(id) {
+      return this.nodes[id] || null;
+    },
+  };
 }
 
 function createDeps() {
+  resetDocument();
   const dom = {
     state: textNode(),
     time: textNode(),
@@ -315,7 +305,3 @@ test("document title includes timer after timer has started", function () {
     "expected timer document title after first start"
   );
 });
-
-if (!process.exitCode) {
-  console.log("All tests passed.");
-}

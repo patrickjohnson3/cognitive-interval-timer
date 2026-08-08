@@ -1,33 +1,8 @@
 const AppController = require("../app-controller.js");
 const Core = require("../core.js");
 const Content = require("../content.js");
-
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
-
-function test(name, fn) {
-  try {
-    const result = fn();
-    if (result && typeof result.then === "function") {
-      result
-        .then(function asyncPass() {
-          console.log("PASS", name);
-        })
-        .catch(function asyncFail(err) {
-          console.error("FAIL", name);
-          console.error("  " + err.message);
-          process.exitCode = 1;
-        });
-      return;
-    }
-    console.log("PASS", name);
-  } catch (err) {
-    console.error("FAIL", name);
-    console.error("  " + err.message);
-    process.exitCode = 1;
-  }
-}
+const assert = require("node:assert/strict");
+const test = require("node:test");
 
 function flushPromises() {
   return new Promise(function resolveSoon(resolve) {

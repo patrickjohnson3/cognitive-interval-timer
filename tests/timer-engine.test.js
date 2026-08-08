@@ -1,20 +1,7 @@
 const Core = require("../core.js");
 const TimerEngine = require("../timer-engine.js");
-
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
-
-function test(name, fn) {
-  try {
-    fn();
-    console.log("PASS", name);
-  } catch (err) {
-    console.error("FAIL", name);
-    console.error("  " + err.message);
-    process.exitCode = 1;
-  }
-}
+const assert = require("node:assert/strict");
+const test = require("node:test");
 
 function createTimerContext() {
   const stateChanges = [];

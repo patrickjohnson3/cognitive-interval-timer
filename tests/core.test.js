@@ -1,21 +1,6 @@
 const Core = require("../core.js");
-
-function assert(condition, message) {
-  if (!condition) {
-    throw new Error(message);
-  }
-}
-
-function test(name, fn) {
-  try {
-    fn();
-    console.log("PASS", name);
-  } catch (err) {
-    console.error("FAIL", name);
-    console.error("  " + err.message);
-    process.exitCode = 1;
-  }
-}
+const assert = require("node:assert/strict");
+const test = require("node:test");
 
 test("nextPhase chooses long_break after ultradian threshold", function () {
   const settings = Core.normalizeSettings({ blocks_per_ultradian: 2 });
@@ -206,7 +191,3 @@ test("normalizeTimerState restores a persisted timer without elapsed wall time",
   assert(timer.remainingSec === 77, "expected remaining time to restore unchanged");
   assert(timer.lastTickMs === null, "expected a fresh wall-clock anchor");
 });
-
-if (!process.exitCode) {
-  console.log("All tests passed.");
-}

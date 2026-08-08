@@ -2,21 +2,8 @@ const fs = require("fs");
 const path = require("path");
 const { parseWorkflowYaml } = require("./helpers/workflow-yaml.js");
 const { DEPLOY_FILES, preparePagesArtifact } = require("../scripts/prepare-pages-artifact.js");
-
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
-
-function test(name, fn) {
-  try {
-    fn();
-    console.log("PASS", name);
-  } catch (err) {
-    console.error("FAIL", name);
-    console.error("  " + err.message);
-    process.exitCode = 1;
-  }
-}
+const assert = require("node:assert/strict");
+const test = require("node:test");
 
 function read(file) {
   return fs.readFileSync(path.join(__dirname, "..", file), "utf8");
@@ -150,7 +137,3 @@ test("Pages artifact uses an explicit runtime allowlist", function () {
   assert(DEPLOY_FILES.includes("index.html"), "expected index in deploy allowlist");
   assert(DEPLOY_FILES.includes("service-worker.js"), "expected service worker in deploy allowlist");
 });
-
-if (!process.exitCode) {
-  console.log("All tests passed.");
-}

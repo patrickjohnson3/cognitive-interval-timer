@@ -1,20 +1,7 @@
 const fs = require("fs");
 const path = require("path");
-
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
-
-function test(name, fn) {
-  try {
-    fn();
-    console.log("PASS", name);
-  } catch (err) {
-    console.error("FAIL", name);
-    console.error("  " + err.message);
-    process.exitCode = 1;
-  }
-}
+const assert = require("node:assert/strict");
+const test = require("node:test");
 
 function read(file) {
   return fs.readFileSync(path.join(__dirname, "..", file), "utf8");
@@ -148,7 +135,3 @@ test("narrow mobile layout has calmer reading spacing", function () {
     assert(mobileSection.includes(snippet), "missing mobile readability rule: " + snippet);
   });
 });
-
-if (!process.exitCode) {
-  console.log("All tests passed.");
-}

@@ -1,19 +1,6 @@
 const { parseThemeTokens } = require("./theme-utils");
-
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
-
-function test(name, fn) {
-  try {
-    fn();
-    console.log("PASS", name);
-  } catch (err) {
-    console.error("FAIL", name);
-    console.error("  " + err.message);
-    process.exitCode = 1;
-  }
-}
+const assert = require("node:assert/strict");
+const test = require("node:test");
 
 test("theme base text/background colors match expected values", function () {
   const themes = parseThemeTokens();
@@ -44,7 +31,3 @@ test("theme base text/background colors match expected values", function () {
     "dark long break accent must be #d97706"
   );
 });
-
-if (!process.exitCode) {
-  console.log("All tests passed.");
-}

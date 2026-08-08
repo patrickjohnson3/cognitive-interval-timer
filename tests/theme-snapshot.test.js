@@ -1,6 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 const { parseThemeTokens } = require("./theme-utils");
+const assert = require("node:assert/strict");
+const test = require("node:test");
 
 function stable(value) {
   if (Array.isArray(value)) return value.map(stable);
@@ -16,21 +18,6 @@ function stable(value) {
   return value;
 }
 
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
-
-function test(name, fn) {
-  try {
-    fn();
-    console.log("PASS", name);
-  } catch (err) {
-    console.error("FAIL", name);
-    console.error("  " + err.message);
-    process.exitCode = 1;
-  }
-}
-
 test("theme token snapshot stays stable", function () {
   const snapshotPath = path.join(__dirname, "__snapshots__", "theme-tokens.snapshot.json");
   const expected = JSON.parse(fs.readFileSync(snapshotPath, "utf8"));
@@ -40,7 +27,3 @@ test("theme token snapshot stays stable", function () {
     "theme token snapshot changed; update tests/__snapshots__/theme-tokens.snapshot.json if intentional"
   );
 });
-
-if (!process.exitCode) {
-  console.log("All tests passed.");
-}

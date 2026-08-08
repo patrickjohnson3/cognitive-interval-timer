@@ -23,7 +23,7 @@ const checks = [
   {
     name: "unit tests",
     command: NODE,
-    args: ["--test"].concat(TEST_FILES),
+    args: ["--test", "--test-isolation=none"].concat(TEST_FILES),
   },
   {
     name: "PWA offline smoke",

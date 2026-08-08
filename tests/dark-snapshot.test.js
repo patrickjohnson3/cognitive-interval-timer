@@ -1,21 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 const { parseThemeTokens } = require("./theme-utils");
-
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
-
-function test(name, fn) {
-  try {
-    fn();
-    console.log("PASS", name);
-  } catch (err) {
-    console.error("FAIL", name);
-    console.error("  " + err.message);
-    process.exitCode = 1;
-  }
-}
+const assert = require("node:assert/strict");
+const test = require("node:test");
 
 function stable(value) {
   if (Array.isArray(value)) return value.map(stable);
@@ -56,7 +43,3 @@ test("dark key token snapshot stays stable", function () {
     "dark snapshot changed; update tests/__snapshots__/dark-ui.snapshot.json if intentional"
   );
 });
-
-if (!process.exitCode) {
-  console.log("All tests passed.");
-}

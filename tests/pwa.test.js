@@ -3,21 +3,8 @@ const path = require("path");
 const appConfig = require("../app-config.js");
 const appShell = require("../app-shell-assets.js");
 const appVersion = require("../app-version.js");
-
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
-
-function test(name, fn) {
-  try {
-    fn();
-    console.log("PASS", name);
-  } catch (err) {
-    console.error("FAIL", name);
-    console.error("  " + err.message);
-    process.exitCode = 1;
-  }
-}
+const assert = require("node:assert/strict");
+const test = require("node:test");
 
 function readProjectFile(file) {
   return fs.readFileSync(path.join(__dirname, "..", file), "utf8");

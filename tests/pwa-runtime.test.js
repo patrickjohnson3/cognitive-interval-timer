@@ -2,34 +2,8 @@ const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 const { createElementFactory } = require("./helpers/dom.js");
-
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
-
-function test(name, fn) {
-  try {
-    const result = fn();
-    if (result && typeof result.then === "function") {
-      result
-        .then(function asyncPass() {
-          console.log("PASS", name);
-        })
-        .catch(function asyncFail(err) {
-          console.error("FAIL", name);
-          console.error("  " + err.message);
-          process.exitCode = 1;
-        });
-      return;
-    }
-
-    console.log("PASS", name);
-  } catch (err) {
-    console.error("FAIL", name);
-    console.error("  " + err.message);
-    process.exitCode = 1;
-  }
-}
+const assert = require("node:assert/strict");
+const test = require("node:test");
 
 function readProjectFile(file) {
   return fs.readFileSync(path.join(__dirname, "..", file), "utf8");
@@ -498,7 +472,3 @@ test("service worker returns 503 for uncached offline assets", async function ()
 
   assert(response.status === 503, "expected offline asset 503 response");
 });
-
-if (!process.exitCode) {
-  console.log("All tests passed.");
-}

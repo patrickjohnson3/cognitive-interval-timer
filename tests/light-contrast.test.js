@@ -1,19 +1,6 @@
 const { parseThemeTokens, contrastRatio } = require("./theme-utils");
-
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
-
-function test(name, fn) {
-  try {
-    fn();
-    console.log("PASS", name);
-  } catch (err) {
-    console.error("FAIL", name);
-    console.error("  " + err.message);
-    process.exitCode = 1;
-  }
-}
+const assert = require("node:assert/strict");
+const test = require("node:test");
 
 test("light contrast ratios meet minimum thresholds for key pairs", function () {
   const light = parseThemeTokens().light;
@@ -34,7 +21,3 @@ test("light contrast ratios meet minimum thresholds for key pairs", function () 
     );
   });
 });
-
-if (!process.exitCode) {
-  console.log("All tests passed.");
-}
