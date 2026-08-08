@@ -23,13 +23,13 @@ Use 2-space indentation, LF endings, UTF-8, and final newlines per `.editorconfi
 
 ## Architecture Overview
 
-`core.js` and `timer-engine.js` own timer state and phase rules. `app-controller.js` coordinates storage, audio, haptics, fullscreen, wake lock, and rendering. `ui-render.js` updates output; `ui-controls.js` wires input.
-This project intentionally uses plain browser JavaScript with minimal dependencies and no runtime build step. Preserve that unless there is a deliberate architectural decision to change it.
-Keep ownership boundaries explicit: timer business logic belongs in `core.js` or `timer-engine.js`; rendering belongs in `ui-render.js`; DOM events belong in `ui-controls.js`; cross-cutting side effects belong in `app-controller.js`. Do not move timer logic into rendering or DOM event handlers.
+`core.js` owns phase rules and state normalization; `timer-engine.js` owns elapsed-time execution. `content.js` owns user-facing phase labels and guidance. `app-controller.js` coordinates storage, audio, haptics, display modes, wake lock, and rendering. `ui-render.js` updates output; `ui-controls.js` wires input. PWA registration/prompts live in `pwa.js` and `pwa-prompts.js`; caching belongs to `service-worker.js`.
+This project intentionally uses plain browser JavaScript with minimal dependencies and no runtime build step. Pages deployment only stamps and copies a static artifact. Preserve that unless there is a deliberate architectural decision to change it.
+Keep ownership boundaries explicit: timer business logic belongs in `core.js` or `timer-engine.js`; copy belongs in `content.js`; rendering belongs in `ui-render.js`; DOM events belong in `ui-controls.js`; cross-cutting side effects belong in `app-controller.js`. Do not move timer logic into rendering, copy, or DOM event handlers.
 
 ## Testing Guidelines
 
-`npm test` uses Node’s runner; many files define local `test()` and `assert()` helpers. Add tests for behavior changes, especially timer state, PWA behavior, accessibility, mobile layout, and service-worker caching. Test files use `tests/<area>.test.js`. CSS regressions often assert selectors or token usage.
+`npm test` uses `node:test` with strict assertions. Add tests for behavior changes, especially timer state, PWA behavior, accessibility, mobile layout, and service-worker caching. Test files use `tests/<area>.test.js`; rendered layout and offline behavior belong in `tests/pwa-offline-smoke.js` rather than source-string assertions.
 Changes affecting startup, asset loading, or caching should be tested with the service worker enabled, not only in a fresh browser session.
 
 ## Accessibility Expectations
