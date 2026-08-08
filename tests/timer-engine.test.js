@@ -60,3 +60,16 @@ test("reset returns timer to idle primary-action state", function () {
   assert(ctx.stateChanges.length === 1, "expected reset to notify state change");
   assert(ctx.phaseChanges.length === 0, "expected reset not to announce phase change");
 });
+
+test("suspension discards hidden elapsed time", function () {
+  const ctx = createTimerContext();
+  ctx.timer.setSuspended(true);
+  assert(ctx.state.timer.lastTickMs === null, "expected suspension to clear the wall-clock anchor");
+
+  ctx.timer.setSuspended(false);
+  assert(
+    typeof ctx.state.timer.lastTickMs === "number",
+    "expected resume to establish a fresh wall-clock anchor"
+  );
+  assert(ctx.state.stats.focusBlocksToday === 0, "expected no focus completion while suspended");
+});

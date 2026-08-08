@@ -97,9 +97,11 @@ function setup(options) {
   const transitionCalls = [];
   const historyCalls = [];
   const windowListeners = {};
+  const documentListeners = {};
 
   global.document = {
     fullscreenElement: null,
+    visibilityState: "visible",
     documentElement: {
       attrs: {},
       setAttribute: function setAttribute(name, value) {
@@ -122,6 +124,9 @@ function setup(options) {
     exitFullscreen: function exitFullscreen() {
       fullscreenRequests.push(false);
       return Promise.resolve();
+    },
+    addEventListener: function addEventListener(type, handler) {
+      documentListeners[type] = handler;
     },
   };
 
@@ -198,6 +203,9 @@ function setup(options) {
       skip: function skip() {},
       reset: function reset() {},
       resetToPhase: function resetToPhase() {},
+      setSuspended: function setSuspended(suspended) {
+        timerCalls.push("suspended:" + suspended);
+      },
     },
     storage: {
       getJSON: function getJSON(key, fallback) {
@@ -269,6 +277,7 @@ function setup(options) {
     transitionCalls,
     historyCalls,
     windowListeners,
+    documentListeners,
   };
 }
 
@@ -278,6 +287,17 @@ test("primary action starts before timer has started", function () {
 
   assert(ctx.timerCalls.includes("start"), "expected primary action to start timer");
   assert(ctx.hapticCalls.includes("tap"), "expected primary action haptic tap");
+});
+
+test("document visibility freezes and resynchronizes the timer clock", function () {
+  const ctx = setup();
+  global.document.visibilityState = "hidden";
+  ctx.documentListeners.visibilitychange();
+  global.document.visibilityState = "visible";
+  ctx.documentListeners.visibilitychange();
+
+  assert(ctx.timerCalls.includes("suspended:true"), "expected hidden timer suspension");
+  assert(ctx.timerCalls.includes("suspended:false"), "expected visible timer resynchronization");
 });
 
 test("primary action pauses while timer is running", function () {

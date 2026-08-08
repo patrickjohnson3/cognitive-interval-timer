@@ -10,6 +10,7 @@
     const Core = config.Core;
     const hooks = config.hooks;
     let intervalId = null;
+    let suspended = false;
 
     function startTicker() {
       if (intervalId) clearInterval(intervalId);
@@ -94,7 +95,7 @@
     }
 
     function tick() {
-      if (state.timer.status !== Core.STATUS.RUNNING) return;
+      if (suspended || state.timer.status !== Core.STATUS.RUNNING) return;
 
       state.stats = Core.rolloverStats(state.stats, Core.dateKey());
       const now = Date.now();
@@ -142,6 +143,17 @@
       hooks.onStateChange();
     }
 
+    function setSuspended(nextSuspended) {
+      suspended = Boolean(nextSuspended);
+      if (suspended) {
+        state.timer.lastTickMs = null;
+        return;
+      }
+      if (state.timer.status === Core.STATUS.RUNNING) {
+        state.timer.lastTickMs = Date.now();
+      }
+    }
+
     return {
       startTicker,
       start,
@@ -150,6 +162,7 @@
       reset,
       resetToPhase,
       enterPhase,
+      setSuspended,
     };
   }
 

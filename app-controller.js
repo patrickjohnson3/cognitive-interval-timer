@@ -113,6 +113,7 @@
       });
 
       bindMinimalModeHistory();
+      bindTimerVisibility();
       applySettingsSideEffects({ hydrateForm: false });
       timer.startTicker();
       onStateChange();
@@ -436,6 +437,15 @@
         applyMinimalModeSetting(false, null, { updateHistory: false });
         onStateChange();
       });
+    }
+
+    function bindTimerVisibility() {
+      if (!doc || typeof doc.addEventListener !== "function" || !timer.setSuspended) return;
+      function syncTimerVisibility() {
+        timer.setSuspended(doc.visibilityState === "hidden");
+      }
+      doc.addEventListener("visibilitychange", syncTimerVisibility);
+      syncTimerVisibility();
     }
 
     function canUseHistory() {
