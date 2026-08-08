@@ -302,6 +302,24 @@ test("timer session state survives application initialization", function () {
   assert(ctx.app.state.timer.phase === Core.PHASE.RECALL, "expected recall phase to restore");
   assert(ctx.app.state.timer.focusBlockNumber === 2, "expected active block to restore");
   assert(ctx.app.state.timer.remainingSec === 42, "expected remaining time to restore");
+  assert.equal(ctx.stored[Core.STORAGE_KEYS.session].timer.remainingSec, 42);
+});
+
+test("timer settings and statistics persist as one coherent session", function () {
+  const ctx = setup();
+  ctx.app.state.settings.focus = 30;
+  ctx.app.state.stats.focusBlocksToday = 4;
+  ctx.app.state.timer.phase = Core.PHASE.RECALL;
+  ctx.app.state.timer.remainingSec = 25;
+
+  ctx.app.onStateChange();
+
+  const session = ctx.stored[Core.STORAGE_KEYS.session];
+  assert.equal(session.version, 1);
+  assert.equal(session.settings.focus, 30);
+  assert.equal(session.stats.focusBlocksToday, 4);
+  assert.equal(session.timer.phase, Core.PHASE.RECALL);
+  assert.equal(session.timer.remainingSec, 25);
 });
 
 test("timer persistence does not add time to a fractional countdown", function () {
@@ -309,7 +327,7 @@ test("timer persistence does not add time to a fractional countdown", function (
   ctx.app.state.timer.remainingSec = 41.25;
   ctx.app.onStateChange();
 
-  assert.equal(ctx.stored[Core.STORAGE_KEYS.timer].remainingSec, 41.25);
+  assert.equal(ctx.stored[Core.STORAGE_KEYS.session].timer.remainingSec, 41.25);
 });
 
 test("primary action pauses while timer is running", function () {
@@ -454,7 +472,7 @@ test("saving fullscreen preserves the explicit wake lock preference", function (
     wake_lock_enabled: false,
   });
 
-  const saved = ctx.stored[Core.STORAGE_KEYS.settings];
+  const saved = ctx.stored[Core.STORAGE_KEYS.session].settings;
   assert(saved.fullscreen_enabled === true, "expected fullscreen setting to save");
   assert(saved.wake_lock_enabled === false, "expected wake lock preference to remain explicit");
 });
@@ -487,7 +505,7 @@ test("saved fullscreen remains a preference without activating on startup", asyn
     "expected saved fullscreen preference to remain checked"
   );
   assert(
-    ctx.stored[Core.STORAGE_KEYS.settings].fullscreen_enabled === true,
+    ctx.stored[Core.STORAGE_KEYS.session].settings.fullscreen_enabled === true,
     "expected saved fullscreen preference to remain stored"
   );
 });
@@ -742,7 +760,7 @@ test("saved wake lock is preserved when request temporarily fails on startup", a
     "expected saved wake lock preference to remain checked"
   );
   assert(
-    ctx.stored[Core.STORAGE_KEYS.settings].wake_lock_enabled === true,
+    ctx.stored[Core.STORAGE_KEYS.session].settings.wake_lock_enabled === true,
     "expected saved wake lock preference to remain stored"
   );
 });
@@ -757,7 +775,7 @@ test("unsupported wake lock clears the unavailable preference", async function (
   await flushPromises();
   assert(ctx.dom.fields.wake_lock_enabled.checked === false, "expected unsupported field to clear");
   assert(
-    ctx.stored[Core.STORAGE_KEYS.settings].wake_lock_enabled === false,
+    ctx.stored[Core.STORAGE_KEYS.session].settings.wake_lock_enabled === false,
     "expected unsupported preference to clear"
   );
 });
@@ -779,7 +797,7 @@ test("saving minimal mode preserves the explicit wake lock preference", function
     wake_lock_enabled: false,
   });
 
-  const saved = ctx.stored[Core.STORAGE_KEYS.settings];
+  const saved = ctx.stored[Core.STORAGE_KEYS.session].settings;
   assert(saved.minimal_mode_enabled === true, "expected minimal mode setting to save");
   assert(saved.wake_lock_enabled === false, "expected wake lock preference to remain explicit");
 });

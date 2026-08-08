@@ -51,6 +51,7 @@
   );
 
   const STORAGE_KEYS = {
+    session: "better_pomodoro_session_v2",
     settings: "better_pomodoro_settings_v1",
     stats: "better_pomodoro_stats_v1",
     theme: "better_pomodoro_theme_v1",

@@ -49,8 +49,8 @@
       },
     };
 
-    let lastSavedStats = null;
-    let lastSavedTimer = null;
+    let lastSavedSession = null;
+    let sessionNeedsMigration = false;
     let sessionActionPending = null;
     const displayModes = DisplayServices.createDisplayModeService({
       documentRef: doc,
@@ -134,24 +134,38 @@
     }
 
     function hydrateFromStorage() {
-      const storedSettings = storage.getJSON(Core.STORAGE_KEYS.settings, Core.DEFAULT_SETTINGS);
+      const storedSession = storage.getJSON(Core.STORAGE_KEYS.session, null);
+      const hasSession =
+        storedSession &&
+        storedSession.version === 1 &&
+        storedSession.settings &&
+        storedSession.stats &&
+        storedSession.timer;
+      sessionNeedsMigration = !hasSession;
+
+      const storedSettings = hasSession
+        ? storedSession.settings
+        : storage.getJSON(Core.STORAGE_KEYS.settings, Core.DEFAULT_SETTINGS);
       appState.settings = Core.normalizeSettings(storedSettings);
       appState.draftSettings = Object.assign({}, appState.settings);
 
-      const storedStats = storage.getJSON(Core.STORAGE_KEYS.stats, {
-        dateKey: Core.dateKey(),
-        focusBlocksToday: 0,
-        focusBlocksSinceLong: 0,
-      });
+      const storedStats = hasSession
+        ? storedSession.stats
+        : storage.getJSON(Core.STORAGE_KEYS.stats, {
+            dateKey: Core.dateKey(),
+            focusBlocksToday: 0,
+            focusBlocksSinceLong: 0,
+          });
       appState.stats = Core.normalizeStats(storedStats, Core.dateKey());
-      lastSavedStats = cloneStats(appState.stats);
 
       const storedTheme = storage.getText(Core.STORAGE_KEYS.theme, "dark");
       appState.theme = storedTheme === "light" ? "light" : "dark";
 
-      const storedTimer = storage.getJSON(Core.STORAGE_KEYS.timer, null);
+      const storedTimer = hasSession
+        ? storedSession.timer
+        : storage.getJSON(Core.STORAGE_KEYS.timer, null);
       appState.timer = Core.normalizeTimerState(storedTimer, appState.settings);
-      lastSavedTimer = timerSnapshot(appState.timer);
+      lastSavedSession = sessionSnapshot();
     }
 
     function cloneStats(stats) {
@@ -160,15 +174,6 @@
         focusBlocksToday: stats.focusBlocksToday,
         focusBlocksSinceLong: stats.focusBlocksSinceLong,
       };
-    }
-
-    function sameStats(a, b) {
-      if (!a || !b) return false;
-      return (
-        a.dateKey === b.dateKey &&
-        a.focusBlocksToday === b.focusBlocksToday &&
-        a.focusBlocksSinceLong === b.focusBlocksSinceLong
-      );
     }
 
     function timerSnapshot(timerState) {
@@ -180,14 +185,17 @@
       };
     }
 
-    function sameTimerSnapshot(a, b) {
-      if (!a || !b) return false;
-      return (
-        a.status === b.status &&
-        a.phase === b.phase &&
-        a.focusBlockNumber === b.focusBlockNumber &&
-        a.remainingSec === b.remainingSec
-      );
+    function sessionSnapshot() {
+      return {
+        version: 1,
+        settings: Object.assign({}, appState.settings),
+        stats: cloneStats(appState.stats),
+        timer: timerSnapshot(appState.timer),
+      };
+    }
+
+    function sameSession(a, b) {
+      return Boolean(a && b && JSON.stringify(a) === JSON.stringify(b));
     }
 
     function storageIsMemoryOnly() {
@@ -198,27 +206,17 @@
       appState.ui.storageWarning = writeResult === false || storageIsMemoryOnly();
     }
 
-    function persistSettings(settings) {
-      syncStorageWarning(storage.setJSON(Core.STORAGE_KEYS.settings, settings));
-    }
-
     function persistTheme(theme) {
       syncStorageWarning(storage.setText(Core.STORAGE_KEYS.theme, theme));
     }
 
-    function persistStatsIfChanged() {
+    function persistSessionIfChanged() {
       if (!sessionLock.hasLock()) return;
-      if (sameStats(lastSavedStats, appState.stats)) return;
-      syncStorageWarning(storage.setJSON(Core.STORAGE_KEYS.stats, appState.stats));
-      lastSavedStats = cloneStats(appState.stats);
-    }
-
-    function persistTimerIfChanged() {
-      if (!sessionLock.hasLock()) return;
-      const snapshot = timerSnapshot(appState.timer);
-      if (sameTimerSnapshot(lastSavedTimer, snapshot)) return;
-      syncStorageWarning(storage.setJSON(Core.STORAGE_KEYS.timer, snapshot));
-      lastSavedTimer = snapshot;
+      const snapshot = sessionSnapshot();
+      if (!sessionNeedsMigration && sameSession(lastSavedSession, snapshot)) return;
+      syncStorageWarning(storage.setJSON(Core.STORAGE_KEYS.session, snapshot));
+      lastSavedSession = snapshot;
+      sessionNeedsMigration = false;
     }
 
     function quietModeIsEnabled() {
@@ -278,6 +276,7 @@
             return false;
           }
           action();
+          if (sessionNeedsMigration) onStateChange();
           return true;
         })
         .catch(function sessionAccessFailed() {
@@ -475,7 +474,6 @@
         appState.settings = Core.normalizeSettings(
           Object.assign({}, appState.settings, { fullscreen_enabled: false })
         );
-        persistSettings(appState.settings);
       }
 
       updateDraftFromForm();
@@ -491,7 +489,6 @@
             wake_lock_enabled: false,
           })
         );
-        persistSettings(appState.settings);
       }
 
       updateDraftFromForm();
@@ -530,7 +527,6 @@
       appState.draftSettings = Object.assign({}, next);
 
       appState.settings = next;
-      persistSettings(appState.settings);
 
       if (appState.timer.status !== Core.STATUS.RUNNING) {
         const nextPhaseDuration = Core.phaseDurationSec(appState.timer.phase, appState.settings);
@@ -550,7 +546,6 @@
       return ensureSessionAccess(function restoreSessionDefaults() {
         appState.settings = Core.normalizeSettings(Core.DEFAULT_SETTINGS);
         appState.draftSettings = Object.assign({}, appState.settings);
-        persistSettings(appState.settings);
 
         appState.ui.settingsDirty = false;
 
@@ -570,8 +565,7 @@
 
     function onStateChange() {
       appState.stats = Core.rolloverStats(appState.stats, Core.dateKey());
-      persistStatsIfChanged();
-      persistTimerIfChanged();
+      persistSessionIfChanged();
       render.render(appState);
     }
 
