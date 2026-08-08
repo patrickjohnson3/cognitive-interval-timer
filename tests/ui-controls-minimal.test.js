@@ -209,7 +209,11 @@ test("minimal reveal click opens panel without bubbling", function () {
   );
   assert(ctx.calls.includes("prevent-default"), "expected reveal click to be consumed");
   assert(ctx.calls.includes("stop-propagation"), "expected reveal click not to bubble");
-  assert.equal(ctx.dom.controls.restartMinimalBlock.focusCount, 1);
+  assert.equal(
+    ctx.dom.controls.restartMinimalBlock.focusCount,
+    0,
+    "opening should preserve focus on the disclosure"
+  );
 });
 
 test("collapsing minimal controls returns focus to the disclosure", function () {

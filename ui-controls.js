@@ -60,7 +60,6 @@
           const open = dom.controls.exitMinimalModeWrap.getAttribute("data-open") === "true";
           setMinimalPanelOpen(!open);
           if (open) focusMinimalModeReveal();
-          else dom.controls.restartMinimalBlock.focus();
         }
       );
       dom.controls.minimalPrimaryAction.addEventListener(
