@@ -91,6 +91,11 @@
       phaseStartedSuffix: "Started",
       settingsSaved: "Settings Saved.",
       defaultsRestored: "Defaults Restored.",
+      fullscreenUnavailable:
+        "Fullscreen is unavailable. The timer will remain in its current view.",
+      wakeLockUnavailable: "Keep Screen Awake is not supported in this browser.",
+      wakeLockRequestFailed:
+        "The screen could not be kept awake. Minimal and fullscreen modes remain available.",
     },
     pwa: {
       installCopy: "Install for offline use.",

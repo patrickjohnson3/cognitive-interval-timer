@@ -38,6 +38,15 @@
       if (type === "defaults_restored") {
         return announcements.defaultsRestored || "Defaults Restored.";
       }
+      if (type === "fullscreen_unavailable") {
+        return announcements.fullscreenUnavailable || "Fullscreen is unavailable.";
+      }
+      if (type === "wake_lock_unavailable") {
+        return announcements.wakeLockUnavailable || "Keep Screen Awake is unavailable.";
+      }
+      if (type === "wake_lock_request_failed") {
+        return announcements.wakeLockRequestFailed || "The screen could not be kept awake.";
+      }
       return "";
     }
 

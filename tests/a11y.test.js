@@ -54,3 +54,11 @@ test("document headings do not skip hierarchy levels", function () {
     assert(level <= levels[index] + 1, "heading level skipped after heading " + (index + 1));
   });
 });
+
+test("platform failures have readable announcements", function () {
+  const a11y = A11y.create({ Content });
+
+  assert.match(a11y.formatAnnouncement("fullscreen_unavailable"), /Fullscreen is unavailable/);
+  assert.match(a11y.formatAnnouncement("wake_lock_unavailable"), /not supported/);
+  assert.match(a11y.formatAnnouncement("wake_lock_request_failed"), /could not be kept awake/);
+});

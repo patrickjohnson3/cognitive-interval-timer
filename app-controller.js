@@ -63,6 +63,7 @@
       onFullscreenExited: reconcileFullscreenExited,
       onFullscreenUnavailable: reconcileFullscreenUnavailable,
       onWakeLockUnavailable: reconcileWakeLockUnavailable,
+      onWakeLockFailure: announceWakeLockFailure,
     });
     const timer =
       deps.timer ||
@@ -505,6 +506,7 @@
 
       updateDraftFromForm();
       onStateChange();
+      announce.announce(a11y.formatAnnouncement("fullscreen_unavailable"));
     }
 
     function reconcileWakeLockUnavailable() {
@@ -520,6 +522,11 @@
 
       updateDraftFromForm();
       onStateChange();
+      announce.announce(a11y.formatAnnouncement("wake_lock_unavailable"));
+    }
+
+    function announceWakeLockFailure() {
+      announce.announce(a11y.formatAnnouncement("wake_lock_request_failed"));
     }
 
     function bindTimerVisibility() {

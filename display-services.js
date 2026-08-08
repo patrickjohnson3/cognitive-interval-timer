@@ -89,6 +89,7 @@
     const onMinimalModeExited = deps.onMinimalModeExited;
     const onFullscreenExited = deps.onFullscreenExited;
     const onWakeLockUnavailable = deps.onWakeLockUnavailable;
+    const onWakeLockFailure = deps.onWakeLockFailure || function noop() {};
     const fullscreen = createFullscreenService({
       documentRef: doc,
       onUnavailable: deps.onFullscreenUnavailable,
@@ -156,17 +157,14 @@
         .then(function reconcileWakeLock(result) {
           const unsupported =
             typeof wakeLock.isSupported === "function" && wakeLock.isSupported() === false;
-          if (
-            currentRequestId === wakeLockRequestId &&
-            enabled &&
-            result === false &&
-            unsupported
-          ) {
-            onWakeLockUnavailable();
+          if (currentRequestId === wakeLockRequestId && enabled && result === false) {
+            if (unsupported) onWakeLockUnavailable();
+            else onWakeLockFailure();
           }
           return result;
         })
         .catch(function containWakeLockFailure() {
+          if (currentRequestId === wakeLockRequestId && enabled) onWakeLockFailure();
           return false;
         });
     }

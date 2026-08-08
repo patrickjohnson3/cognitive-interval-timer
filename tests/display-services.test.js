@@ -174,6 +174,31 @@ test("display mode service owns minimal fullscreen wake lock and history state",
   assert(events.includes("minimal:external-exit"));
 });
 
+test("temporary wake lock failures use the non-destructive failure callback", async function () {
+  const events = [];
+  const service = DisplayServices.createDisplayModeService({
+    documentRef: { documentElement: {}, fullscreenElement: null },
+    wakeLock: {
+      isSupported: function isSupported() {
+        return true;
+      },
+      setEnabled: function setEnabled() {
+        return Promise.resolve(false);
+      },
+    },
+    onWakeLockFailure: function onWakeLockFailure() {
+      events.push("failure");
+    },
+    onWakeLockUnavailable: function onWakeLockUnavailable() {
+      events.push("unsupported");
+    },
+  });
+
+  await service.setWakeLock(true);
+
+  assert.deepEqual(events, ["failure"]);
+});
+
 test("stale minimal history removal does not exit a newer minimal session", async function () {
   const listeners = {};
   const states = [];

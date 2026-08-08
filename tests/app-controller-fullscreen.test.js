@@ -71,6 +71,7 @@ function setup(options) {
   const hapticCalls = [];
   const audioCalls = [];
   const transitionCalls = [];
+  const announcementCalls = [];
   const historyCalls = [];
   const browser = createBrowserFixture({
     requestFullscreen: function requestFullscreen() {
@@ -157,7 +158,9 @@ function setup(options) {
       showTransition: function showTransition(message) {
         transitionCalls.push(message);
       },
-      announce: function announce() {},
+      announce: function announce(message) {
+        announcementCalls.push(message);
+      },
     },
     render,
     controls,
@@ -234,8 +237,8 @@ function setup(options) {
     },
     a11y: {
       applyAriaDefaults: function applyAriaDefaults() {},
-      formatAnnouncement: function formatAnnouncement() {
-        return "";
+      formatAnnouncement: function formatAnnouncement(type) {
+        return type;
       },
     },
     dom,
@@ -254,6 +257,7 @@ function setup(options) {
     hapticCalls,
     audioCalls,
     transitionCalls,
+    announcementCalls,
     historyCalls,
     windowListeners: browser.windowListeners,
     documentListeners: browser.documentListeners,
@@ -527,6 +531,7 @@ test("fullscreen rejection clears fullscreen field", async function () {
     ctx.app.state.ui.settingsDirty === true,
     "expected auto-enabled wake lock to remain unsaved"
   );
+  assert(ctx.announcementCalls.includes("fullscreen_unavailable"));
 });
 
 test("fullscreen exit rejection restores the actual enabled field", async function () {
@@ -755,6 +760,7 @@ test("temporary wake lock rejection preserves wake lock field", async function (
     ctx.dom.fields.wake_lock_enabled.checked === true,
     "expected temporary rejection to preserve wake lock preference"
   );
+  assert(ctx.announcementCalls.includes("wake_lock_request_failed"));
 });
 
 test("wake lock rejection leaves fullscreen enabled", async function () {
@@ -826,6 +832,7 @@ test("unsupported wake lock clears the unavailable preference", async function (
     ctx.stored[Core.STORAGE_KEYS.session].settings.wake_lock_enabled === false,
     "expected unsupported preference to clear"
   );
+  assert(ctx.announcementCalls.includes("wake_lock_unavailable"));
 });
 
 test("saving minimal mode preserves the explicit wake lock preference", function () {
