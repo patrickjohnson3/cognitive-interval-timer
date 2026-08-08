@@ -5,6 +5,14 @@
     root.PomodoroWakeLock = factory();
   }
 })(typeof self !== "undefined" ? self : this, function makeWakeLock() {
+  function callAsPromise(operation) {
+    try {
+      return Promise.resolve(operation());
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
   function createController(env) {
     const scope = env || {};
     const nav = scope.navigator || (typeof navigator !== "undefined" ? navigator : null);
@@ -50,12 +58,15 @@
 
       const currentRequestId = ++requestId;
 
-      return nav.wakeLock
-        .request("screen")
+      return callAsPromise(function requestScreenWakeLock() {
+        return nav.wakeLock.request("screen");
+      })
         .then(function onLock(lock) {
           if (!wanted || currentRequestId !== requestId) {
             if (!lock || typeof lock.release !== "function") return false;
-            return Promise.resolve(lock.release())
+            return callAsPromise(function releaseStaleLock() {
+              return lock.release();
+            })
               .catch(function ignoreStaleReleaseError() {})
               .then(function staleLockReleased() {
                 return false;
@@ -82,7 +93,9 @@
       wakeLock = null;
       if (!lock || typeof lock.release !== "function") return Promise.resolve(false);
 
-      return Promise.resolve(lock.release())
+      return callAsPromise(function releaseActiveLock() {
+        return lock.release();
+      })
         .then(function onRelease() {
           return true;
         })

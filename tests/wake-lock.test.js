@@ -63,6 +63,21 @@ test("reports unsupported browser without throwing", async function () {
   assert(enabled === false, "expected unsupported enable to resolve false");
 });
 
+test("contains synchronous wake-lock request failures", async function () {
+  const wakeLock = WakeLock.createController({
+    document: { visibilityState: "visible", addEventListener: function addEventListener() {} },
+    navigator: {
+      wakeLock: {
+        request: function request() {
+          throw new Error("wake lock failed synchronously");
+        },
+      },
+    },
+  });
+
+  assert.equal(await wakeLock.setEnabled(true), false);
+});
+
 test("releases a pending lock that resolves after wake lock is disabled", async function () {
   let resolveRequest = null;
   const lock = createLock();

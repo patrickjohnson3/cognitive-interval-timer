@@ -5,6 +5,14 @@
     root.PomodoroDisplayServices = factory();
   }
 })(typeof self !== "undefined" ? self : this, function makeDisplayServices() {
+  function callAsPromise(operation) {
+    try {
+      return Promise.resolve(operation());
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
   function createFullscreenService(deps) {
     const doc = deps.documentRef || document;
     const onUnavailable = deps.onUnavailable || function noop() {};
@@ -18,7 +26,9 @@
 
       if (!enabled && activeFullscreen) {
         if (doc.exitFullscreen) {
-          return Promise.resolve(doc.exitFullscreen())
+          return callAsPromise(function requestFullscreenExit() {
+            return doc.exitFullscreen();
+          })
             .then(function fullscreenExited() {
               return false;
             })
@@ -39,10 +49,14 @@
       if (pendingEnable) return pendingEnable;
 
       if (root && root.requestFullscreen) {
-        pendingEnable = Promise.resolve(root.requestFullscreen())
+        pendingEnable = callAsPromise(function requestFullscreenEntry() {
+          return root.requestFullscreen();
+        })
           .then(function fullscreenEntered() {
             if (!desiredEnabled && doc.fullscreenElement && doc.exitFullscreen) {
-              return Promise.resolve(doc.exitFullscreen()).then(function exitStaleFullscreen() {
+              return callAsPromise(function requestStaleFullscreenExit() {
+                return doc.exitFullscreen();
+              }).then(function exitStaleFullscreen() {
                 return false;
               });
             }
@@ -50,7 +64,7 @@
           })
           .catch(function handleFullscreenEnterError() {
             if (desiredEnabled) onUnavailable();
-            return false;
+            return Boolean(doc.fullscreenElement);
           })
           .finally(function clearPendingEnable() {
             pendingEnable = null;
@@ -136,14 +150,25 @@
         return Promise.resolve(false);
       }
 
-      return Promise.resolve(wakeLock.setEnabled(enabled)).then(function reconcileWakeLock(result) {
-        const unsupported =
-          typeof wakeLock.isSupported === "function" && wakeLock.isSupported() === false;
-        if (currentRequestId === wakeLockRequestId && enabled && result === false && unsupported) {
-          onWakeLockUnavailable();
-        }
-        return result;
-      });
+      return callAsPromise(function requestWakeLockState() {
+        return wakeLock.setEnabled(enabled);
+      })
+        .then(function reconcileWakeLock(result) {
+          const unsupported =
+            typeof wakeLock.isSupported === "function" && wakeLock.isSupported() === false;
+          if (
+            currentRequestId === wakeLockRequestId &&
+            enabled &&
+            result === false &&
+            unsupported
+          ) {
+            onWakeLockUnavailable();
+          }
+          return result;
+        })
+        .catch(function containWakeLockFailure() {
+          return false;
+        });
     }
 
     function setMinimalMode(enabled, preferences, options) {

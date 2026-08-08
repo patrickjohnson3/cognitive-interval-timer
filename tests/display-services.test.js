@@ -22,6 +22,26 @@ test("fullscreen service enters and exits fullscreen", async function () {
   assert((await fullscreen.setEnabled(false)) === false, "expected fullscreen disable result");
 });
 
+test("fullscreen service contains synchronous platform failures", async function () {
+  let unavailable = 0;
+  const fullscreen = DisplayServices.createFullscreenService({
+    documentRef: {
+      fullscreenElement: null,
+      documentElement: {
+        requestFullscreen: function requestFullscreen() {
+          throw new Error("fullscreen failed synchronously");
+        },
+      },
+    },
+    onUnavailable: function onUnavailable() {
+      unavailable += 1;
+    },
+  });
+
+  assert.equal(await fullscreen.setEnabled(true), false);
+  assert.equal(unavailable, 1);
+});
+
 test("fullscreen service ignores stale async results", async function () {
   let resolveEnter = null;
   const doc = {
@@ -45,6 +65,7 @@ test("fullscreen service ignores stale async results", async function () {
   const enablePromise = fullscreen.setEnabled(true);
   const disablePromise = fullscreen.setEnabled(false);
 
+  await Promise.resolve();
   resolveEnter();
   await enablePromise;
   await disablePromise;
@@ -73,6 +94,7 @@ test("fullscreen service coalesces repeated enable requests", async function () 
 
   const first = fullscreen.setEnabled(true);
   const second = fullscreen.setEnabled(true);
+  await Promise.resolve();
   resolveEnter();
 
   assert.equal(await first, true);
