@@ -223,6 +223,9 @@ function setup(options) {
       },
     },
     wakeLock: {
+      isSupported: function isSupported() {
+        return config.wakeLockSupported !== false;
+      },
       setEnabled: function setEnabled(enabled) {
         wakeLockCalls.push(Boolean(enabled));
         if (Object.prototype.hasOwnProperty.call(config, "wakeLockResult")) {
@@ -640,16 +643,15 @@ test("exiting minimal mode preserves previously enabled wake lock", function () 
   );
 });
 
-test("wake lock rejection clears wake lock field", async function () {
+test("temporary wake lock rejection preserves wake lock field", async function () {
   const ctx = setup({ wakeLockResult: false });
   ctx.dom.fields.wake_lock_enabled.checked = true;
   await ctx.boundHandlers.onWakeLockToggle(true);
 
   assert(
-    ctx.dom.fields.wake_lock_enabled.checked === false,
-    "expected wake lock checkbox to clear"
+    ctx.dom.fields.wake_lock_enabled.checked === true,
+    "expected temporary rejection to preserve wake lock preference"
   );
-  assert(ctx.app.state.ui.settingsDirty === false, "expected rejected wake lock to avoid dirty UI");
 });
 
 test("wake lock rejection leaves fullscreen enabled", async function () {
@@ -663,7 +665,10 @@ test("wake lock rejection leaves fullscreen enabled", async function () {
     ctx.dom.fields.fullscreen_enabled.checked === true,
     "expected fullscreen to remain enabled"
   );
-  assert(ctx.dom.fields.wake_lock_enabled.checked === false, "expected wake lock field to clear");
+  assert(
+    ctx.dom.fields.wake_lock_enabled.checked === true,
+    "expected wake lock preference to remain"
+  );
 });
 
 test("wake lock rejection leaves minimal mode enabled", async function () {
@@ -681,10 +686,13 @@ test("wake lock rejection leaves minimal mode enabled", async function () {
     ctx.dom.fields.minimal_mode_enabled.checked === true,
     "expected minimal field to remain enabled"
   );
-  assert(ctx.dom.fields.wake_lock_enabled.checked === false, "expected wake lock field to clear");
+  assert(
+    ctx.dom.fields.wake_lock_enabled.checked === true,
+    "expected wake lock preference to remain"
+  );
 });
 
-test("saved wake lock is cleared when request fails on startup", async function () {
+test("saved wake lock is preserved when request temporarily fails on startup", async function () {
   const ctx = setup({
     wakeLockResult: false,
     storedSettings: Core.normalizeSettings({ wake_lock_enabled: true }),
@@ -693,12 +701,27 @@ test("saved wake lock is cleared when request fails on startup", async function 
   await flushPromises();
   assert(ctx.wakeLockCalls.includes(true), "expected saved wake lock to be requested");
   assert(
-    ctx.dom.fields.wake_lock_enabled.checked === false,
-    "expected wake lock checkbox to clear"
+    ctx.dom.fields.wake_lock_enabled.checked === true,
+    "expected saved wake lock preference to remain checked"
   );
   assert(
+    ctx.stored[Core.STORAGE_KEYS.settings].wake_lock_enabled === true,
+    "expected saved wake lock preference to remain stored"
+  );
+});
+
+test("unsupported wake lock clears the unavailable preference", async function () {
+  const ctx = setup({
+    wakeLockResult: false,
+    wakeLockSupported: false,
+    storedSettings: Core.normalizeSettings({ wake_lock_enabled: true }),
+  });
+
+  await flushPromises();
+  assert(ctx.dom.fields.wake_lock_enabled.checked === false, "expected unsupported field to clear");
+  assert(
     ctx.stored[Core.STORAGE_KEYS.settings].wake_lock_enabled === false,
-    "expected saved wake lock setting to clear"
+    "expected unsupported preference to clear"
   );
 });
 

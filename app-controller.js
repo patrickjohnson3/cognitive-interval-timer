@@ -466,7 +466,9 @@
         return Promise.resolve(false);
       }
       return Promise.resolve(wakeLock.setEnabled(enabled)).then(function reconcileWakeLock(result) {
-        if (currentRequestId === wakeLockRequestId && enabled && result === false) {
+        const unsupported =
+          typeof wakeLock.isSupported === "function" && wakeLock.isSupported() === false;
+        if (currentRequestId === wakeLockRequestId && enabled && result === false && unsupported) {
           reconcileWakeLockUnavailable();
         }
         return result;
