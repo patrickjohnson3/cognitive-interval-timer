@@ -5,6 +5,11 @@
 - Explore restoring saved Minimal Mode and Fullscreen preferences when the app launches.
 - Account for browser user-activation requirements; use an explicit activation prompt if automatic entry is blocked.
 
+## Real-Device Acceptance Checks
+
+- Explore a repeatable phone/PWA acceptance checklist in addition to automated source and headless-browser assertions.
+- Cover mobile portrait and landscape layout, fullscreen, Android back navigation, wake lock, and service-worker update behavior.
+
 ## Android PWA Navigation Bar Color
 
 - Investigate whether Android/Chrome exposes any reliable PWA-side control over the bottom
