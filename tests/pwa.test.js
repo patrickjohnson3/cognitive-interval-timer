@@ -291,10 +291,6 @@ test("service worker uses an app-scoped versioned cache name", function () {
     "cache version should come from generated app metadata"
   );
   assert(
-    serviceWorker.includes('const SERVICE_WORKER_BUILD = "local";'),
-    "service worker should include a deploy-stamped build placeholder"
-  );
-  assert(
     serviceWorker.includes('const CACHE_NAME = CACHE_PREFIX + "app-shell-" + CACHE_VERSION;'),
     "cache name should be app-scoped and versioned"
   );

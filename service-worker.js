@@ -4,8 +4,7 @@ if (typeof importScripts === "function") {
 
 const CACHE_PREFIX = self.PomodoroAppConfig.cachePrefix;
 const APP_VERSION = self.PomodoroAppVersion;
-const SERVICE_WORKER_BUILD = "local";
-const CACHE_VERSION = APP_VERSION.build || SERVICE_WORKER_BUILD || APP_VERSION.version || "local";
+const CACHE_VERSION = APP_VERSION.build || APP_VERSION.version || "local";
 const CACHE_NAME = CACHE_PREFIX + "app-shell-" + CACHE_VERSION;
 const REQUIRED_APP_SHELL = self.PomodoroAppShell.REQUIRED_APP_SHELL;
 const OPTIONAL_APP_SHELL = self.PomodoroAppShell.OPTIONAL_APP_SHELL;

@@ -80,19 +80,6 @@ function writeAppVersion(outputDir, metadata) {
   fs.writeFileSync(path.join(outputDir, "app-version.js"), appVersionSource(metadata));
 }
 
-function writeServiceWorkerBuild(outputDir, metadata) {
-  const serviceWorkerPath = path.join(outputDir, "service-worker.js");
-  const serviceWorker = fs.readFileSync(serviceWorkerPath, "utf8");
-  const stampedServiceWorker = serviceWorker.replace(
-    'const SERVICE_WORKER_BUILD = "local";',
-    "const SERVICE_WORKER_BUILD = " + JSON.stringify(metadata.build) + ";"
-  );
-  if (stampedServiceWorker === serviceWorker) {
-    throw new Error("Missing service worker build placeholder");
-  }
-  fs.writeFileSync(serviceWorkerPath, stampedServiceWorker);
-}
-
 function preparePagesArtifact(outputArg) {
   const outputDir = path.resolve(ROOT, outputArg || "_site");
   assertGeneratedOutput(outputDir);
@@ -110,7 +97,6 @@ function preparePagesArtifact(outputArg) {
 
   const metadata = buildMetadata();
   writeAppVersion(outputDir, metadata);
-  writeServiceWorkerBuild(outputDir, metadata);
 
   const missingAppShellAssets = appShell.APP_SHELL.filter((asset) => asset !== "./").filter(
     (asset) => !fs.existsSync(path.join(outputDir, asset.replace(/^\.\//, "")))
