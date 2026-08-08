@@ -52,6 +52,7 @@
     autoStartNext: "Auto-Start Next Phase",
     soundOnPhaseChange: "Play Sound On Phase Change",
     quietMode: "Quiet Mode",
+    singleKeyShortcuts: "Enable Single-Key Shortcuts",
     fullscreenMode: "Fullscreen",
     minimalMode: "Minimal Mode",
     keepScreenAwake: "Keep Screen Awake",

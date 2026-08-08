@@ -26,6 +26,7 @@
       dom.copy.autoStart.textContent = uiCopy.autoStartNext;
       dom.copy.soundEnabled.textContent = uiCopy.soundOnPhaseChange;
       dom.copy.quietModeEnabled.textContent = uiCopy.quietMode;
+      dom.copy.singleKeyShortcutsEnabled.textContent = uiCopy.singleKeyShortcuts;
       dom.copy.fullscreenEnabled.textContent = uiCopy.fullscreenMode;
       dom.copy.minimalModeEnabled.textContent = uiCopy.minimalMode;
       dom.copy.wakeLockEnabled.textContent = uiCopy.keepScreenAwake;

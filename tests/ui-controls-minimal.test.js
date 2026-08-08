@@ -60,6 +60,12 @@ function createDom() {
         tagName: "INPUT",
         type: "checkbox",
       }),
+      single_key_shortcuts_enabled: eventTargetNode({
+        id: "single_key_shortcuts_enabled",
+        tagName: "INPUT",
+        type: "checkbox",
+        checked: true,
+      }),
       fullscreen_enabled: eventTargetNode({
         id: "fullscreen_enabled",
         tagName: "INPUT",
@@ -318,6 +324,41 @@ test("timer shortcuts do not intercept native button keyboard actions", function
       return call.startsWith("shortcut:");
     }),
     "expected no global timer shortcut from a focused button"
+  );
+});
+
+test("single-key shortcuts can be disabled", function () {
+  const ctx = bindWithBrowserStubs();
+  ctx.dom.fields.single_key_shortcuts_enabled.checked = false;
+
+  [" ", "s", "r"].forEach(function eachShortcut(key) {
+    ctx.windowListeners.keydown({ key, target: eventTargetNode({ tagName: "BODY" }) });
+  });
+
+  assert(
+    !ctx.calls.some(function isShortcut(call) {
+      return call.startsWith("shortcut:");
+    }),
+    "expected disabled shortcuts not to run"
+  );
+});
+
+test("modified keys do not trigger timer shortcuts", function () {
+  const ctx = bindWithBrowserStubs();
+
+  [" ", "s", "r"].forEach(function eachShortcut(key) {
+    ctx.windowListeners.keydown({
+      key,
+      ctrlKey: true,
+      target: eventTargetNode({ tagName: "BODY" }),
+    });
+  });
+
+  assert(
+    !ctx.calls.some(function isShortcut(call) {
+      return call.startsWith("shortcut:");
+    }),
+    "expected modified keys not to run shortcuts"
   );
 });
 

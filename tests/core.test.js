@@ -196,6 +196,11 @@ test("normalizeSettings preserves quiet mode preference", function () {
   assert(settings.quiet_mode_enabled === true, "expected quiet mode preference to normalize");
 });
 
+test("normalizeSettings preserves the single-key shortcut preference", function () {
+  const settings = Core.normalizeSettings({ single_key_shortcuts_enabled: false });
+  assert.equal(settings.single_key_shortcuts_enabled, false);
+});
+
 test("normalizeTimerState restores a persisted timer without elapsed wall time", function () {
   const settings = Core.normalizeSettings(null);
   const timer = Core.normalizeTimerState(

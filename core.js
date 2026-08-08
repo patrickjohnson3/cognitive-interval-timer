@@ -37,6 +37,7 @@
     auto_start: true,
     sound_enabled: true,
     quiet_mode_enabled: false,
+    single_key_shortcuts_enabled: true,
     fullscreen_enabled: false,
     minimal_mode_enabled: false,
     wake_lock_enabled: false,
@@ -97,6 +98,10 @@
         typeof merged.quiet_mode_enabled === "boolean"
           ? merged.quiet_mode_enabled
           : DEFAULT_SETTINGS.quiet_mode_enabled,
+      single_key_shortcuts_enabled:
+        typeof merged.single_key_shortcuts_enabled === "boolean"
+          ? merged.single_key_shortcuts_enabled
+          : DEFAULT_SETTINGS.single_key_shortcuts_enabled,
       fullscreen_enabled:
         typeof merged.fullscreen_enabled === "boolean"
           ? merged.fullscreen_enabled

@@ -99,6 +99,9 @@
       bindCheckbox(dom.fields.quiet_mode_enabled, function onQuietModeInput() {
         handlers.onSettingsInput(readSettingsForm());
       });
+      bindCheckbox(dom.fields.single_key_shortcuts_enabled, function onShortcutSettingInput() {
+        handlers.onSettingsInput(readSettingsForm());
+      });
       bindCheckbox(dom.fields.fullscreen_enabled, function onFullscreenInput(field) {
         handlers.onSettingsInput(readSettingsForm());
         handlers.onFullscreenToggle(field.checked);
@@ -125,6 +128,8 @@
           return;
         }
         if (isInteractiveTarget(event.target)) return;
+        if (event.ctrlKey || event.metaKey || event.altKey) return;
+        if (!dom.fields.single_key_shortcuts_enabled.checked) return;
         const key = event.key.toLowerCase();
         if (key === " ") {
           event.preventDefault();

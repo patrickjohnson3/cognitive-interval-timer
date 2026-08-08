@@ -117,6 +117,7 @@
         autoStart: byId("label-auto-start"),
         soundEnabled: byId("label-sound-enabled"),
         quietModeEnabled: byId("label-quiet-mode-enabled"),
+        singleKeyShortcutsEnabled: byId("label-single-key-shortcuts-enabled"),
         fullscreenEnabled: byId("label-fullscreen-enabled"),
         minimalModeEnabled: byId("label-minimal-mode-enabled"),
         wakeLockEnabled: byId("label-wake-lock-enabled"),

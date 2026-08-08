@@ -107,6 +107,8 @@ The countdown freezes while the page is hidden or suspended. Returning to the ap
 
 ### Keyboard shortcuts
 
+Single-key shortcuts are enabled by default and can be disabled under **Behavior**.
+
 - `Space` - Start/Pause/Resume
 - `S` - Next Phase
 - `R` - Restart Block
