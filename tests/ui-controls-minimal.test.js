@@ -40,6 +40,7 @@ function createDom() {
       defaults: createNode({ id: "defaults" }),
       exitMinimalModeWrap: createNode({ id: "minimal-exit-wrap" }),
       exitMinimalModeReveal: createNode({ id: "minimal-exit-reveal" }),
+      exitMinimalModePanel: createNode({ id: "minimal-exit-panel", tagName: "DIV" }),
       restartMinimalBlock: createNode({ id: "restart-minimal-block" }),
       exitMinimalMode: createNode({ id: "exit-minimal-mode" }),
     },
@@ -211,8 +212,29 @@ test("minimal reveal click opens panel without bubbling", function () {
     ctx.dom.controls.exitMinimalModeWrap.getAttribute("data-open") === "true",
     "expected reveal click to open minimal panel"
   );
+  assert(
+    ctx.dom.controls.exitMinimalModePanel.hidden === false,
+    "expected panel to become visible"
+  );
+  assert(
+    ctx.dom.controls.exitMinimalModeReveal.getAttribute("aria-expanded") === "true",
+    "expected reveal to expose its expanded state"
+  );
   assert(ctx.calls.includes("prevent-default"), "expected reveal click to be consumed");
   assert(ctx.calls.includes("stop-propagation"), "expected reveal click not to bubble");
+});
+
+test("closed minimal panel is removed from keyboard navigation", function () {
+  const ctx = bindWithBrowserStubs();
+
+  assert(
+    ctx.dom.controls.exitMinimalModePanel.hidden === true,
+    "expected closed panel to be hidden"
+  );
+  assert(
+    ctx.dom.controls.exitMinimalModeReveal.getAttribute("aria-expanded") === "false",
+    "expected reveal to expose its collapsed state"
+  );
 });
 
 test("primary action button triggers primary action handler", function () {

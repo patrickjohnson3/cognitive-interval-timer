@@ -701,6 +701,10 @@ select {
     transform 160ms ease;
 }
 
+.minimal-exit-panel[hidden] {
+  display: none;
+}
+
 .minimal-exit-reveal {
   position: fixed;
   bottom: calc(env(safe-area-inset-bottom, 0px) + 72px);

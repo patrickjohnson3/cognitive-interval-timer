@@ -354,10 +354,12 @@
         type="button"
         class="minimal-exit-reveal"
         aria-label="Show minimal mode controls"
+        aria-controls="minimal-exit-panel"
+        aria-expanded="false"
       >
         Controls
       </button>
-      <div class="minimal-exit-panel">
+      <div id="minimal-exit-panel" class="minimal-exit-panel" hidden>
         <button id="restart-minimal-block" type="button" class="minimal-exit-btn">
           Restart Block
         </button>

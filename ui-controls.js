@@ -38,6 +38,7 @@
     }
 
     function bindControls(handlers) {
+      setMinimalPanelOpen(false);
       dom.controls.start.addEventListener("click", handlers.onPrimaryAction);
       dom.controls.skip.addEventListener("click", handlers.onSkip);
       dom.controls.reset.addEventListener("click", handlers.onReset);
@@ -53,19 +54,19 @@
           if (event && event.preventDefault) event.preventDefault();
           if (event && event.stopPropagation) event.stopPropagation();
           const open = dom.controls.exitMinimalModeWrap.getAttribute("data-open") === "true";
-          dom.controls.exitMinimalModeWrap.setAttribute("data-open", open ? "false" : "true");
+          setMinimalPanelOpen(!open);
         }
       );
       dom.controls.restartMinimalBlock.addEventListener(
         "click",
         function onRestartMinimalBlockClick(event) {
           if (event && event.stopPropagation) event.stopPropagation();
-          dom.controls.exitMinimalModeWrap.setAttribute("data-open", "false");
+          setMinimalPanelOpen(false);
           handlers.onReset();
         }
       );
       dom.controls.exitMinimalMode.addEventListener("click", function onExitMinimalModeClick() {
-        dom.controls.exitMinimalModeWrap.setAttribute("data-open", "false");
+        setMinimalPanelOpen(false);
         handlers.onExitMinimalMode();
       });
       dom.theme.addEventListener("change", function themeChange(event) {
@@ -105,7 +106,7 @@
 
       window.addEventListener("keydown", function onKeydown(event) {
         if (event.key === "Escape") {
-          dom.controls.exitMinimalModeWrap.setAttribute("data-open", "false");
+          setMinimalPanelOpen(false);
           handlers.onExitMinimalMode();
           return;
         }
@@ -155,6 +156,12 @@
       return dom.controls.exitMinimalModeWrap.getAttribute("data-open") === "true";
     }
 
+    function setMinimalPanelOpen(open) {
+      dom.controls.exitMinimalModeWrap.setAttribute("data-open", String(open));
+      dom.controls.exitMinimalModeReveal.setAttribute("aria-expanded", String(open));
+      dom.controls.exitMinimalModePanel.hidden = !open;
+    }
+
     function shouldHandleMinimalAction(event) {
       if (!document.documentElement.hasAttribute("data-minimal-mode")) return false;
       if (event.button != null && event.button !== 0) return false;
@@ -170,7 +177,7 @@
     function toggleMinimalTimer(event, handlers) {
       if (!shouldHandleMinimalAction(event)) return;
       if (isMinimalPanelOpen()) {
-        dom.controls.exitMinimalModeWrap.setAttribute("data-open", "false");
+        setMinimalPanelOpen(false);
         consumeMinimalEvent(event);
         return;
       }

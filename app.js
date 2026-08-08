@@ -101,6 +101,7 @@
         defaults: byId("defaults"),
         exitMinimalModeWrap: byId("minimal-exit-wrap"),
         exitMinimalModeReveal: byId("minimal-exit-reveal"),
+        exitMinimalModePanel: byId("minimal-exit-panel"),
         restartMinimalBlock: byId("restart-minimal-block"),
         exitMinimalMode: byId("exit-minimal-mode"),
       },
