@@ -170,16 +170,15 @@ Run the PWA offline smoke test:
 npm run test:pwa:offline
 ```
 
-The PWA smoke test starts a local static server, launches headless Chrome, waits for the service worker cache, switches Chrome offline, and verifies the app shell still loads.
+The PWA smoke test starts a local static server, launches headless Chrome, checks portrait, landscape, minimal-mode, theme, and accessibility behavior, then switches Chrome offline and verifies the app shell still loads.
 
 The suite includes:
 
 - Core timer logic tests
-- Theme token snapshot tests
-- Contrast and grayscale-bound checks
-- UI token wiring checks
-- Break layout regression checks
-- PWA manifest/service-worker checks
+- Controller, display-service, and input tests
+- Theme token, contrast, and hardcoded-color checks
+- Rendered responsive-layout and accessibility checks
+- PWA manifest, runtime, offline-cache, and Pages-artifact checks
 
 ## PWA Update Testing
 
