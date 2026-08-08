@@ -131,7 +131,7 @@ Minimal mode:
 
 - Shows only the phase name, timer, and phase tagline
 - Requests fullscreen when enabled
-- Can be exited with `Esc` or the hidden top panel
+- Can be exited with `Esc` or the bottom controls drawer
 
 PWA install/offline behavior:
 
