@@ -346,7 +346,12 @@
     }
 
     function onFullscreenChange(isFullscreen) {
-      if (isFullscreen || !dom.fields.fullscreen_enabled.checked) return;
+      if (isFullscreen) return;
+      if (doc.documentElement.hasAttribute("data-minimal-mode")) {
+        onExitMinimalMode();
+        return;
+      }
+      if (!dom.fields.fullscreen_enabled.checked) return;
       dom.fields.fullscreen_enabled.checked = false;
       onSettingsInput(controls.readSettingsForm());
     }

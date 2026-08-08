@@ -490,6 +490,29 @@ test("Android back exits minimal mode before leaving the app", function () {
   );
 });
 
+test("Android fullscreen exit also exits minimal mode", function () {
+  const ctx = setup();
+  ctx.dom.fields.minimal_mode_enabled.checked = true;
+  ctx.boundHandlers.onMinimalModeToggle(true);
+
+  ctx.boundHandlers.onFullscreenChange(false);
+
+  assert(
+    !global.document.documentElement.hasAttribute("data-minimal-mode"),
+    "expected fullscreen exit to exit minimal mode"
+  );
+  assert(
+    ctx.dom.fields.minimal_mode_enabled.checked === false,
+    "expected fullscreen exit to clear minimal mode checkbox"
+  );
+  assert(
+    ctx.historyCalls.some(function isBack(call) {
+      return call.type === "back";
+    }),
+    "expected fullscreen exit to remove minimal mode history entry"
+  );
+});
+
 test("exiting minimal mode restores current fullscreen form state", function () {
   const ctx = setup();
   global.document.documentElement.setAttribute("data-minimal-mode", "true");
