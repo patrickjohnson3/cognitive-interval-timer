@@ -295,9 +295,7 @@
 
       Core.PHASES.forEach(function eachPhase(phase) {
         if (!dom.copy.phaseLabels[phase]) return;
-        const contentPhaseConfig = Content.PHASE_CONFIG && Content.PHASE_CONFIG[phase];
-        dom.copy.phaseLabels[phase].textContent =
-          (contentPhaseConfig && contentPhaseConfig.settingsLabel) || phaseLabel(phase);
+        dom.copy.phaseLabels[phase].textContent = phaseLabel(phase);
       });
     }
 
