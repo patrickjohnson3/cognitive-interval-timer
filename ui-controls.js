@@ -114,6 +114,7 @@
 
       window.addEventListener("keydown", function onKeydown(event) {
         if (event.key === "Escape") {
+          if (dismissActiveTooltip()) return;
           if (isMinimalPanelOpen()) {
             setMinimalPanelOpen(false);
             focusMinimalModeReveal();
@@ -205,6 +206,20 @@
 
     function focusPrimaryAction() {
       dom.controls.start.focus();
+    }
+
+    function dismissActiveTooltip() {
+      const activeElement = document.activeElement;
+      if (
+        !activeElement ||
+        !activeElement.closest ||
+        !activeElement.closest(".tip-wrap") ||
+        !activeElement.blur
+      ) {
+        return false;
+      }
+      activeElement.blur();
+      return true;
     }
 
     return {

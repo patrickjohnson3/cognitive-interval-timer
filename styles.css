@@ -506,6 +506,7 @@ label {
 .tip-wrap:hover .tip-bubble,
 .tip-wrap:focus-within .tip-bubble {
   opacity: 1;
+  pointer-events: auto;
   transform: translate(var(--tip-shift-x), var(--tip-shift-y-visible));
 }
 

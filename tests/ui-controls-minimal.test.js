@@ -23,6 +23,9 @@ function createNode(options) {
     focus: function focus() {
       this.focusCount += 1;
     },
+    blur: function blur() {
+      this.blurCount = (this.blurCount || 0) + 1;
+    },
     checkValidity: function checkValidity() {
       return true;
     },
@@ -336,6 +339,20 @@ test("Escape closes an open minimal panel before exiting minimal mode", function
   ctx.windowListeners.keydown({ key: "Escape", target: createNode({ tagName: "BODY" }) });
 
   assert(ctx.calls.includes("exit-minimal"), "expected Escape to exit minimal mode");
+});
+
+test("Escape dismisses a focused tooltip before other Escape actions", function () {
+  const ctx = bindWithBrowserStubs();
+  const trigger = createNode({ tagName: "BUTTON" });
+  trigger.closest = function closest(selector) {
+    return selector === ".tip-wrap" ? {} : null;
+  };
+  global.document.activeElement = trigger;
+
+  ctx.windowListeners.keydown({ key: "Escape", target: trigger });
+
+  assert.equal(trigger.blurCount, 1);
+  assert(!ctx.calls.includes("exit-minimal"));
 });
 
 test("timer shortcuts do not intercept native button keyboard actions", function () {

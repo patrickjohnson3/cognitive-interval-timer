@@ -15,10 +15,6 @@
       const root = rootNode || document;
       const triggers = root.querySelectorAll(".tip-trigger");
       triggers.forEach(function eachTrigger(trigger) {
-        if (!trigger.getAttribute("aria-haspopup")) {
-          trigger.setAttribute("aria-haspopup", "true");
-        }
-
         const describedBy = trigger.getAttribute("aria-describedby");
         if (describedBy) return;
 
