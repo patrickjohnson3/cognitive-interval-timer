@@ -8,7 +8,7 @@ A browser-based interval timer inspired by Pomodoro, designed around cognitive p
 - Short Break
 - Long Break
 
-The app is client-side only (no backend) and includes light/dark themes with restrained color accents, keyboard shortcuts, audio phase-change cues, and persistent settings/stats via local storage.
+The app is client-side only (no backend) and includes light/dark themes with restrained color accents, keyboard shortcuts, audio phase-change cues, and persistent timer/settings/stats state via local storage.
 
 ## Live Site
 
@@ -213,6 +213,6 @@ npm run format
 
 ## Persistence
 
-The app stores settings, stats, and theme in `localStorage`.
+The app stores the active timer, settings, stats, and theme in `localStorage`, so refreshes and PWA updates preserve the session.
 
 If storage is unavailable, it falls back to in-memory storage for the current session.
