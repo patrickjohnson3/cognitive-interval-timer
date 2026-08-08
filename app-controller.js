@@ -53,6 +53,7 @@
     let lastSavedSession = null;
     let sessionNeedsMigration = false;
     let sessionActionPending = null;
+    let initialized = false;
     const displayModes = DisplayServices.createDisplayModeService({
       documentRef: doc,
       windowRef: deps.windowRef,
@@ -95,6 +96,8 @@
     };
 
     function initialize() {
+      if (initialized) return false;
+      initialized = true;
       hydrateFromStorage();
       syncStorageWarning();
       render.hydrateStaticContent();
@@ -134,6 +137,7 @@
           sessionLock.release();
         });
       }
+      return true;
     }
 
     function randomFrom(values) {

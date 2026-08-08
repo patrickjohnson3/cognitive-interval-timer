@@ -64,6 +64,7 @@ function setup(options) {
   }
   const fullscreenRequests = [];
   let boundHandlers = null;
+  let bindCount = 0;
   const wakeLockCalls = [];
   const timerCalls = [];
   const hapticCalls = [];
@@ -97,6 +98,7 @@ function setup(options) {
 
   const controls = {
     bindControls: function bindControls(handlers) {
+      bindCount += 1;
       boundHandlers = handlers;
     },
     readSettingsForm: function readSettingsForm() {
@@ -158,7 +160,9 @@ function setup(options) {
     render,
     controls,
     timer: {
-      startTicker: function startTicker() {},
+      startTicker: function startTicker() {
+        timerCalls.push("startTicker");
+      },
       start: function start() {
         timerCalls.push("start");
       },
@@ -251,8 +255,24 @@ function setup(options) {
     historyCalls,
     windowListeners: browser.windowListeners,
     documentListeners: browser.documentListeners,
+    getBindCount: function getBindCount() {
+      return bindCount;
+    },
   };
 }
+
+test("application initialization is idempotent", function () {
+  const ctx = setup();
+
+  assert.equal(ctx.app.controller.initialize(), false);
+  assert.equal(ctx.getBindCount(), 1);
+  assert.equal(
+    ctx.timerCalls.filter(function isTicker(call) {
+      return call === "startTicker";
+    }).length,
+    1
+  );
+});
 
 test("primary action starts before timer has started", function () {
   const ctx = setup();
