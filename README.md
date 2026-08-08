@@ -56,7 +56,7 @@ https://patrickjohnson3.github.io/cognitive-interval-timer/
 
 ## Run Locally
 
-Any static server works.
+Any static server works for local development. PWA installation is supported from the GitHub Pages URL, not arbitrary local server paths.
 
 Example with VS Code Live Server:
 
@@ -135,6 +135,7 @@ Minimal mode:
 
 PWA install/offline behavior:
 
+- Install the PWA from the GitHub Pages URL listed above; manifest URLs target that deployment path.
 - Browsers that support install prompts can show an in-settings `Install` card.
 - On iOS, the app shows in-settings guidance to use Share, then Add to Home Screen.
 - Installed or previously opened sessions can load the cached app shell offline.
