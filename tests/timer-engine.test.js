@@ -6,6 +6,7 @@ const test = require("node:test");
 function createTimerContext() {
   const stateChanges = [];
   const phaseChanges = [];
+  let currentTimeMs = 1000;
   const state = {
     settings: Core.normalizeSettings({ prep_enabled: true }),
     stats: Core.normalizeStats({
@@ -18,12 +19,15 @@ function createTimerContext() {
       phase: Core.PHASE.FOCUS,
       focusBlockNumber: 1,
       remainingSec: 30,
-      lastTickMs: Date.now(),
+      lastTickMs: currentTimeMs,
     },
   };
   const timer = TimerEngine.create({
     state,
     Core,
+    now: function now() {
+      return currentTimeMs;
+    },
     hooks: {
       onStateChange: function onStateChange() {
         stateChanges.push(true);
@@ -34,7 +38,18 @@ function createTimerContext() {
     },
   });
 
-  return { state, timer, stateChanges, phaseChanges };
+  return {
+    state,
+    timer,
+    stateChanges,
+    phaseChanges,
+    advanceClock: function advanceClock(milliseconds) {
+      currentTimeMs += milliseconds;
+    },
+    setClock: function setClock(milliseconds) {
+      currentTimeMs = milliseconds;
+    },
+  };
 }
 
 test("reset returns timer to idle primary-action state", function () {
@@ -90,13 +105,41 @@ test("ordinary ticks render only when the displayed second changes", function ()
   try {
     ctx.timer.startTicker();
     ctx.state.timer.remainingSec = 29.8;
-    ctx.state.timer.lastTickMs = Date.now() - 100;
+    ctx.state.timer.lastTickMs = 900;
     tick();
     assert(ctx.stateChanges.length === 0, "expected sub-second tick to skip rendering");
 
-    ctx.state.timer.lastTickMs = Date.now() - 1100;
+    ctx.state.timer.lastTickMs = -100;
     tick();
     assert(ctx.stateChanges.length === 1, "expected displayed-second change to render");
+  } finally {
+    global.setInterval = originalSetInterval;
+  }
+});
+
+test("large or backward clock gaps do not complete unattended work", function () {
+  const ctx = createTimerContext();
+  const originalSetInterval = global.setInterval;
+  let tick = null;
+  global.setInterval = function captureTicker(callback) {
+    tick = callback;
+    return 1;
+  };
+
+  try {
+    ctx.state.timer.remainingSec = 1;
+    ctx.timer.startTicker();
+    ctx.advanceClock(6000);
+    tick();
+
+    assert.equal(ctx.state.timer.phase, Core.PHASE.FOCUS);
+    assert.equal(ctx.state.timer.remainingSec, 1);
+    assert.equal(ctx.state.stats.focusBlocksToday, 0);
+
+    ctx.setClock(500);
+    tick();
+    assert.equal(ctx.state.timer.lastTickMs, 500);
+    assert.equal(ctx.state.timer.remainingSec, 1);
   } finally {
     global.setInterval = originalSetInterval;
   }

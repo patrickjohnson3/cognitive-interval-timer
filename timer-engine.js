@@ -9,6 +9,15 @@
     const state = config.state;
     const Core = config.Core;
     const hooks = config.hooks;
+    const now =
+      config.now ||
+      function monotonicNow() {
+        if (typeof performance !== "undefined" && typeof performance.now === "function") {
+          return performance.now();
+        }
+        return Date.now();
+      };
+    const maxTickGapMs = config.maxTickGapMs || 5000;
     let intervalId = null;
     let suspended = false;
 
@@ -30,7 +39,7 @@
       }
 
       state.timer.status = Core.STATUS.RUNNING;
-      state.timer.lastTickMs = Date.now();
+      state.timer.lastTickMs = now();
       hooks.onStateChange();
     }
 
@@ -61,7 +70,7 @@
         autoStart: state.settings.auto_start,
         creditFocus: false,
       });
-      state.timer.lastTickMs = state.timer.status === Core.STATUS.RUNNING ? Date.now() : null;
+      state.timer.lastTickMs = state.timer.status === Core.STATUS.RUNNING ? now() : null;
 
       hooks.onPhaseChange({
         from: from,
@@ -80,19 +89,21 @@
         return;
       }
 
-      const now = Date.now();
+      const currentTickMs = now();
       if (state.timer.lastTickMs == null) {
-        state.timer.lastTickMs = now;
+        state.timer.lastTickMs = currentTickMs;
         if (statsRolledOver) hooks.onStateChange();
         return;
       }
 
-      const elapsedSec = (now - state.timer.lastTickMs) / 1000;
-      if (elapsedSec <= 0) {
+      const elapsedMs = currentTickMs - state.timer.lastTickMs;
+      if (elapsedMs <= 0 || elapsedMs > maxTickGapMs) {
+        state.timer.lastTickMs = currentTickMs;
         if (statsRolledOver) hooks.onStateChange();
         return;
       }
-      state.timer.lastTickMs = now;
+      const elapsedSec = elapsedMs / 1000;
+      state.timer.lastTickMs = currentTickMs;
       const previousDisplaySecond = Math.floor(state.timer.remainingSec);
 
       if (state.timer.remainingSec > elapsedSec) {
@@ -144,7 +155,7 @@
         return;
       }
       if (state.timer.status === Core.STATUS.RUNNING) {
-        state.timer.lastTickMs = Date.now();
+        state.timer.lastTickMs = now();
       }
     }
 
