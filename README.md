@@ -23,6 +23,7 @@ https://patrickjohnson3.github.io/cognitive-interval-timer/
 - Best-effort mobile haptic feedback on timer actions and phase changes
 - Light and dark theme selector
 - Daily focus block tracking
+- Active session indicator (`Focus Block N of session`)
 - Unsaved settings indicator
 - Keyboard shortcuts for timer control
 - Fullscreen mode
