@@ -161,7 +161,7 @@
         status: timerState.status,
         phase: timerState.phase,
         focusBlockNumber: timerState.focusBlockNumber,
-        remainingSec: Math.ceil(timerState.remainingSec),
+        remainingSec: timerState.remainingSec,
       };
     }
 

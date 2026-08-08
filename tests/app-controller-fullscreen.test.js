@@ -297,6 +297,14 @@ test("timer session state survives application initialization", function () {
   assert(ctx.app.state.timer.remainingSec === 42, "expected remaining time to restore");
 });
 
+test("timer persistence does not add time to a fractional countdown", function () {
+  const ctx = setup();
+  ctx.app.state.timer.remainingSec = 41.25;
+  ctx.app.onStateChange();
+
+  assert.equal(ctx.stored[Core.STORAGE_KEYS.timer].remainingSec, 41.25);
+});
+
 test("primary action pauses while timer is running", function () {
   const ctx = setup();
   ctx.app.state.timer.status = Core.STATUS.RUNNING;
