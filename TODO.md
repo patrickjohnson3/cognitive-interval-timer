@@ -1,5 +1,10 @@
 # TODO
 
+## Restore Display Modes At Startup
+
+- Explore restoring saved Minimal Mode and Fullscreen preferences when the app launches.
+- Account for browser user-activation requirements; use an explicit activation prompt if automatic entry is blocked.
+
 ## Android PWA Navigation Bar Color
 
 - Investigate whether Android/Chrome exposes any reliable PWA-side control over the bottom
