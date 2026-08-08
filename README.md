@@ -8,7 +8,7 @@ A browser-based interval timer inspired by Pomodoro, designed around cognitive p
 - Short Break
 - Long Break
 
-The app is client-side only (no backend) and includes light/dark grayscale themes, keyboard shortcuts, audio phase-change cues, and persistent settings/stats via local storage.
+The app is client-side only (no backend) and includes light/dark themes with restrained color accents, keyboard shortcuts, audio phase-change cues, and persistent settings/stats via local storage.
 
 ## Live Site
 
