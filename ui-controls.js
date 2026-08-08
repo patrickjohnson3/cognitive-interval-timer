@@ -41,6 +41,7 @@
 
     function bindControls(handlers) {
       setMinimalPanelOpen(false);
+      bindTooltips();
       dom.controls.start.addEventListener("click", handlers.onPrimaryAction);
       dom.controls.skip.addEventListener("click", handlers.onSkip);
       dom.controls.reset.addEventListener("click", handlers.onReset);
@@ -165,6 +166,39 @@
       });
     }
 
+    function bindTooltips() {
+      if (typeof document.querySelectorAll !== "function") return;
+      document.querySelectorAll(".tip-wrap").forEach(function bindTooltip(wrapper) {
+        const trigger = wrapper.querySelector(".tip-trigger");
+        const bubble = wrapper.querySelector(".tip-bubble");
+        if (!trigger || !bubble) return;
+
+        hideTooltip(wrapper, bubble);
+        wrapper.addEventListener("mouseenter", function showHoveredTooltip() {
+          showTooltip(wrapper, bubble);
+        });
+        wrapper.addEventListener("mouseleave", function hideUnfocusedTooltip() {
+          if (document.activeElement !== trigger) hideTooltip(wrapper, bubble);
+        });
+        trigger.addEventListener("focus", function showFocusedTooltip() {
+          showTooltip(wrapper, bubble);
+        });
+        trigger.addEventListener("blur", function hideBlurredTooltip() {
+          hideTooltip(wrapper, bubble);
+        });
+      });
+    }
+
+    function showTooltip(wrapper, bubble) {
+      bubble.hidden = false;
+      wrapper.setAttribute("data-open", "true");
+    }
+
+    function hideTooltip(wrapper, bubble) {
+      bubble.hidden = true;
+      wrapper.setAttribute("data-open", "false");
+    }
+
     function bindMinimalModeSurface(handlers) {
       const eventName =
         "PointerEvent" in window ? "pointerup" : "TouchEvent" in window ? "touchend" : "click";
@@ -221,15 +255,12 @@
 
     function dismissActiveTooltip() {
       const activeElement = document.activeElement;
-      if (
-        !activeElement ||
-        !activeElement.closest ||
-        !activeElement.closest(".tip-wrap") ||
-        !activeElement.blur
-      ) {
-        return false;
-      }
-      activeElement.blur();
+      if (!activeElement || !activeElement.closest) return false;
+      const wrapper = activeElement.closest(".tip-wrap");
+      if (!wrapper || !wrapper.querySelector) return false;
+      const bubble = wrapper.querySelector(".tip-bubble");
+      if (!bubble || bubble.hidden) return false;
+      hideTooltip(wrapper, bubble);
       return true;
     }
 

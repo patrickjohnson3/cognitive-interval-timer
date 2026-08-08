@@ -65,6 +65,11 @@ function createBrowserFixture(options) {
     addEventListener: function addEventListener(type, handler) {
       documentListeners[type] = handler;
     },
+    querySelectorAll:
+      config.querySelectorAll ||
+      function querySelectorAll() {
+        return [];
+      },
   };
   if (config.exitFullscreen) documentRef.exitFullscreen = config.exitFullscreen;
 

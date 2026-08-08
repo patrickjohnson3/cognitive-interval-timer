@@ -92,6 +92,7 @@ function bindWithBrowserStubs(options) {
   const browser = createBrowserFixture({
     pointerEvents: config.pointerEvents !== false,
     touchEvents: config.touchEvents,
+    querySelectorAll: config.querySelectorAll,
   });
   const calls = [];
   const handlers = {
@@ -307,17 +308,51 @@ test("Escape closes an open minimal panel before exiting minimal mode", function
 });
 
 test("Escape dismisses a focused tooltip before other Escape actions", function () {
-  const ctx = bindWithBrowserStubs();
+  const bubble = eventTargetNode({ tagName: "SPAN", hidden: true });
   const trigger = eventTargetNode({ tagName: "BUTTON" });
-  trigger.closest = function closest(selector) {
-    return selector === ".tip-wrap" ? {} : null;
+  const wrapper = eventTargetNode({ tagName: "SPAN" });
+  wrapper.querySelector = function querySelector(selector) {
+    if (selector === ".tip-trigger") return trigger;
+    if (selector === ".tip-bubble") return bubble;
+    return null;
   };
+  trigger.closest = function closest(selector) {
+    return selector === ".tip-wrap" ? wrapper : null;
+  };
+  const ctx = bindWithBrowserStubs({
+    querySelectorAll: function querySelectorAll() {
+      return [wrapper];
+    },
+  });
+  trigger.listeners.focus();
   global.document.activeElement = trigger;
 
   ctx.windowListeners.keydown({ key: "Escape", target: trigger });
 
-  assert.equal(trigger.blurCount, 1);
+  assert.equal(bubble.hidden, true);
+  assert.equal(wrapper.getAttribute("data-open"), "false");
+  assert.equal(trigger.blurCount || 0, 0, "tooltip dismissal should preserve trigger focus");
   assert(!ctx.calls.includes("exit-minimal"));
+});
+
+test("closed tooltips are hidden from assistive technology", function () {
+  const bubble = eventTargetNode({ tagName: "SPAN" });
+  const trigger = eventTargetNode({ tagName: "BUTTON" });
+  const wrapper = eventTargetNode({ tagName: "SPAN" });
+  wrapper.querySelector = function querySelector(selector) {
+    return selector === ".tip-trigger" ? trigger : bubble;
+  };
+  bindWithBrowserStubs({
+    querySelectorAll: function querySelectorAll() {
+      return [wrapper];
+    },
+  });
+
+  assert.equal(bubble.hidden, true);
+  trigger.listeners.focus();
+  assert.equal(bubble.hidden, false);
+  trigger.listeners.blur();
+  assert.equal(bubble.hidden, true);
 });
 
 test("timer shortcuts do not intercept native button keyboard actions", function () {

@@ -499,6 +499,10 @@ label {
     transform 120ms ease;
 }
 
+.tip-bubble[hidden] {
+  display: none;
+}
+
 .tip-bubble--below {
   --tip-top: calc(100% + var(--space-2));
   --tip-bottom: auto;
@@ -527,8 +531,7 @@ label {
   line-height: 1.35;
 }
 
-.tip-wrap:hover .tip-bubble,
-.tip-wrap:focus-within .tip-bubble {
+.tip-wrap[data-open="true"] .tip-bubble {
   opacity: 1;
   pointer-events: auto;
   transform: translate(var(--tip-shift-x), var(--tip-shift-y-visible));
