@@ -226,10 +226,10 @@
     const events = [];
     let transitions = 0;
 
-    while (remainingElapsed > 0 && timer.running) {
+    while (remainingElapsed > 0 && timer.status === STATUS.RUNNING) {
       transitions += 1;
       if (transitions > config.maxTransitions) {
-        timer.running = false;
+        timer.status = STATUS.PAUSED;
         break;
       }
 
@@ -257,7 +257,7 @@
 
       timer.phase = to;
       timer.remainingSec = phaseDurationSec(to, settings);
-      timer.running = Boolean(config.autoStart);
+      timer.status = config.autoStart ? STATUS.RUNNING : STATUS.PAUSED;
 
       events.push({ type: "phase", from: from, to: to, creditFocus: creditFocus });
     }

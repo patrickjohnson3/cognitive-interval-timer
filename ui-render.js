@@ -42,11 +42,8 @@
     }
 
     function buildView(state) {
-      const statusKey = state.timer.running
-        ? Core.STATUS.RUNNING
-        : state.timer.hasStartedOnce
-          ? Core.STATUS.PAUSED
-          : Core.STATUS.IDLE;
+      const statusKey = state.timer.status;
+      const sessionStarted = statusKey !== Core.STATUS.IDLE;
       const primaryActionLabels = labels.primaryActionLabels || {};
       const primaryActionIcons = labels.primaryActionIcons || {};
       const primaryActionAriaLabels = labels.primaryActionAriaLabels || {};
@@ -68,13 +65,13 @@
           state.stats.focusBlocksSinceLong +
           " / " +
           state.settings.blocks_per_ultradian,
-        focusBlockText: state.timer.hasStartedOnce
+        focusBlockText: sessionStarted
           ? (labels.focusBlockPrefix || "Focus Block ") + (state.stats.focusBlocksToday + 1)
           : labels.focusBlockReady || "Focus Block\nReady",
-        focusBlockContextText: state.timer.hasStartedOnce
+        focusBlockContextText: sessionStarted
           ? labels.focusBlockSessionSuffix || "of session"
           : labels.focusBlockReadyContext || "Ready to begin session.",
-        focusBlockAriaLabel: state.timer.hasStartedOnce
+        focusBlockAriaLabel: sessionStarted
           ? (labels.focusBlockPrefix || "Focus Block ") +
             (state.stats.focusBlocksToday + 1) +
             " " +
@@ -106,7 +103,7 @@
             : statusKey === Core.STATUS.PAUSED
               ? "Resume timer"
               : "Start timer"),
-        titleText: state.timer.hasStartedOnce
+        titleText: sessionStarted
           ? Core.formatTime(state.timer.remainingSec) +
             (labels.documentTitleSeparator || " - ") +
             Core.stateLabel(state.timer.phase) +

@@ -282,8 +282,7 @@ test("primary action starts before timer has started", function () {
 
 test("primary action pauses while timer is running", function () {
   const ctx = setup();
-  ctx.app.state.timer.running = true;
-  ctx.app.state.timer.hasStartedOnce = true;
+  ctx.app.state.timer.status = Core.STATUS.RUNNING;
   ctx.boundHandlers.onPrimaryAction();
 
   assert(ctx.timerCalls.includes("pause"), "expected primary action to pause timer");
@@ -292,8 +291,7 @@ test("primary action pauses while timer is running", function () {
 
 test("primary action resumes while timer is paused", function () {
   const ctx = setup();
-  ctx.app.state.timer.running = false;
-  ctx.app.state.timer.hasStartedOnce = true;
+  ctx.app.state.timer.status = Core.STATUS.PAUSED;
   ctx.boundHandlers.onPrimaryAction();
 
   assert(ctx.timerCalls.includes("start"), "expected primary action to resume timer");

@@ -28,11 +28,10 @@
       stats: Core.normalizeStats(null),
       theme: "dark",
       timer: {
-        running: false,
+        status: Core.STATUS.IDLE,
         phase: Core.PHASE.FOCUS,
         remainingSec: 0,
         lastTickMs: null,
-        hasStartedOnce: false,
       },
       ui: {
         settingsDirty: false,
@@ -214,7 +213,7 @@
     }
 
     function onPrimaryAction() {
-      if (appState.timer.running) {
+      if (appState.timer.status === Core.STATUS.RUNNING) {
         pause();
         return;
       }
@@ -506,7 +505,7 @@
       appState.settings = next;
       persistSettings(appState.settings);
 
-      if (!appState.timer.running) {
+      if (appState.timer.status !== Core.STATUS.RUNNING) {
         const nextPhaseDuration = Core.phaseDurationSec(appState.timer.phase, appState.settings);
         appState.timer.remainingSec = Math.max(0, nextPhaseDuration - elapsedInPhase);
       }

@@ -19,23 +19,22 @@
     function start() {
       state.stats = Core.rolloverStats(state.stats, Core.dateKey());
 
-      if (!state.timer.hasStartedOnce) {
+      if (state.timer.status === Core.STATUS.IDLE) {
         hooks.onPhaseChange({
           from: null,
           to: state.timer.phase,
           label: Core.stateLabel(state.timer.phase),
           reason: "initial_start",
         });
-        state.timer.hasStartedOnce = true;
       }
 
-      state.timer.running = true;
+      state.timer.status = Core.STATUS.RUNNING;
       state.timer.lastTickMs = Date.now();
       hooks.onStateChange();
     }
 
     function pause() {
-      state.timer.running = false;
+      state.timer.status = Core.STATUS.PAUSED;
       state.timer.lastTickMs = null;
       hooks.onStateChange();
     }
@@ -46,9 +45,8 @@
 
     function resetToPhase(phase) {
       state.stats = Core.rolloverStats(state.stats, Core.dateKey());
-      state.timer.running = false;
+      state.timer.status = Core.STATUS.IDLE;
       state.timer.lastTickMs = null;
-      state.timer.hasStartedOnce = false;
       state.timer.phase = phase;
       state.timer.remainingSec = Core.phaseDurationSec(phase, state.settings);
       hooks.onStateChange();
@@ -91,8 +89,8 @@
 
       state.timer.phase = phase;
       state.timer.remainingSec = Core.phaseDurationSec(phase, state.settings);
-      state.timer.running = Boolean(nextConfig.autoStart);
-      state.timer.lastTickMs = state.timer.running ? Date.now() : null;
+      state.timer.status = nextConfig.autoStart ? Core.STATUS.RUNNING : Core.STATUS.PAUSED;
+      state.timer.lastTickMs = state.timer.status === Core.STATUS.RUNNING ? Date.now() : null;
 
       hooks.onPhaseChange({
         from: from,
@@ -104,7 +102,7 @@
     }
 
     function tick() {
-      if (!state.timer.running) return;
+      if (state.timer.status !== Core.STATUS.RUNNING) return;
 
       state.stats = Core.rolloverStats(state.stats, Core.dateKey());
       const now = Date.now();
@@ -128,12 +126,12 @@
         }
       );
 
-      if (!state.timer.running) {
+      if (state.timer.status !== Core.STATUS.RUNNING) {
         state.timer.lastTickMs = null;
       }
 
       if (consumed.transitionLimitHit) {
-        state.timer.running = false;
+        state.timer.status = Core.STATUS.PAUSED;
         state.timer.lastTickMs = null;
         state.timer.remainingSec = Core.phaseDurationSec(state.timer.phase, state.settings);
         hooks.onStateChange();

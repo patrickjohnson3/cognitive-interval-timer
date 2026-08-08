@@ -50,7 +50,7 @@ test("advanceTimerByElapsed transitions and credits focus completion", function 
     prep: 1,
     blocks_per_ultradian: 2,
   });
-  const timer = { running: true, phase: "focus", remainingSec: 10 };
+  const timer = { status: Core.STATUS.RUNNING, phase: "focus", remainingSec: 10 };
   const stats = Core.normalizeStats({
     dateKey: Core.dateKey(),
     focusBlocksToday: 0,
@@ -89,7 +89,7 @@ test("advanceTimerByElapsed handles large elapsed time without dropping transiti
     blocks_per_ultradian: 2,
   });
 
-  const timer = { running: true, phase: "focus", remainingSec: 1 };
+  const timer = { status: Core.STATUS.RUNNING, phase: "focus", remainingSec: 1 };
   const stats = Core.normalizeStats({
     dateKey: Core.dateKey(),
     focusBlocksToday: 0,
@@ -111,7 +111,7 @@ test("advanceTimerByElapsed follows a full two-block cycle into long break", fun
     blocks_per_ultradian: 2,
     auto_start: true,
   });
-  let timer = { running: true, phase: "prep", remainingSec: 1 };
+  let timer = { status: Core.STATUS.RUNNING, phase: "prep", remainingSec: 1 };
   let stats = Core.normalizeStats({
     dateKey: Core.dateKey(),
     focusBlocksToday: 0,
