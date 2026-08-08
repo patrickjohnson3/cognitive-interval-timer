@@ -6,10 +6,17 @@
   }
 })(typeof self !== "undefined" ? self : this, function makeUIControls() {
   function create(dom) {
-    function isFormTarget(target) {
+    function isInteractiveTarget(target) {
       if (!target) return false;
       const tag = target.tagName;
-      return tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA" || target.isContentEditable;
+      return (
+        tag === "INPUT" ||
+        tag === "SELECT" ||
+        tag === "TEXTAREA" ||
+        tag === "BUTTON" ||
+        tag === "A" ||
+        target.isContentEditable
+      );
     }
 
     function readSettingsForm() {
@@ -102,7 +109,7 @@
           handlers.onExitMinimalMode();
           return;
         }
-        if (isFormTarget(event.target)) return;
+        if (isInteractiveTarget(event.target)) return;
         const key = event.key.toLowerCase();
         if (key === " ") {
           event.preventDefault();
@@ -152,7 +159,7 @@
       if (!document.documentElement.hasAttribute("data-minimal-mode")) return false;
       if (event.button != null && event.button !== 0) return false;
       if (isMinimalPanelTarget(event.target)) return false;
-      if (isFormTarget(event.target)) return false;
+      if (isInteractiveTarget(event.target)) return false;
       return true;
     }
 
