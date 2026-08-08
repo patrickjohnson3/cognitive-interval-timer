@@ -48,11 +48,8 @@
       const primaryActionLabels = labels.primaryActionLabels || {};
       const primaryActionIcons = labels.primaryActionIcons || {};
       const primaryActionAriaLabels = labels.primaryActionAriaLabels || {};
-      const changed = [];
       const phaseCopy = phaseConfig[state.timer.phase] || {};
       const phaseLabel = phaseCopy.displayName || String(state.timer.phase || "");
-      if (state.ui.sessionFlags.changedAutoStart) changed.push(labels.autoStart || "Auto-Start");
-      if (state.ui.sessionFlags.changedSound) changed.push(labels.sound || "Sound");
 
       return {
         stateText: phaseLabel,
@@ -85,11 +82,6 @@
           : state.ui.settingsDirty
             ? labels.unsavedChanges || "Unsaved Changes"
             : labels.allSettingsSaved || "All Settings Saved",
-        sessionChangesText:
-          changed.length > 0
-            ? (labels.sessionChangesPrefix || "Session Changes: ") + changed.join(", ")
-            : (labels.sessionChangesPrefix || "Session Changes: ") +
-              (labels.sessionChangesNone || "None"),
         primaryButtonIcon:
           primaryActionIcons[statusKey] || (statusKey === Core.STATUS.RUNNING ? "⏸" : "▶"),
         primaryButtonText:
@@ -128,7 +120,6 @@
       dom.focusBlockContext.textContent = vm.focusBlockContextText;
       dom.focusBlockBadge.setAttribute("aria-label", vm.focusBlockAriaLabel);
       dom.dirtyIndicator.textContent = vm.dirtyText;
-      dom.sessionNote.textContent = vm.sessionChangesText;
       updatePrimaryButton(vm);
       document.title = vm.titleText;
     }

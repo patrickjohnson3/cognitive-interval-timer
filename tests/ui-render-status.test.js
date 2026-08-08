@@ -29,7 +29,6 @@ function createDeps() {
     focusBlockBadge: textNode(),
     focusBlockContext: textNode(),
     dirtyIndicator: textNode(),
-    sessionNote: textNode(),
     controls: {
       start: controlButtonNode(),
     },
@@ -129,10 +128,6 @@ function baseState() {
     ui: {
       settingsDirty: false,
       storageWarning: false,
-      sessionFlags: {
-        changedAutoStart: false,
-        changedSound: false,
-      },
     },
   };
 }

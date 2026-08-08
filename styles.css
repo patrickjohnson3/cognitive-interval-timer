@@ -577,8 +577,7 @@ select {
   color: var(--color-success);
 }
 
-.settings-state,
-.session-note {
+.settings-state {
   margin-top: var(--space-1);
   font-size: 0.84rem;
   color: var(--text-secondary, var(--color-muted));
@@ -622,7 +621,6 @@ select {
 :root[data-minimal-mode="true"] .stats,
 :root[data-minimal-mode="true"] .settings-actions-wrap,
 :root[data-minimal-mode="true"] .settings-state,
-:root[data-minimal-mode="true"] .session-note,
 :root[data-minimal-mode="true"] .ok {
   display: none !important;
 }

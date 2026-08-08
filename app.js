@@ -88,7 +88,6 @@
       long: byId("long"),
       saveMsg: byId("save-msg"),
       dirtyIndicator: byId("dirty-indicator"),
-      sessionNote: byId("session-note"),
       theme: byId("theme"),
       live: byId("live-announcer"),
       tagline: byId("tagline"),

@@ -38,10 +38,6 @@
       ui: {
         settingsDirty: false,
         storageWarning: false,
-        sessionFlags: {
-          changedAutoStart: false,
-          changedSound: false,
-        },
       },
     };
 
@@ -569,13 +565,6 @@
       const next = normalizeAppSettings(rawSettings);
       appState.draftSettings = Object.assign({}, next);
 
-      if (next.auto_start !== appState.settings.auto_start) {
-        appState.ui.sessionFlags.changedAutoStart = true;
-      }
-      if (next.sound_enabled !== appState.settings.sound_enabled) {
-        appState.ui.sessionFlags.changedSound = true;
-      }
-
       appState.settings = next;
       persistSettings(appState.settings);
 
@@ -599,8 +588,6 @@
       persistSettings(appState.settings);
 
       appState.ui.settingsDirty = false;
-      appState.ui.sessionFlags.changedAutoStart = false;
-      appState.ui.sessionFlags.changedSound = false;
 
       applySettingsSideEffects();
       timer.reset();
