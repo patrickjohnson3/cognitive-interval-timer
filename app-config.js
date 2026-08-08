@@ -15,5 +15,10 @@
     manifestStartUrl: "/cognitive-interval-timer/",
     manifestScope: "/cognitive-interval-timer/",
     manifestOrientation: "any",
+    themeColors: {
+      dark: "#0f172a",
+      light: "#f5f7f9",
+    },
+    manifestBackgroundColor: "#111827",
   };
 });

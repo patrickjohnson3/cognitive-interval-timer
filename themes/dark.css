@@ -1,4 +1,6 @@
 :root[data-theme="dark"] {
+  color-scheme: dark;
+
   --color-bg: #0f172a;
   --color-bg-alt: #17223a;
   --color-surface: #1e293b;

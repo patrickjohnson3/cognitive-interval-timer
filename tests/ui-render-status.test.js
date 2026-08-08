@@ -1,4 +1,5 @@
 const UIRender = require("../ui-render.js");
+const AppConfig = require("../app-config.js");
 const { controlButtonNode, textNode } = require("./helpers/dom.js");
 
 global.document = {
@@ -114,7 +115,7 @@ function createDeps() {
     },
   };
 
-  return { dom, Core, Content, storage };
+  return { dom, Core, Content, AppConfig, storage };
 }
 
 function baseState() {
@@ -167,10 +168,16 @@ test("hydrateTheme updates browser theme color", function () {
   document.nodes["theme-color-meta"] = themeColor;
 
   render.hydrateTheme("light");
-  assert(themeColor.attributes.content === "#f5f7f9", "expected light browser theme color");
+  assert(
+    themeColor.attributes.content === AppConfig.themeColors.light,
+    "expected light browser theme color"
+  );
 
   render.hydrateTheme("dark");
-  assert(themeColor.attributes.content === "#0f172a", "expected dark browser theme color");
+  assert(
+    themeColor.attributes.content === AppConfig.themeColors.dark,
+    "expected dark browser theme color"
+  );
 
   delete document.nodes["theme-color-meta"];
 });

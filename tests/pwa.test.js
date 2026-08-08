@@ -50,6 +50,10 @@ test("index links PWA manifest and registration script", function () {
     html.includes('<meta id="theme-color-meta" name="theme-color"'),
     "missing dynamic theme-color meta"
   );
+  assert(
+    html.includes('<meta name="color-scheme" content="dark light" />'),
+    "missing dark-first color-scheme hint"
+  );
   assert(html.includes('<script src="pwa.js"></script>'), "missing PWA registration script");
   assert(html.includes('<script src="app-version.js"></script>'), "missing app version script");
   assert(html.includes('<script src="app-config.js"></script>'), "missing app config script");
@@ -143,6 +147,14 @@ test("manifest has installable app metadata and icons", function () {
     manifest.orientation === appConfig.manifestOrientation,
     "manifest should explicitly allow all orientations"
   );
+  assert(
+    manifest.theme_color === appConfig.themeColors.dark,
+    "manifest theme_color should match dark app chrome"
+  );
+  assert(
+    manifest.background_color === appConfig.manifestBackgroundColor,
+    "manifest background_color should match app config"
+  );
   assert(Array.isArray(manifest.icons) && manifest.icons.length >= 2, "expected manifest icons");
   manifest.icons.forEach(function eachIcon(icon) {
     assert(fs.existsSync(path.join(__dirname, "..", icon.src)), "missing icon file " + icon.src);
@@ -154,6 +166,17 @@ test("manifest has installable app metadata and icons", function () {
       "icon size mismatch " + icon.src
     );
   });
+});
+
+test("themes declare color-scheme for browser chrome and controls", function () {
+  const darkTheme = readProjectFile("themes/dark.css");
+  const lightTheme = readProjectFile("themes/light.css");
+
+  assert(darkTheme.includes("color-scheme: dark;"), "dark theme should declare dark color-scheme");
+  assert(
+    lightTheme.includes("color-scheme: light;"),
+    "light theme should declare light color-scheme"
+  );
 });
 
 test("manifest includes dedicated maskable icons", function () {

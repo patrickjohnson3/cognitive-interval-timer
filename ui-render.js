@@ -8,13 +8,11 @@
   function create(deps) {
     const Core = deps.Core;
     const Content = deps.Content || {};
+    const AppConfig = deps.AppConfig || {};
     const dom = deps.dom;
     const uiCopy = Content.UI_COPY || {};
     const labels = uiCopy.labels || {};
-    const themeColors = {
-      dark: "#0f172a",
-      light: "#f5f7f9",
-    };
+    const themeColors = AppConfig.themeColors || { dark: "#0f172a", light: "#f5f7f9" };
 
     function setTagline(text) {
       dom.tagline.textContent = text;

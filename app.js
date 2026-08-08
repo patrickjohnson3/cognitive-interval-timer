@@ -13,6 +13,7 @@
   const AppController = window.PomodoroAppController;
   const A11y = window.PomodoroA11y;
   const AppVersion = window.PomodoroAppVersion;
+  const AppConfig = window.PomodoroAppConfig;
 
   if (
     !Core ||
@@ -28,7 +29,8 @@
     !TimerEngine ||
     !AppController ||
     !A11y ||
-    !AppVersion
+    !AppVersion ||
+    !AppConfig
   ) {
     throw new Error("Missing required modules. Ensure all scripts load before app.js");
   }
@@ -46,6 +48,7 @@
     dom: dom,
     Core: Core,
     Content: Content,
+    AppConfig: AppConfig,
   });
 
   const controls = UIControls.create(dom);

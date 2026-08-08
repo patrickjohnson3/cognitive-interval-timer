@@ -1,4 +1,6 @@
 :root[data-theme="light"] {
+  color-scheme: light;
+
   --color-bg: #f5f7f9;
   --color-bg-alt: #eef2f6;
   --color-surface: #ffffff;
