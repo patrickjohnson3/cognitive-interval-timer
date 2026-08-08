@@ -29,7 +29,7 @@ https://patrickjohnson3.github.io/cognitive-interval-timer/
 - Best-effort keep-screen-awake mode on browsers with Screen Wake Lock support
 - Minimal mode with centered phase, timer, and phase tagline
 - Installable PWA app shell with offline support
-- No build step required
+- No runtime build step; Pages deployment creates a stamped static artifact
 
 ## Project Structure
 
