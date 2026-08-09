@@ -502,8 +502,8 @@ test("modified keys do not trigger timer shortcuts", function () {
   );
 });
 
-test("clicking screen in minimal mode toggles start pause without pointer events", function () {
-  const ctx = bindWithBrowserStubs({ pointerEvents: false });
+test("clicking screen in minimal mode toggles start pause", function () {
+  const ctx = bindWithBrowserStubs();
   ctx.documentElement.setAttribute("data-minimal-mode", "true");
   ctx.windowListeners.click({
     button: 0,
@@ -513,29 +513,11 @@ test("clicking screen in minimal mode toggles start pause without pointer events
   assert(ctx.calls.includes("shortcut:toggle"), "expected minimal click to toggle timer");
 });
 
-test("pointer release in minimal mode toggles start pause", function () {
+test("minimal mode does not bind raw pointer or touch releases", function () {
   const ctx = bindWithBrowserStubs();
-  ctx.documentElement.setAttribute("data-minimal-mode", "true");
-  ctx.windowListeners.pointerup({
-    button: 0,
-    cancelable: true,
-    preventDefault: function preventDefault() {},
-    target: eventTargetNode({ id: "timer-panel", tagName: "DIV" }),
-  });
 
-  assert(ctx.calls.includes("shortcut:toggle"), "expected minimal pointerup to toggle timer");
-});
-
-test("touch release in minimal mode toggles start pause without pointer events", function () {
-  const ctx = bindWithBrowserStubs({ pointerEvents: false, touchEvents: true });
-  ctx.documentElement.setAttribute("data-minimal-mode", "true");
-  ctx.windowListeners.touchend({
-    cancelable: true,
-    preventDefault: function preventDefault() {},
-    target: eventTargetNode({ id: "timer-panel", tagName: "DIV" }),
-  });
-
-  assert(ctx.calls.includes("shortcut:toggle"), "expected minimal touchend to toggle timer");
+  assert.equal(ctx.windowListeners.pointerup, undefined);
+  assert.equal(ctx.windowListeners.touchend, undefined);
 });
 
 test("clicking outside open minimal panel closes it without toggling timer", function () {
@@ -562,23 +544,6 @@ test("clicking outside open minimal panel closes it without toggling timer", fun
   );
 });
 
-test("pointer release closes open minimal panel without toggling timer", function () {
-  const ctx = bindWithBrowserStubs();
-  const target = eventTargetNode({ id: "timer-panel", tagName: "DIV" });
-  ctx.documentElement.setAttribute("data-minimal-mode", "true");
-  ctx.dom.controls.exitMinimalModeWrap.setAttribute("data-open", "true");
-  ctx.windowListeners.pointerup({ button: 0, target });
-
-  assert(
-    ctx.dom.controls.exitMinimalModeWrap.getAttribute("data-open") === "false",
-    "expected pointer release to close minimal panel"
-  );
-  assert(
-    !ctx.calls.includes("shortcut:toggle"),
-    "synthesized click should not toggle after panel close"
-  );
-});
-
 test("restarting from minimal panel resets without toggling timer", function () {
   const ctx = bindWithBrowserStubs();
   ctx.documentElement.setAttribute("data-minimal-mode", "true");
@@ -602,7 +567,7 @@ test("clicking exit panel in minimal mode does not toggle timer", function () {
   const ctx = bindWithBrowserStubs();
   const exitTarget = eventTargetNode({ id: "minimal-exit-wrap" });
   ctx.documentElement.setAttribute("data-minimal-mode", "true");
-  ctx.windowListeners.pointerup({ button: 0, target: exitTarget });
+  ctx.windowListeners.click({ button: 0, target: exitTarget });
 
   assert(!ctx.calls.includes("shortcut:toggle"), "exit panel clicks should not toggle timer");
 });

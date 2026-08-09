@@ -235,9 +235,7 @@
     }
 
     function bindMinimalModeSurface(handlers) {
-      const eventName =
-        "PointerEvent" in window ? "pointerup" : "TouchEvent" in window ? "touchend" : "click";
-      window.addEventListener(eventName, function onMinimalSurfaceAction(event) {
+      window.addEventListener("click", function onMinimalSurfaceAction(event) {
         toggleMinimalTimer(event, handlers);
       });
     }
