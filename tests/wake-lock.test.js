@@ -141,3 +141,46 @@ test("retries one spontaneous visible wake-lock release", async function () {
   releaseListeners[1]();
   assert.equal(scheduled.length, 1, "retry-acquired lock should not create an endless loop");
 });
+
+test("reacquires the wake lock when a hidden page becomes visible", async function () {
+  const documentRef = {
+    visibilityState: "visible",
+    listeners: {},
+    addEventListener: function addEventListener(type, listener) {
+      this.listeners[type] = listener;
+    },
+  };
+  const releaseListeners = [];
+  let requests = 0;
+  const wakeLock = WakeLock.createController({
+    document: documentRef,
+    navigator: {
+      wakeLock: {
+        request: function request() {
+          requests += 1;
+          return Promise.resolve({
+            addEventListener: function addEventListener(type, listener) {
+              if (type === "release") releaseListeners.push(listener);
+            },
+            release: function release() {
+              return Promise.resolve();
+            },
+          });
+        },
+      },
+    },
+  });
+
+  await wakeLock.setEnabled(true);
+  documentRef.visibilityState = "hidden";
+  releaseListeners[0]();
+  assert.equal(requests, 1, "hidden release should not request immediately");
+
+  documentRef.visibilityState = "visible";
+  documentRef.listeners.visibilitychange();
+  await Promise.resolve();
+  await Promise.resolve();
+
+  assert.equal(requests, 2);
+  assert.equal(releaseListeners.length, 2);
+});
