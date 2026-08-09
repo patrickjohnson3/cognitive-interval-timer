@@ -71,10 +71,13 @@ test("timer actions have concise status announcements", function () {
   assert.equal(a11y.formatAnnouncement("block_restarted"), "Block restarted.");
 });
 
-test("tooltip triggers meet the 24 CSS-pixel touch target minimum", function () {
+test("tooltip triggers meet the 44 CSS-pixel touch target minimum", function () {
   const css = fs.readFileSync(path.join(__dirname, "..", "styles.css"), "utf8");
   const rule = css.match(/\.tip-trigger\s*\{([^}]*)\}/)[1];
+  const coarsePointerRule = css.match(/@media \(any-pointer: coarse\)\s*\{([\s\S]*?)\n\}/)[1];
 
-  assert.match(rule, /width:\s*1\.5rem/);
-  assert.match(rule, /height:\s*1\.5rem/);
+  assert.match(rule, /width:\s*44px/);
+  assert.match(rule, /height:\s*44px/);
+  assert.match(coarsePointerRule, /width:\s*48px/);
+  assert.match(coarsePointerRule, /height:\s*48px/);
 });

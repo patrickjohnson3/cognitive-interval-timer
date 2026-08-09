@@ -108,6 +108,7 @@ body {
 
 .settings-trigger {
   position: relative;
+  min-height: 44px;
   padding: var(--space-2) var(--space-3);
   color: var(--text-secondary, var(--color-muted));
   background: transparent;
@@ -298,6 +299,7 @@ h1 {
 
 .controls button {
   width: 100%;
+  min-height: 44px;
   min-width: 0;
   display: inline-flex;
   align-items: center;
@@ -624,8 +626,8 @@ label {
 }
 
 .tip-trigger {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border-radius: 999px;
   font-size: 0.72rem;
@@ -748,6 +750,7 @@ select {
 .checks label {
   display: flex;
   align-items: center;
+  min-height: 44px;
   gap: var(--space-2);
   color: var(--color-text);
   font-size: var(--font-size-label-strong);
@@ -920,7 +923,7 @@ select {
   left: 0;
   right: 0;
   width: 116px;
-  height: 42px;
+  height: 44px;
   margin-inline: auto;
   padding: 0 var(--space-4);
   border-radius: 999px;
@@ -1127,6 +1130,24 @@ select {
     --tip-shift-x: 0;
     width: min(260px, calc(100vw - (var(--space-4) * 2)));
     max-width: calc(100vw - (var(--space-4) * 2));
+  }
+}
+
+@media (any-pointer: coarse) {
+  .settings-trigger,
+  .controls button,
+  .settings button,
+  .settings input[type="number"],
+  .settings select,
+  .settings .checks label,
+  .minimal-exit-reveal {
+    min-height: 48px;
+  }
+
+  .tip-trigger,
+  .settings .tip-trigger {
+    width: 48px;
+    height: 48px;
   }
 }
 

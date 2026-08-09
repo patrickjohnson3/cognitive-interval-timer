@@ -542,18 +542,41 @@ async function assertResponsiveUI(client) {
   });
   await settleLayout(client);
 
-  const landscapeOkay = await evaluateValue(
+  const landscapeChecks = await evaluateValue(
     client,
     `(() => {
       const columns = getComputedStyle(document.querySelector(".main")).gridTemplateColumns
         .split(" ")
         .filter(Boolean);
-      return matchMedia("(orientation: landscape)").matches &&
-        columns.length === 1 &&
-        document.documentElement.scrollWidth <= window.innerWidth;
+      const touchTargets = [
+        document.getElementById("open-settings"),
+        document.querySelector(".tip-trigger"),
+        document.getElementById("start")
+      ];
+      const targets = touchTargets.map((target) => {
+          const rect = target.getBoundingClientRect();
+          return { id: target.id || target.className, width: rect.width, height: rect.height };
+        });
+      return {
+        landscape: matchMedia("(orientation: landscape)").matches,
+        columnCount: columns.length,
+        fitsViewport: document.documentElement.scrollWidth <= window.innerWidth,
+        coarsePointer: matchMedia("(any-pointer: coarse)").matches,
+        targets,
+        targetsLargeEnough: targets.every((target) => target.width >= 44 && target.height >= 44)
+      };
     })()`
   );
-  if (!landscapeOkay) throw new Error("Rendered short-landscape layout checks failed");
+  if (
+    !landscapeChecks.landscape ||
+    landscapeChecks.columnCount !== 1 ||
+    !landscapeChecks.fitsViewport ||
+    !landscapeChecks.targetsLargeEnough
+  ) {
+    throw new Error(
+      "Rendered short-landscape layout checks failed: " + JSON.stringify(landscapeChecks)
+    );
+  }
 
   const minimalLandscapeOkay = await evaluateValue(
     client,
@@ -561,9 +584,10 @@ async function assertResponsiveUI(client) {
       document.documentElement.setAttribute("data-minimal-mode", "true");
       const hint = document.getElementById("hint").getBoundingClientRect();
       const reveal = document.getElementById("minimal-exit-reveal").getBoundingClientRect();
+      const validTarget = reveal.width >= 44 && reveal.height >= 44;
       const separated = hint.bottom + 4 <= reveal.top;
       document.documentElement.removeAttribute("data-minimal-mode");
-      return separated;
+      return separated && validTarget;
     })()`
   );
   if (!minimalLandscapeOkay) {
