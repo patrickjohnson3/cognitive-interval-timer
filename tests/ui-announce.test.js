@@ -29,3 +29,33 @@ test("visual status messages appear and clear", function () {
     global.clearTimeout = originalClearTimeout;
   }
 });
+
+test("live announcements clear before delayed writes, including repeated text", function () {
+  const originalSetTimeout = global.setTimeout;
+  const callbacks = [];
+  const delays = [];
+  global.setTimeout = function setTimeoutStub(callback, delay) {
+    callbacks.push(callback);
+    delays.push(delay);
+    return callbacks.length;
+  };
+
+  try {
+    const live = Object.assign(textNode(), { textContent: "Focus started." });
+    const announce = UIAnnounce.create({ live: live });
+
+    announce.announce("Focus started.");
+    assert.equal(live.textContent, "");
+    assert.deepEqual(delays, [10]);
+
+    callbacks[0]();
+    assert.equal(live.textContent, "Focus started.");
+
+    announce.announce("Focus started.");
+    assert.equal(live.textContent, "");
+    callbacks[1]();
+    assert.equal(live.textContent, "Focus started.");
+  } finally {
+    global.setTimeout = originalSetTimeout;
+  }
+});
