@@ -822,13 +822,16 @@ async function main() {
     await assertSettingsPersistence(client, appUrl);
     await assertResponsiveUI(client);
     await client.send("Page.navigate", { url: appUrl });
-    await new Promise(function waitForController(resolve) {
-      setTimeout(resolve, 1000);
-    });
-    await client.send("Runtime.evaluate", {
-      expression: "caches.keys().then(function (keys) { return keys.length > 0; })",
-      awaitPromise: true,
-    });
+    await waitForPageReady(client);
+    await waitForCondition(
+      client,
+      `navigator.serviceWorker.ready
+        .then(function () { return caches.keys(); })
+        .then(function (keys) {
+          return Boolean(navigator.serviceWorker.controller) && keys.length > 0;
+        })`,
+      "Service worker did not control the populated app shell"
+    );
     await client.send("Network.emulateNetworkConditions", {
       offline: true,
       latency: 0,
@@ -836,9 +839,7 @@ async function main() {
       uploadThroughput: 0,
     });
     await client.send("Page.navigate", { url: appUrl });
-    await new Promise(function settle(resolve) {
-      setTimeout(resolve, 1000);
-    });
+    await waitForPageReady(client);
     const result = await client.send("Runtime.evaluate", {
       expression:
         "Boolean(document.querySelector('.app')) && document.title === 'Cognitive Interval Timer'",
