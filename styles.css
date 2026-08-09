@@ -795,6 +795,20 @@ select {
   margin-top: var(--space-2);
 }
 
+.maintenance-section .setting-help {
+  margin-bottom: var(--space-1);
+}
+
+#defaults {
+  min-height: 44px;
+  padding: var(--space-2) 0;
+  color: var(--text-secondary, var(--color-muted));
+  background: transparent;
+  box-shadow: none;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
 .ok {
   margin-top: var(--space-2);
   min-height: 1.3em;

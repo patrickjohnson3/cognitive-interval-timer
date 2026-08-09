@@ -483,17 +483,31 @@
           </section>
 
           <div id="pwa-install-slot" class="pwa-install-slot" hidden></div>
-          <p id="app-version" class="app-version" aria-label="App version"></p>
 
           <div class="settings-actions-wrap">
             <div class="settings-divider" aria-hidden="true"></div>
             <div class="actions">
               <button id="save" type="button" class="primary">Save settings</button>
-              <button id="defaults" type="button">Restore defaults</button>
             </div>
           </div>
           <div class="settings-state" id="dirty-indicator" aria-live="polite"></div>
           <div class="ok" id="save-msg" aria-live="polite"></div>
+
+          <div class="settings-divider" aria-hidden="true"></div>
+
+          <section
+            class="settings-section maintenance-section"
+            aria-labelledby="maintenance-heading"
+          >
+            <h2 id="maintenance-heading">Maintenance</h2>
+            <p id="help-restore-defaults" class="setting-help">
+              Restores all timing and preferences, then restarts the current block.
+            </p>
+            <button id="defaults" type="button" aria-describedby="help-restore-defaults">
+              Restore defaults
+            </button>
+            <p id="app-version" class="app-version" aria-label="App version"></p>
+          </section>
         </aside>
       </section>
     </main>
