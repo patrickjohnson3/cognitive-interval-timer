@@ -335,6 +335,25 @@ async function assertSettingsNavigation(client) {
   );
   if (!openedStateOkay) throw new Error("Settings did not open as a focused dedicated view");
 
+  const tooltipsFit = await evaluateValue(
+    client,
+    `(() => {
+      return ["prep-default-tip", "blocks-default-tip"].every((tooltipId) => {
+        const bubble = document.getElementById(tooltipId);
+        const trigger = document.querySelector('[aria-describedby="' + tooltipId + '"]');
+        trigger.scrollIntoView({ block: "center" });
+        trigger.focus();
+        const rect = bubble.getBoundingClientRect();
+        const fits = !bubble.hidden && rect.left >= 0 && rect.right <= window.innerWidth;
+        trigger.blur();
+        return fits;
+      });
+    })()`
+  );
+  if (!tooltipsFit) throw new Error("A mobile settings tooltip extends past the viewport");
+
+  await evaluateValue(client, 'document.getElementById("settings-view-heading").focus(); true');
+
   await pressKey(client, "Escape", "Escape", 27);
   const closedStateOkay = await evaluateValue(
     client,

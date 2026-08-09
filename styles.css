@@ -998,12 +998,12 @@ select {
     margin-top: var(--space-1);
   }
 
-  .settings label {
-    position: relative;
-  }
-
   .settings .tip-wrap {
     position: static;
+  }
+
+  .settings .cycle-field {
+    position: relative;
   }
 
   .settings .tip-bubble {
