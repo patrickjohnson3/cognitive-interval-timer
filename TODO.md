@@ -38,3 +38,14 @@
   `theme_color: #0f172a`, `background_color: #111827`, and `color-scheme: dark light`.
 - If browser behavior remains unchanged after reinstalling the PWA, treat this as a platform
   limitation unless moving to a native Android wrapper or TWA.
+
+## Deferred: Cognitive Progressive Overload
+
+- Explore whether the timer should eventually distinguish cognitive block types such as Deep
+  Learning, Problem Solving, Retrieval, and Creative Construction.
+- Treat elapsed time as insufficient evidence of useful cognitive training; sustained engagement
+  near the edge of capability is the relevant product hypothesis.
+- Determine whether block types would meaningfully change preparation, guidance, recall, or
+  progression rather than merely adding category labels.
+- Do not implement this until the basic work/recovery loop is validated and exceptionally good.
+  Avoid block-type settings, tracking, or progression systems as near-term feature work.
