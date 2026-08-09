@@ -5,6 +5,8 @@
     root.PomodoroAppController = factory(root.PomodoroDisplayServices);
   }
 })(typeof self !== "undefined" ? self : this, function makeAppController(DisplayServices) {
+  const RUNNING_SESSION_WRITE_INTERVAL_MS = 5000;
+
   function create(deps) {
     const Core = deps.Core;
     const Content = deps.Content;
@@ -29,6 +31,8 @@
     const wakeLock = deps.wakeLock;
     const a11y = deps.a11y;
     const doc = deps.documentRef || document;
+    const win = deps.windowRef || (typeof window !== "undefined" ? window : null);
+    const now = deps.now || Date.now;
     const confirmAction =
       deps.confirmAction ||
       function confirmInDocument(message) {
@@ -58,6 +62,7 @@
     };
 
     let lastSavedSession = null;
+    let lastSessionWriteMs = 0;
     let sessionNeedsMigration = false;
     let sessionActionPending = null;
     let initialized = false;
@@ -181,6 +186,7 @@
         : storage.getJSON(Core.STORAGE_KEYS.timer, null);
       appState.timer = Core.normalizeTimerState(storedTimer, appState.settings);
       lastSavedSession = sessionSnapshot();
+      lastSessionWriteMs = now();
       appState.ui.storageCorruption =
         typeof storage.hadReadError === "function" && storage.hadReadError();
     }
@@ -203,6 +209,7 @@
       appState.stats = Core.normalizeStats(storedSession.stats, Core.dateKey());
       appState.timer = Core.normalizeTimerState(storedSession.timer, appState.settings);
       lastSavedSession = sessionSnapshot();
+      lastSessionWriteMs = now();
       sessionNeedsMigration = false;
 
       if (!appState.ui.settingsDirty) {
@@ -255,12 +262,37 @@
       syncStorageWarning(storage.setText(Core.STORAGE_KEYS.theme, theme));
     }
 
-    function persistSessionIfChanged() {
+    function onlyRunningProgressChanged(previous, next) {
+      return Boolean(
+        previous &&
+        next &&
+        sameSettings(previous.settings, next.settings) &&
+        previous.stats.dateKey === next.stats.dateKey &&
+        previous.stats.focusBlocksToday === next.stats.focusBlocksToday &&
+        previous.stats.focusBlocksSinceLong === next.stats.focusBlocksSinceLong &&
+        previous.timer.status === Core.STATUS.RUNNING &&
+        next.timer.status === Core.STATUS.RUNNING &&
+        previous.timer.phase === next.timer.phase &&
+        previous.timer.focusBlockNumber === next.timer.focusBlockNumber
+      );
+    }
+
+    function persistSessionIfChanged(options) {
       if (!sessionLock.hasLock()) return;
+      const config = Object.assign({ force: false }, options || {});
       const snapshot = sessionSnapshot();
       if (!sessionNeedsMigration && sameSession(lastSavedSession, snapshot)) return;
+      if (
+        !config.force &&
+        !sessionNeedsMigration &&
+        onlyRunningProgressChanged(lastSavedSession, snapshot) &&
+        now() - lastSessionWriteMs < RUNNING_SESSION_WRITE_INTERVAL_MS
+      ) {
+        return;
+      }
       syncStorageWarning(storage.setJSON(Core.STORAGE_KEYS.session, snapshot));
       lastSavedSession = snapshot;
+      lastSessionWriteMs = now();
       sessionNeedsMigration = false;
     }
 
@@ -578,9 +610,17 @@
       function syncTimerVisibility() {
         const activeSessionWithoutLock =
           appState.timer.status !== Core.STATUS.IDLE && !sessionLock.hasLock();
+        if (doc.visibilityState === "hidden") {
+          persistSessionIfChanged({ force: true });
+        }
         timer.setSuspended(doc.visibilityState === "hidden" || activeSessionWithoutLock);
       }
       doc.addEventListener("visibilitychange", syncTimerVisibility);
+      if (win && typeof win.addEventListener === "function") {
+        win.addEventListener("pagehide", function persistBeforePageExit() {
+          persistSessionIfChanged({ force: true });
+        });
+      }
       syncTimerVisibility();
     }
 

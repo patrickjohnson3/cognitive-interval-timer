@@ -77,6 +77,7 @@ function setup(options) {
   const announcementCalls = [];
   const visualStatusCalls = [];
   const historyCalls = [];
+  let sessionWriteCount = 0;
   const browser = createBrowserFixture({
     requestFullscreen: function requestFullscreen() {
       fullscreenRequests.push(true);
@@ -201,6 +202,7 @@ function setup(options) {
       },
       setJSON: function setJSON(key, value) {
         stored[key] = value;
+        if (key === Core.STORAGE_KEYS.session) sessionWriteCount += 1;
         if (Object.prototype.hasOwnProperty.call(config, "storageWriteResult")) {
           return config.storageWriteResult;
         }
@@ -256,6 +258,7 @@ function setup(options) {
     dom,
     windowRef: browser.window,
     confirmAction: config.confirmAction,
+    now: config.now,
   });
 
   app.controller.initialize();
@@ -277,6 +280,9 @@ function setup(options) {
     documentListeners: browser.documentListeners,
     getBindCount: function getBindCount() {
       return bindCount;
+    },
+    getSessionWriteCount: function getSessionWriteCount() {
+      return sessionWriteCount;
     },
   };
 }
@@ -439,6 +445,61 @@ test("timer persistence does not add time to a fractional countdown", function (
   ctx.app.onStateChange();
 
   assert.equal(ctx.stored[Core.STORAGE_KEYS.session].timer.remainingSec, 41.25);
+});
+
+test("running countdown persistence is throttled without delaying state changes", function () {
+  let currentTime = 1000;
+  const ctx = setup({
+    now: function now() {
+      return currentTime;
+    },
+  });
+  const initialWrites = ctx.getSessionWriteCount();
+
+  ctx.app.state.timer.status = Core.STATUS.RUNNING;
+  ctx.app.onStateChange();
+  assert.equal(ctx.getSessionWriteCount(), initialWrites + 1, "start state should persist now");
+
+  ctx.app.state.timer.remainingSec -= 1;
+  ctx.app.onStateChange();
+  assert.equal(ctx.getSessionWriteCount(), initialWrites + 1, "running progress should wait");
+
+  currentTime += 5000;
+  ctx.app.state.timer.remainingSec -= 1;
+  ctx.app.onStateChange();
+  assert.equal(ctx.getSessionWriteCount(), initialWrites + 2, "checkpoint should persist");
+
+  ctx.app.state.timer.status = Core.STATUS.PAUSED;
+  ctx.app.onStateChange();
+  assert.equal(ctx.getSessionWriteCount(), initialWrites + 3, "pause state should persist now");
+});
+
+test("page suspension forces pending running progress to storage", function () {
+  let currentTime = 1000;
+  const ctx = setup({
+    now: function now() {
+      return currentTime;
+    },
+  });
+  ctx.app.state.timer.status = Core.STATUS.RUNNING;
+  ctx.app.onStateChange();
+  const runningWrites = ctx.getSessionWriteCount();
+
+  ctx.app.state.timer.remainingSec -= 1;
+  ctx.app.onStateChange();
+  assert.equal(ctx.getSessionWriteCount(), runningWrites);
+
+  global.document.visibilityState = "hidden";
+  ctx.documentListeners.visibilitychange();
+  assert.equal(ctx.getSessionWriteCount(), runningWrites + 1);
+  assert.equal(
+    ctx.stored[Core.STORAGE_KEYS.session].timer.remainingSec,
+    ctx.app.state.timer.remainingSec
+  );
+
+  ctx.app.state.timer.remainingSec -= 1;
+  ctx.windowListeners.pagehide();
+  assert.equal(ctx.getSessionWriteCount(), runningWrites + 2);
 });
 
 test("primary action pauses while timer is running", function () {
