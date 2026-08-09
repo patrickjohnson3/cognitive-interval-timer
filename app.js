@@ -91,6 +91,7 @@
       focusBlockContext: byId("focus-block-context"),
       today: byId("today"),
       long: byId("long"),
+      sessionStatus: byId("session-status"),
       saveMsg: byId("save-msg"),
       dirtyIndicator: byId("dirty-indicator"),
       theme: byId("theme"),

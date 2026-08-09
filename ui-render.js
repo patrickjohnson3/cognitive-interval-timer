@@ -128,6 +128,7 @@
               : state.ui.settingsDirty
                 ? labels.unsavedChanges
                 : labels.allSettingsSaved,
+        sessionStatusText: state.ui.sessionConflict ? labels.sessionInUse : "",
         primaryButtonIcon: labels.primaryActionIcons[statusKey],
         primaryButtonText: labels.primaryActionLabels[statusKey],
         primaryButtonAriaLabel: labels.primaryActionAriaLabels[statusKey],
@@ -157,6 +158,8 @@
       dom.focusBlockContext.textContent = vm.focusBlockContextText;
       dom.focusBlockBadge.setAttribute("aria-label", vm.focusBlockAriaLabel);
       dom.dirtyIndicator.textContent = vm.dirtyText;
+      dom.sessionStatus.textContent = vm.sessionStatusText;
+      dom.sessionStatus.hidden = !vm.sessionStatusText;
       dom.controls.openSettings.setAttribute("data-dirty", String(state.ui.settingsDirty));
       dom.controls.openSettings.setAttribute(
         "aria-label",

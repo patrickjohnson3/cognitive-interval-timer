@@ -305,6 +305,22 @@ h1 {
   gap: 0.35em;
 }
 
+.session-status {
+  margin: var(--space-3) 0 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-accent-strong);
+  border-radius: 10px;
+  background: var(--hint-bg);
+  color: var(--text-primary, var(--color-text));
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.session-status[hidden] {
+  display: none;
+}
+
 button,
 input,
 select {

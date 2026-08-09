@@ -41,6 +41,7 @@ function createDeps() {
     long: textNode(),
     focusBlockBadge: textNode(),
     focusBlockContext: textNode(),
+    sessionStatus: Object.assign(textNode(), { hidden: true }),
     dirtyIndicator: textNode(),
     copy: {
       phaseSettingsHeading: textNode(),
@@ -122,6 +123,7 @@ function createDeps() {
         unsavedChanges: "Unsaved Changes",
         allSettingsSaved: "All Settings Saved",
         storageUnavailable: "Settings are not being saved in this browser.",
+        sessionInUse: "Another window is using this timer session.",
         primaryActionIcons: {
           idle: "▶",
           running: "⏸",
@@ -166,6 +168,8 @@ function baseState() {
     ui: {
       settingsDirty: false,
       storageWarning: false,
+      storageCorruption: false,
+      sessionConflict: false,
     },
   };
 }
@@ -186,6 +190,22 @@ test("primary button shows Start before timer has started", function () {
   );
   assert.equal(deps.dom.controls.minimalPrimaryAction.label.textContent, "Start");
   assert.equal(deps.dom.controls.minimalPrimaryAction.attributes["aria-label"], "Start timer");
+});
+
+test("session conflicts appear beside the timer controls", function () {
+  const deps = createDeps();
+  const render = UIRender.create(deps);
+  const state = baseState();
+  state.ui.sessionConflict = true;
+
+  render.render(state);
+
+  assert.equal(deps.dom.sessionStatus.hidden, false);
+  assert.equal(deps.dom.sessionStatus.textContent, "Another window is using this timer session.");
+
+  state.ui.sessionConflict = false;
+  render.render(state);
+  assert.equal(deps.dom.sessionStatus.hidden, true);
 });
 
 test("cycle summary reflects the active duration settings", function () {
