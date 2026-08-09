@@ -83,6 +83,11 @@
   function showUpdatePrompt(registration) {
     if (!registration || !registration.waiting) return;
 
+    const updateIndicator = document.getElementById("pwa-update-indicator");
+    const settingsButton = document.getElementById("open-settings");
+    if (updateIndicator) updateIndicator.hidden = false;
+    if (settingsButton) settingsButton.setAttribute("aria-describedby", "pwa-update-indicator");
+
     prompts.showUpdate({
       copyText: pwaCopy.updateCopy || "A newer version is ready.",
       buttonText: pwaCopy.updateButton || "Update",

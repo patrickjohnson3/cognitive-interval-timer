@@ -114,6 +114,20 @@ body {
   box-shadow: none;
 }
 
+.settings-update-indicator {
+  display: inline-block;
+  width: 0.55rem;
+  height: 0.55rem;
+  margin-inline-start: var(--space-1);
+  border-radius: 50%;
+  background: var(--color-accent-strong);
+  box-shadow: 0 0 6px var(--color-accent-glow);
+}
+
+.settings-update-indicator[hidden] {
+  display: none;
+}
+
 .settings-trigger[data-dirty="true"]::after {
   content: "";
   position: absolute;

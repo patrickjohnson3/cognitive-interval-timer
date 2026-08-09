@@ -170,6 +170,17 @@ function loadPWA(options) {
       this.focusCount += 1;
     },
   };
+  nodes["pwa-update-indicator"] = {
+    id: "pwa-update-indicator",
+    hidden: true,
+  };
+  nodes["open-settings"] = {
+    id: "open-settings",
+    attributes: {},
+    setAttribute: function setAttribute(name, value) {
+      this.attributes[name] = String(value);
+    },
+  };
 
   const registration = config.registration || {};
   const navigatorRef = {
@@ -270,6 +281,11 @@ test("PWA update prompt renders in settings slot and posts skip-waiting", async 
   assert.equal(card.children[0].attributes.role, "status");
   assert.equal(card.children[0].attributes["aria-live"], "polite");
   assert(button && button.textContent === "Update", "expected update button");
+  assert.equal(runtime.nodes["pwa-update-indicator"].hidden, false);
+  assert.equal(
+    runtime.nodes["open-settings"].attributes["aria-describedby"],
+    "pwa-update-indicator"
+  );
 
   button.listeners.click();
   assert(button.disabled === true, "expected update button to disable after click");
