@@ -108,6 +108,11 @@ function createDeps() {
         shortHint: "One task.",
         longHint: "Long hint.",
       },
+      break: {
+        displayName: "Short Break",
+        shortHint: "Step away.",
+        longHint: "Recover before the next focus block.",
+      },
     },
     UI_COPY: {
       labels: {
@@ -190,6 +195,22 @@ test("primary button shows Start before timer has started", function () {
   );
   assert.equal(deps.dom.controls.minimalPrimaryAction.label.textContent, "Start");
   assert.equal(deps.dom.controls.minimalPrimaryAction.attributes["aria-label"], "Start timer");
+});
+
+test("renderer exposes the current phase and timer status for semantic styling", function () {
+  const deps = createDeps();
+  const render = UIRender.create(deps);
+  const state = baseState();
+
+  render.render(state);
+  assert.equal(global.document.documentElement.attrs["data-phase"], "focus");
+  assert.equal(global.document.documentElement.attrs["data-timer-status"], "idle");
+
+  state.timer.phase = "break";
+  state.timer.status = "running";
+  render.render(state);
+  assert.equal(global.document.documentElement.attrs["data-phase"], "break");
+  assert.equal(global.document.documentElement.attrs["data-timer-status"], "running");
 });
 
 test("session conflicts appear beside the timer controls", function () {

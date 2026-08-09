@@ -32,10 +32,16 @@ test("dark key token snapshot stays stable", function () {
     "--color-button-hover": dark["--color-button-hover"],
     "--color-accent": dark["--color-accent"],
     "--color-accent-strong": dark["--color-accent-strong"],
+    "--color-attention": dark["--color-attention"],
+    "--color-recovery": dark["--color-recovery"],
+    "--color-success": dark["--color-success"],
+    "--color-error": dark["--color-error"],
     "--border-subtle": dark["--border-subtle"],
     "--border-strong": dark["--border-strong"],
     "--panel-bg": dark["--panel-bg"],
     "--button-primary-bg": dark["--button-primary-bg"],
+    "--timer-text-color": dark["--timer-text-color"],
+    "--badge-text": dark["--badge-text"],
   };
 
   assert(

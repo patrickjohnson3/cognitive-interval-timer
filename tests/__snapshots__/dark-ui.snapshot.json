@@ -1,14 +1,20 @@
 {
+  "--badge-text": "var(--text-secondary)",
+  "--border-strong": "#b86514",
+  "--border-subtle": "rgba(51, 65, 85, 0.78)",
+  "--button-primary-bg": "linear-gradient(160deg, #d28a2e, #b86514)",
+  "--color-accent": "#d28a2e",
+  "--color-accent-strong": "#b86514",
+  "--color-attention": "#d28a2e",
   "--color-bg": "#0f172a",
-  "--color-text": "#e5e7eb",
-  "--text-primary": "#e5e7eb",
-  "--text-secondary": "#94a3b8",
   "--color-button": "#263244",
   "--color-button-hover": "#334155",
-  "--color-accent": "#3b82f6",
-  "--color-accent-strong": "#2563eb",
-  "--border-subtle": "rgba(51, 65, 85, 0.78)",
-  "--border-strong": "#2f6ede",
+  "--color-error": "#dc7373",
+  "--color-recovery": "#8995a3",
+  "--color-success": "#6f9b78",
+  "--color-text": "#e5e7eb",
   "--panel-bg": "linear-gradient(170deg, var(--color-surface), var(--color-bg-alt))",
-  "--button-primary-bg": "linear-gradient(160deg, #3476e8, #2563eb)"
+  "--text-primary": "#e5e7eb",
+  "--text-secondary": "#94a3b8",
+  "--timer-text-color": "#f2efe6"
 }

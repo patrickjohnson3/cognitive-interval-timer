@@ -144,6 +144,8 @@
 
     function render(state) {
       const vm = buildView(state);
+      document.documentElement.setAttribute("data-phase", state.timer.phase);
+      document.documentElement.setAttribute("data-timer-status", state.timer.status);
       dom.state.textContent = vm.stateText;
       dom.time.textContent = vm.timeText;
       dom.hint.textContent = vm.hintText;

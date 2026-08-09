@@ -16,13 +16,19 @@ test("theme base text/background colors match expected values", function () {
   assert(themes.dark["--color-text"] === "#e5e7eb", "dark text must be #e5e7eb");
   assert(themes.dark["--color-muted"] === "#94a3b8", "dark secondary text must be #94a3b8");
   assert(themes.dark["--color-border"] === "#334155", "dark border must be #334155");
-  assert(themes.dark["--color-accent"] === "#3b82f6", "dark focus accent must be #3b82f6");
+  assert(themes.dark["--color-accent"] === "#d28a2e", "dark attention accent must be #d28a2e");
   assert(
-    themes.dark["--color-break-accent"] === "#22c55e",
-    "dark short break accent must be #22c55e"
+    themes.dark["--color-break-accent"] === "#8995a3",
+    "dark short break accent must be #8995a3"
   );
   assert(
-    themes.dark["--color-long-break-accent"] === "#d97706",
-    "dark long break accent must be #d97706"
+    themes.dark["--color-long-break-accent"] === "#8995a3",
+    "dark long break accent must be #8995a3"
+  );
+  assert(themes.dark["--color-success"] === "#6f9b78", "dark success must be muted green");
+  assert(themes.dark["--color-error"] === "#dc7373", "dark errors must use muted red");
+  assert(
+    themes.dark["--phase-focus-accent"] === "#64748b",
+    "dark focus phase must use a neutral accent"
   );
 });
