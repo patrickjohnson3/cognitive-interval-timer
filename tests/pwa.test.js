@@ -226,8 +226,7 @@ test("index exposes visible app version metadata", function () {
   assert(appVersion.label === "1.1.0-local", "unexpected local app version label");
 });
 
-test("service worker caches the app shell", function () {
-  const serviceWorker = readProjectFile("service-worker.js");
+test("app shell declares required and optional assets", function () {
   const requiredAssets = shellAssetGroup("REQUIRED_APP_SHELL");
   const optionalAssets = shellAssetGroup("OPTIONAL_APP_SHELL");
   const expectedAssets = [
@@ -258,42 +257,6 @@ test("service worker caches the app shell", function () {
     optionalAssets.includes("./assets/icons/icon-512.png"),
     "icons should be optional cache assets"
   );
-  assert(serviceWorker.includes("cacheOptionalAsset"), "missing optional asset cache helper");
-  assert(serviceWorker.includes("function appShellAssetUrl"), "missing scope-aware asset helper");
-  assert(
-    serviceWorker.includes("REQUIRED_APP_SHELL.map(function fetchRequiredAsset"),
-    "required shell responses should be validated before caching"
-  );
-});
-
-test("service worker uses an app-scoped versioned cache name", function () {
-  const serviceWorker = readProjectFile("service-worker.js");
-
-  assert(
-    serviceWorker.includes("const CACHE_PREFIX = self.PomodoroAppConfig.cachePrefix;"),
-    "cache prefix should come from app config"
-  );
-  assert(
-    serviceWorker.includes("const APP_VERSION = self.PomodoroAppVersion;"),
-    "cache version should come from generated app metadata"
-  );
-  assert(
-    serviceWorker.includes('const CACHE_NAME = CACHE_PREFIX + "app-shell-" + CACHE_VERSION;'),
-    "cache name should be app-scoped and versioned"
-  );
-});
-
-test("service worker only deletes this app's old caches", function () {
-  const serviceWorker = readProjectFile("service-worker.js");
-
-  assert(
-    serviceWorker.includes("key.startsWith(CACHE_PREFIX)"),
-    "old-cache cleanup should be scoped to app prefix"
-  );
-  assert(
-    serviceWorker.includes("pruneCurrentAppShellCache"),
-    "current app-shell cache should prune removed assets"
-  );
 });
 
 test("every service worker app-shell asset exists locally", function () {
@@ -306,69 +269,6 @@ test("every service worker app-shell asset exists locally", function () {
     });
 
   assert(missing.length === 0, "missing app-shell assets: " + missing.join(", "));
-});
-
-test("PWA registration exposes a user-controlled update flow", function () {
-  const pwa = readProjectFile("pwa.js");
-  const prompts = readProjectFile("pwa-prompts.js");
-  const serviceWorker = readProjectFile("service-worker.js");
-  const content = readProjectFile("content.js");
-  const css = readProjectFile("styles.css");
-
-  assert(prompts.includes("pwa-update-button"), "missing update prompt button");
-  assert(
-    prompts.includes('createPromptCard("pwa-update"'),
-    "update prompt should render as a settings card"
-  );
-  assert(
-    !css.includes("#pwa-update {\n  position: fixed;"),
-    "update prompt should not use fixed floating styles"
-  );
-  assert(pwa.includes("isInstalledDisplayMode"), "missing installed-mode update guard");
-  assert(pwa.includes("(display-mode: standalone)"), "missing standalone display-mode check");
-  assert(pwa.includes("(display-mode: fullscreen)"), "missing fullscreen display-mode check");
-  assert(pwa.includes("(display-mode: minimal-ui)"), "missing minimal-ui display-mode check");
-  assert(pwa.includes("controllerchange"), "missing reload-after-update handler");
-  assert(pwa.includes("SKIP_WAITING"), "missing skip-waiting message from page");
-  assert(prompts.includes("pwa-status"), "missing visible service-worker status card");
-  assert(
-    content.includes("Offline support is unavailable right now."),
-    "missing registration failure status copy"
-  );
-  assert(!pwa.includes("ignoreRegistrationError"), "registration errors should not be silent");
-  assert(serviceWorker.includes("SKIP_WAITING"), "missing skip-waiting message handler");
-  assert(
-    !serviceWorker.includes('self.skipWaiting();\n});\n\nself.addEventListener("activate"'),
-    "install should not force skipWaiting"
-  );
-});
-
-test("PWA registration handles browser install prompt", function () {
-  const html = readProjectFile("index.html");
-  const pwa = readProjectFile("pwa.js");
-  const prompts = readProjectFile("pwa-prompts.js");
-  const content = readProjectFile("content.js");
-  const css = readProjectFile("styles.css");
-
-  assert(html.includes('id="pwa-install-slot"'), "missing install prompt slot");
-  assert(pwa.includes("beforeinstallprompt"), "missing install prompt event handler");
-  assert(prompts.includes("pwa-install-slot"), "install prompt should render into settings slot");
-  assert(content.includes("Install for offline use."), "missing install prompt copy");
-  assert(prompts.includes("pwa-install-button"), "missing install button id");
-  assert(pwa.includes("isIOSBrowser"), "missing iOS install guidance detection");
-  assert(content.includes("Add to Home Screen"), "missing iOS install guidance copy");
-  assert(pwa.includes("navigator.standalone"), "missing iOS installed-mode detection");
-  assert(pwa.includes("deferredInstallPrompt"), "missing deferred install prompt state");
-  assert(pwa.includes("appinstalled"), "missing installed cleanup handler");
-  assert(css.includes(".pwa-prompt-card"), "missing shared prompt card styles");
-  assert(
-    !pwa.includes("pwa-install-card"),
-    "shared PWA prompt class should not be install-specific"
-  );
-  assert(
-    !css.includes("#pwa-install,\n#pwa-update"),
-    "install prompt should not share fixed update styling"
-  );
 });
 
 test("display settings explain their immediate and saved behavior", function () {

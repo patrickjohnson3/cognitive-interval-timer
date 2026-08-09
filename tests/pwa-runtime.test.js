@@ -45,7 +45,10 @@ function loadServiceWorkerRuntime(options) {
   const listeners = {};
   const cached = new Map(config.cached || []);
   const cacheWrites = [];
+  const deletedCaches = [];
+  const deletedRequests = [];
   const fetchCalls = [];
+  const openedCaches = [];
   const context = {
     Promise,
     Response,
@@ -59,21 +62,23 @@ function loadServiceWorkerRuntime(options) {
     },
     caches: {
       keys: function keys() {
-        return Promise.resolve([]);
+        return Promise.resolve(config.cacheKeys || []);
       },
-      delete: function deleteCache() {
+      delete: function deleteCache(key) {
+        deletedCaches.push(key);
         return Promise.resolve(true);
       },
       match: function match(request) {
         return Promise.resolve(cached.get(request.url || request) || null);
       },
-      open: function openCache() {
+      open: function openCache(key) {
+        openedCaches.push(key);
         return Promise.resolve({
           addAll: function addAll() {
             return Promise.resolve();
           },
           keys: function keys() {
-            return Promise.resolve([]);
+            return Promise.resolve(config.cachedRequests || []);
           },
           put: function put(request, response) {
             if (config.cachePutError) return Promise.reject(config.cachePutError);
@@ -81,7 +86,8 @@ function loadServiceWorkerRuntime(options) {
             cached.set(request.url || request, response);
             return Promise.resolve();
           },
-          delete: function deleteRequest() {
+          delete: function deleteRequest(request) {
+            deletedRequests.push(request.url || request);
             return Promise.resolve(true);
           },
         });
@@ -123,7 +129,15 @@ function loadServiceWorkerRuntime(options) {
     filename: "service-worker.js",
   });
 
-  return { cacheWrites, cached, fetchCalls, listeners };
+  return {
+    cacheWrites,
+    cached,
+    deletedCaches,
+    deletedRequests,
+    fetchCalls,
+    listeners,
+    openedCaches,
+  };
 }
 
 function runFetch(runtime, request) {
@@ -563,75 +577,52 @@ test("install prompt returns focus to settings after the browser choice", async 
   assert.equal(runtime.nodes.theme.focusCount, 1);
 });
 
+test("browser install lifecycle shows and removes the install prompt", function () {
+  const runtime = loadPWA();
+  let prevented = false;
+
+  runtime.listeners["window:beforeinstallprompt"]({
+    preventDefault: function preventDefault() {
+      prevented = true;
+    },
+    prompt: function prompt() {},
+    userChoice: Promise.resolve({ outcome: "accepted" }),
+  });
+
+  assert.equal(prevented, true);
+  assert.equal(runtime.slot.hidden, false);
+  assert.equal(runtime.nodes["pwa-install-button"].textContent, "Install");
+
+  runtime.listeners["window:appinstalled"]();
+  assert.equal(runtime.nodes["pwa-install"], undefined);
+});
+
+test("iOS browser receives install guidance only outside standalone mode", async function () {
+  const browserRuntime = loadPWA({ userAgent: "iPhone" });
+  browserRuntime.listeners["window:load"]();
+  await flushPromises();
+  assert.equal(
+    browserRuntime.nodes["pwa-install"].children[0].textContent,
+    "To install on iOS, tap Share, then Add to Home Screen."
+  );
+
+  const installedRuntime = loadPWA({ userAgent: "iPhone", standalone: true });
+  installedRuntime.listeners["window:load"]();
+  await flushPromises();
+  assert.equal(installedRuntime.nodes["pwa-install"], undefined);
+});
+
 test("service worker deletes only this app's old caches", async function () {
-  const deletedCaches = [];
-  const deletedRequests = [];
-  const listeners = {};
   const currentCache = currentServiceWorkerCacheName();
   const expectedRequest = { url: "https://example.test/index.html" };
   const staleRequest = { url: "https://example.test/removed.js" };
-  const context = {
-    Promise,
-    Response,
-    URL,
-    caches: {
-      keys: function keys() {
-        return Promise.resolve([
-          "cognitive-interval-timer-old",
-          "other-project-cache",
-          currentCache,
-        ]);
-      },
-      delete: function deleteCache(key) {
-        deletedCaches.push(key);
-        return Promise.resolve(true);
-      },
-      open: function openCache(key) {
-        assert(key === currentCache, "expected current cache to be opened for pruning");
-        return Promise.resolve({
-          keys: function keys() {
-            return Promise.resolve([expectedRequest, staleRequest]);
-          },
-          delete: function deleteRequest(request) {
-            deletedRequests.push(request.url);
-            return Promise.resolve(true);
-          },
-        });
-      },
-    },
-    self: {
-      clients: {
-        claim: function claim() {
-          return Promise.resolve();
-        },
-      },
-      addEventListener: function addEventListener(type, handler) {
-        listeners[type] = handler;
-      },
-      location: {
-        origin: "https://example.test",
-      },
-      registration: {
-        scope: "https://example.test/",
-      },
-    },
-  };
-
-  vm.runInNewContext(readProjectFile("app-config.js"), context, {
-    filename: "app-config.js",
-  });
-  vm.runInNewContext(readProjectFile("app-shell-assets.js"), context, {
-    filename: "app-shell-assets.js",
-  });
-  vm.runInNewContext(readProjectFile("app-version.js"), context, {
-    filename: "app-version.js",
-  });
-  vm.runInNewContext(readProjectFile("service-worker.js"), context, {
-    filename: "service-worker.js",
+  const runtime = loadServiceWorkerRuntime({
+    cacheKeys: ["cognitive-interval-timer-old", "other-project-cache", currentCache],
+    cachedRequests: [expectedRequest, staleRequest],
   });
 
   let activationPromise = null;
-  listeners.activate({
+  runtime.listeners.activate({
     waitUntil: function waitUntil(promise) {
       activationPromise = promise;
     },
@@ -639,16 +630,23 @@ test("service worker deletes only this app's old caches", async function () {
 
   await activationPromise;
   assert(
-    deletedCaches.includes("cognitive-interval-timer-old"),
+    runtime.deletedCaches.includes("cognitive-interval-timer-old"),
     "expected old app cache to be deleted"
   );
   assert(
-    !deletedCaches.includes("other-project-cache"),
+    !runtime.deletedCaches.includes("other-project-cache"),
     "unrelated origin cache should not be deleted"
   );
-  assert(!deletedCaches.includes(currentCache), "current app cache should not be deleted");
-  assert(!deletedRequests.includes(expectedRequest.url), "expected app-shell request to be kept");
-  assert(deletedRequests.includes(staleRequest.url), "expected stale current-cache entry to prune");
+  assert(!runtime.deletedCaches.includes(currentCache), "current app cache should not be deleted");
+  assert.deepEqual(runtime.openedCaches, [currentCache]);
+  assert(
+    !runtime.deletedRequests.includes(expectedRequest.url),
+    "expected app-shell request to be kept"
+  );
+  assert(
+    runtime.deletedRequests.includes(staleRequest.url),
+    "expected stale current-cache entry to prune"
+  );
 });
 
 test("service worker keeps update activation alive and acknowledges it", async function () {
