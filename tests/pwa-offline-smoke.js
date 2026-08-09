@@ -380,6 +380,42 @@ async function assertSettingsNavigation(client) {
   );
   if (!settingsTargetsOkay) throw new Error("A mobile Settings target is smaller than 44px");
 
+  const settingsScrollOkay = await evaluateValue(
+    client,
+    `(() => {
+      const settings = document.getElementById("settings-view");
+      const header = document.querySelector(".settings-view-header");
+      const outerHeader = document.querySelector(".header");
+      settings.scrollTop = settings.scrollHeight;
+      const settingsRect = settings.getBoundingClientRect();
+      const headerRect = header.getBoundingClientRect();
+      const settingsStyle = getComputedStyle(settings);
+      return {
+        outerHeaderDisplay: getComputedStyle(outerHeader).display,
+        scrollTop: settings.scrollTop,
+        clientHeight: settings.clientHeight,
+        viewportHeight: window.innerHeight,
+        headerTop: headerRect.top,
+        settingsTop: settingsRect.top,
+        settingsPaddingTop: parseFloat(settingsStyle.paddingTop)
+      };
+    })()`
+  );
+  if (
+    settingsScrollOkay.outerHeaderDisplay !== "none" ||
+    settingsScrollOkay.scrollTop <= 0 ||
+    settingsScrollOkay.clientHeight > settingsScrollOkay.viewportHeight ||
+    Math.abs(
+      settingsScrollOkay.headerTop -
+        settingsScrollOkay.settingsTop -
+        settingsScrollOkay.settingsPaddingTop
+    ) >= 1
+  ) {
+    throw new Error(
+      "Settings is not an independent sticky scroll view: " + JSON.stringify(settingsScrollOkay)
+    );
+  }
+
   await evaluateValue(client, 'document.getElementById("settings-view-heading").focus(); true');
 
   await pressKey(client, "Escape", "Escape", 27);
