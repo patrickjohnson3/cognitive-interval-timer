@@ -10,8 +10,7 @@
     prep: {
       displayName: "Prep",
       shortHint: "Prepare your mind. Choose one clear goal.",
-      longHint:
-        "Stand up, take a few slow breaths, and clearly state the one specific thing you’re about to do. This helps your brain switch from wandering mode to focused mode so you start the work clean and intentional.",
+      longHint: "Stand up. Breathe slowly. Clearly state the one thing you’re about to do.",
     },
     focus: {
       displayName: "Focus",

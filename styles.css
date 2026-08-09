@@ -373,6 +373,21 @@ h1 {
   gap: 0.35em;
 }
 
+#reset {
+  border-color: var(--border-subtle, var(--color-border));
+  color: var(--text-secondary, var(--color-muted));
+  background: transparent;
+  box-shadow: none;
+}
+
+#reset:hover {
+  border-color: var(--border-strong, var(--color-border));
+  color: var(--text-primary, var(--color-text));
+  background: var(--theme-row-bg);
+  box-shadow: none;
+  transform: none;
+}
+
 .session-status {
   margin: var(--space-3) 0 0;
   padding: var(--space-2) var(--space-3);
@@ -454,6 +469,10 @@ button.primary:hover {
 
 :root[data-phase="focus"] .long-hint {
   color: var(--text-secondary, var(--color-muted));
+}
+
+:root[data-phase="prep"] .long-hint {
+  border-color: var(--long-hint-border, var(--border-subtle, var(--color-border)));
 }
 
 :root[data-theme="signal"] button:not(.primary):hover {
@@ -547,13 +566,15 @@ kbd {
   margin: var(--space-2) 0 0;
   padding-inline-start: var(--space-1);
   color: var(--text-secondary, var(--color-muted));
-  font-size: 0.86rem;
+  font-size: 0.84rem;
+  line-height: 1.35;
 }
 
 .stats {
-  margin-top: var(--space-3);
+  margin-top: var(--space-1);
   padding-inline-start: var(--space-1);
-  font-size: 0.92rem;
+  font-size: 0.84rem;
+  line-height: 1.35;
   color: var(--text-secondary, var(--color-muted));
   display: grid;
   gap: var(--space-1);

@@ -695,6 +695,12 @@ async function assertResponsiveUI(client) {
       const panel = document.querySelector(".session-panel");
       const panelRect = panel.getBoundingClientRect();
       const panelStyle = getComputedStyle(panel);
+      const skip = document.getElementById("skip");
+      const reset = document.getElementById("reset");
+      const skipRect = skip.getBoundingClientRect();
+      const resetRect = reset.getBoundingClientRect();
+      const shortcutStyle = getComputedStyle(document.querySelector(".shortcut-hint"));
+      const statsStyle = getComputedStyle(document.querySelector(".stats"));
       return {
         panelWidth: panelRect.width,
         paddingTop: parseFloat(panelStyle.paddingTop),
@@ -703,8 +709,16 @@ async function assertResponsiveUI(client) {
         paddingLeft: parseFloat(panelStyle.paddingLeft),
         hintMarginBottom: parseFloat(getComputedStyle(document.getElementById("hint")).marginBottom),
         metadataMarginTop: parseFloat(
-          getComputedStyle(document.querySelector(".shortcut-hint")).marginTop
-        )
+          shortcutStyle.marginTop
+        ),
+        telemetryGap: parseFloat(statsStyle.marginTop),
+        shortcutFontSize: parseFloat(shortcutStyle.fontSize),
+        statsFontSize: parseFloat(statsStyle.fontSize),
+        secondaryControlsMatch:
+          Math.abs(skipRect.width - resetRect.width) < 1 &&
+          Math.abs(skipRect.height - resetRect.height) < 1,
+        skipBackground: getComputedStyle(skip).backgroundColor,
+        resetBackground: getComputedStyle(reset).backgroundColor
       };
     })()`
   );
@@ -720,7 +734,12 @@ async function assertResponsiveUI(client) {
     desktopSpacing.paddingLeft > 24 ||
     desktopSpacing.hintMarginBottom < 13 ||
     desktopSpacing.metadataMarginTop < 10 ||
-    desktopSpacing.metadataMarginTop > 12
+    desktopSpacing.metadataMarginTop > 12 ||
+    desktopSpacing.telemetryGap > 6 ||
+    desktopSpacing.shortcutFontSize !== desktopSpacing.statsFontSize ||
+    !desktopSpacing.secondaryControlsMatch ||
+    desktopSpacing.skipBackground === desktopSpacing.resetBackground ||
+    desktopSpacing.resetBackground !== "rgba(0, 0, 0, 0)"
   ) {
     throw new Error("Desktop timer spacing regressed: " + JSON.stringify(desktopSpacing));
   }

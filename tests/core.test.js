@@ -193,6 +193,13 @@ test("Focus guidance stays concise", function () {
   );
 });
 
+test("Prep guidance contains instructions without repeating their rationale", function () {
+  assert.equal(
+    Content.PHASE_CONFIG.prep.longHint,
+    "Stand up. Breathe slowly. Clearly state the one thing you’re about to do."
+  );
+});
+
 test("normalizeSettings preserves wake lock preference", function () {
   const settings = Core.normalizeSettings({ wake_lock_enabled: true });
   assert(settings.wake_lock_enabled === true, "expected wake lock preference to normalize");
