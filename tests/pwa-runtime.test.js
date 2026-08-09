@@ -16,6 +16,30 @@ function currentServiceWorkerCacheName() {
   return appConfig.cachePrefix + "app-shell-" + appVersion.build;
 }
 
+function appShellResponse(request) {
+  const url = String(request.url || request);
+  let contentType = "text/html";
+  if (url.endsWith(".js")) contentType = "text/javascript";
+  else if (url.endsWith(".css")) contentType = "text/css";
+  else if (url.endsWith(".webmanifest")) contentType = "application/manifest+json";
+  else if (url.endsWith(".png")) contentType = "image/png";
+  else if (url.endsWith(".svg")) contentType = "image/svg+xml";
+
+  return {
+    ok: true,
+    status: 200,
+    type: "basic",
+    headers: {
+      get: function getHeader() {
+        return contentType;
+      },
+    },
+    clone: function clone() {
+      return this;
+    },
+  };
+}
+
 function loadServiceWorkerRuntime(options) {
   const config = options || {};
   const listeners = {};
@@ -31,22 +55,7 @@ function loadServiceWorkerRuntime(options) {
       if (config.fetchError) return Promise.reject(config.fetchError);
       if (typeof config.fetchResponse === "function")
         return Promise.resolve(config.fetchResponse(request));
-      return Promise.resolve({
-        ok: true,
-        status: 200,
-        type: "basic",
-        headers: {
-          get: function getHeader() {
-            const url = request.url || request;
-            if (String(url).endsWith(".js")) return "text/javascript";
-            if (String(url).endsWith(".json")) return "application/json";
-            return "text/html";
-          },
-        },
-        clone: function clone() {
-          return this;
-        },
-      });
+      return Promise.resolve(appShellResponse(request));
     },
     caches: {
       keys: function keys() {
@@ -134,6 +143,17 @@ function runFetch(runtime, request) {
       return response;
     });
   });
+}
+
+function runInstall(runtime) {
+  let installPromise = null;
+  runtime.listeners.install({
+    waitUntil: function waitUntil(promise) {
+      installPromise = promise;
+    },
+  });
+  assert(installPromise, "expected install event lifetime to be extended");
+  return installPromise;
 }
 
 function flushPromises() {
@@ -653,6 +673,40 @@ test("service worker keeps update activation alive and acknowledges it", async f
   assert.equal(messages.length, 1);
   assert.equal(messages[0].type, "SKIP_WAITING_RESULT");
   assert.equal(messages[0].ok, true);
+});
+
+test("service worker installation rejects a missing required asset", async function () {
+  const runtime = loadServiceWorkerRuntime({
+    fetchResponse: function fetchResponse(request) {
+      if (String(request).endsWith("/styles.css")) {
+        return Promise.reject(new Error("required asset unavailable"));
+      }
+      return appShellResponse(request);
+    },
+  });
+
+  await assert.rejects(runInstall(runtime), /required asset unavailable/);
+  assert.equal(runtime.cacheWrites.length, 0);
+});
+
+test("service worker installation tolerates a missing optional asset", async function () {
+  const unavailableAsset = "https://example.test/assets/icons/icon-192.png";
+  const runtime = loadServiceWorkerRuntime({
+    fetchResponse: function fetchResponse(request) {
+      if (String(request) === unavailableAsset) {
+        return Promise.reject(new Error("optional asset unavailable"));
+      }
+      return appShellResponse(request);
+    },
+  });
+
+  await runInstall(runtime);
+
+  const requiredAssets = require("../app-shell-assets.js").REQUIRED_APP_SHELL;
+  requiredAssets.forEach(function requiredAssetWasCached(asset) {
+    assert(runtime.cacheWrites.includes(new URL(asset, "https://example.test/").href));
+  });
+  assert(!runtime.cacheWrites.includes(unavailableAsset));
 });
 
 test("service worker runtime-caches only app-shell assets", async function () {
