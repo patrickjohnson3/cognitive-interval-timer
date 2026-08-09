@@ -602,6 +602,18 @@ async function assertSettingsNavigation(client) {
 }
 
 async function assertResponsiveUI(client) {
+  const desktopCheckboxesAreNative = await evaluateValue(
+    client,
+    'getComputedStyle(document.getElementById("prep_enabled")).appearance !== "none"'
+  );
+  if (!desktopCheckboxesAreNative) {
+    throw new Error("Desktop Settings should retain native checkboxes");
+  }
+
+  await client.send("Emulation.setTouchEmulationEnabled", {
+    enabled: true,
+    maxTouchPoints: 5,
+  });
   for (const viewport of [
     { width: 320, height: 568, type: "portraitPrimary", angle: 0 },
     { width: 568, height: 320, type: "landscapePrimary", angle: 90 },
@@ -688,6 +700,8 @@ async function assertResponsiveUI(client) {
         controlTargets: buttons.every((button) => button.getBoundingClientRect().height >= 48),
         readableGuidance: parseFloat(longHint.lineHeight) / parseFloat(longHint.fontSize) >= 1.5,
         hiddenContentSafe: !hiddenFocusable,
+        mobileSwitches:
+          getComputedStyle(document.getElementById("prep_enabled")).appearance === "none",
         cycleSummary: cycleSummary.textContent.replace(/\\s+/g, " ").trim(),
         settingsLabels: Boolean(document.getElementById("label-timer-flow-settings")) &&
           Boolean(document.getElementById("label-display-settings"))
@@ -699,6 +713,7 @@ async function assertResponsiveUI(client) {
     portraitChecks.controlTargets &&
     portraitChecks.readableGuidance &&
     portraitChecks.hiddenContentSafe &&
+    portraitChecks.mobileSwitches &&
     portraitChecks.cycleSummary === "45 focus · 3 recall · 15 break" &&
     portraitChecks.settingsLabels;
   if (!portraitOkay) {
