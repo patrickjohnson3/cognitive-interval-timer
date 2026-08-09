@@ -557,6 +557,41 @@ async function assertSettingsNavigation(client) {
     );
   }
 
+  await client.send("Emulation.setDeviceMetricsOverride", {
+    width: 800,
+    height: 800,
+    deviceScaleFactor: 1,
+    mobile: true,
+    screenOrientation: { type: "portraitPrimary", angle: 0 },
+  });
+  await settleLayout(client);
+  const wideSettingsTooltipFits = await evaluateValue(
+    client,
+    `(() => {
+      const bubble = document.getElementById("focus-default-tip");
+      const trigger = document.querySelector('[aria-describedby="focus-default-tip"]');
+      const settings = document.getElementById("settings-view").getBoundingClientRect();
+      trigger.scrollIntoView({ block: "center" });
+      trigger.focus();
+      const rect = bubble.getBoundingClientRect();
+      const fits = !bubble.hidden && rect.left >= settings.left && rect.right <= settings.right;
+      trigger.blur();
+      return fits;
+    })()`
+  );
+  if (!wideSettingsTooltipFits) {
+    throw new Error("A Settings tooltip is clipped above the mobile layout breakpoint");
+  }
+
+  await client.send("Emulation.setDeviceMetricsOverride", {
+    width: 390,
+    height: 844,
+    deviceScaleFactor: 1,
+    mobile: true,
+    screenOrientation: { type: "portraitPrimary", angle: 0 },
+  });
+  await settleLayout(client);
+
   const settingsScaleOkay = await evaluateValue(
     client,
     `(() => {

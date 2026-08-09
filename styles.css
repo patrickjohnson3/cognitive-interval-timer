@@ -817,8 +817,13 @@ label {
 }
 
 .settings .field-label .tip-wrap {
+  position: static;
   flex: 0 0 24px;
   width: 24px;
+}
+
+.settings .cycle-field {
+  position: relative;
 }
 
 .settings .tip-trigger {
@@ -868,6 +873,17 @@ label {
 .settings .tip-trigger:focus-visible::before {
   outline: 3px solid var(--color-focus-ring);
   outline-offset: 2px;
+}
+
+.settings .tip-bubble {
+  --tip-left: 0;
+  --tip-right: auto;
+  --tip-top: calc(100% + var(--space-1));
+  --tip-bottom: auto;
+  --tip-shift-x: 0;
+  --tip-shift-y-hidden: -2px;
+  width: min(300px, 100%);
+  max-width: none;
 }
 
 .tip-bubble {
@@ -1374,25 +1390,6 @@ select {
   #pwa-install-button,
   #pwa-update-button {
     width: 100%;
-  }
-
-  .settings .tip-wrap {
-    position: static;
-  }
-
-  .settings .cycle-field {
-    position: relative;
-  }
-
-  .settings .tip-bubble {
-    --tip-left: 0;
-    --tip-right: 0;
-    --tip-top: calc(100% + var(--space-1));
-    --tip-bottom: auto;
-    --tip-shift-x: 0;
-    --tip-shift-y-hidden: -2px;
-    width: auto;
-    max-width: none;
   }
 
   #focus-block-definition-tip {
