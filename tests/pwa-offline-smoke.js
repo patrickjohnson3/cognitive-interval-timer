@@ -795,6 +795,23 @@ async function main() {
     if (!result.result || result.result.value !== true) {
       throw new Error("Offline app shell did not load");
     }
+
+    await waitForCondition(
+      client,
+      'document.querySelector("#start .control-label")?.textContent === "Start"',
+      "Offline app did not initialize its timer controls"
+    );
+    await evaluateValue(client, 'document.getElementById("start").click(); true');
+    await waitForCondition(
+      client,
+      `(() => {
+        const saved = JSON.parse(localStorage.getItem("better_pomodoro_session_v2"));
+        return document.querySelector("#start .control-label")?.textContent === "Pause" &&
+          saved.timer.status === "running" && saved.timer.focusBlockNumber === 1;
+      })()`,
+      "Offline timer did not start and persist"
+    );
+    await evaluateValue(client, 'document.getElementById("reset").click(); true');
   } finally {
     client.close();
     chrome.kill();
