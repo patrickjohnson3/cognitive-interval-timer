@@ -352,6 +352,21 @@ async function assertSettingsNavigation(client) {
   );
   if (!tooltipsFit) throw new Error("A mobile settings tooltip extends past the viewport");
 
+  const settingsScaleOkay = await evaluateValue(
+    client,
+    `(() => {
+      document.documentElement.style.fontSize = "200%";
+      const header = document.querySelector(".settings-view-header");
+      const back = document.getElementById("close-settings");
+      const rect = back.getBoundingClientRect();
+      const fits = rect.left >= 0 && rect.right <= window.innerWidth && rect.width > 0 &&
+        header.scrollWidth <= header.clientWidth;
+      document.documentElement.style.fontSize = "";
+      return fits;
+    })()`
+  );
+  if (!settingsScaleOkay) throw new Error("Settings header clips controls at 200% text size");
+
   await evaluateValue(client, 'document.getElementById("settings-view-heading").focus(); true');
 
   await pressKey(client, "Escape", "Escape", 27);
