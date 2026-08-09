@@ -87,6 +87,17 @@
         timeText: Core.formatTime(state.timer.remainingSec),
         hintText: phaseCopy.shortHint,
         longHintText: phaseCopy.longHint,
+        cycleFocusText: String(state.settings.focus),
+        cycleRecallText: String(state.settings.recall),
+        cycleBreakText: String(state.settings.break),
+        cycleSummaryAriaLabel:
+          "Cycle: " +
+          state.settings.focus +
+          " minutes focus, " +
+          state.settings.recall +
+          " minutes recall, " +
+          state.settings.break +
+          " minutes short break",
         todayText:
           labels.focusBlocksTodayPrefix +
           state.stats.focusBlocksToday +
@@ -136,12 +147,21 @@
       dom.time.textContent = vm.timeText;
       dom.hint.textContent = vm.hintText;
       dom.longHint.textContent = vm.longHintText;
+      dom.cycleFocus.textContent = vm.cycleFocusText;
+      dom.cycleRecall.textContent = vm.cycleRecallText;
+      dom.cycleBreak.textContent = vm.cycleBreakText;
+      dom.cycleSummary.setAttribute("aria-label", vm.cycleSummaryAriaLabel);
       dom.today.textContent = vm.todayText;
       dom.long.textContent = vm.sinceLongText;
       dom.focusBlockBadge.textContent = vm.focusBlockText;
       dom.focusBlockContext.textContent = vm.focusBlockContextText;
       dom.focusBlockBadge.setAttribute("aria-label", vm.focusBlockAriaLabel);
       dom.dirtyIndicator.textContent = vm.dirtyText;
+      dom.controls.openSettings.setAttribute("data-dirty", String(state.ui.settingsDirty));
+      dom.controls.openSettings.setAttribute(
+        "aria-label",
+        state.ui.settingsDirty ? "Settings, unsaved changes" : "Settings"
+      );
       updatePrimaryButton(vm);
       document.title = vm.titleText;
     }

@@ -310,6 +310,45 @@ async function assertInteractiveAccessibility(client) {
   );
 }
 
+async function assertSettingsNavigation(client) {
+  const initialStateOkay = await evaluateValue(
+    client,
+    `(() => {
+      const session = document.getElementById("session-view");
+      const settings = document.getElementById("settings-view");
+      const trigger = document.getElementById("open-settings");
+      return !session.hidden && settings.hidden && trigger.getAttribute("aria-expanded") === "false";
+    })()`
+  );
+  if (!initialStateOkay) throw new Error("Timer should be the initial view");
+
+  const openedStateOkay = await evaluateValue(
+    client,
+    `(() => {
+      const trigger = document.getElementById("open-settings");
+      trigger.click();
+      return document.getElementById("session-view").hidden &&
+        !document.getElementById("settings-view").hidden &&
+        trigger.getAttribute("aria-expanded") === "true" &&
+        document.activeElement?.id === "settings-view-heading";
+    })()`
+  );
+  if (!openedStateOkay) throw new Error("Settings did not open as a focused dedicated view");
+
+  await pressKey(client, "Escape", "Escape", 27);
+  const closedStateOkay = await evaluateValue(
+    client,
+    `(() => {
+      const trigger = document.getElementById("open-settings");
+      return !document.getElementById("session-view").hidden &&
+        document.getElementById("settings-view").hidden &&
+        trigger.getAttribute("aria-expanded") === "false" &&
+        document.activeElement === trigger;
+    })()`
+  );
+  if (!closedStateOkay) throw new Error("Closing settings did not restore timer focus");
+}
+
 async function assertResponsiveUI(client) {
   await client.send("Emulation.setDeviceMetricsOverride", {
     width: 390,
@@ -320,7 +359,7 @@ async function assertResponsiveUI(client) {
   });
   await settleLayout(client);
 
-  const portraitOkay = await evaluateValue(
+  const portraitChecks = await evaluateValue(
     client,
     `(() => {
       const buttons = Array.from(document.querySelectorAll(".controls button"));
@@ -328,16 +367,30 @@ async function assertResponsiveUI(client) {
       const hiddenFocusable = Array.from(document.querySelectorAll('[aria-hidden="true"]')).some(
         (node) => node.querySelector("button, input, select, textarea, a[href], [tabindex]:not([tabindex='-1'])")
       );
-      return document.documentElement.scrollWidth <= window.innerWidth &&
-        buttons.every((button) => button.getBoundingClientRect().height >= 48) &&
-        parseFloat(longHint.lineHeight) / parseFloat(longHint.fontSize) >= 1.5 &&
-        !hiddenFocusable &&
-        Boolean(document.getElementById("label-timer-flow-settings")) &&
-        Boolean(document.getElementById("label-display-settings"));
+      const cycleSummary = document.getElementById("cycle-summary");
+      return {
+        fitsViewport: document.documentElement.scrollWidth <= window.innerWidth,
+        controlTargets: buttons.every((button) => button.getBoundingClientRect().height >= 48),
+        readableGuidance: parseFloat(longHint.lineHeight) / parseFloat(longHint.fontSize) >= 1.5,
+        hiddenContentSafe: !hiddenFocusable,
+        cycleSummary: cycleSummary.textContent.replace(/\\s+/g, " ").trim(),
+        settingsLabels: Boolean(document.getElementById("label-timer-flow-settings")) &&
+          Boolean(document.getElementById("label-display-settings"))
+      };
     })()`
   );
-  if (!portraitOkay) throw new Error("Rendered portrait layout or accessibility checks failed");
+  const portraitOkay =
+    portraitChecks.fitsViewport &&
+    portraitChecks.controlTargets &&
+    portraitChecks.readableGuidance &&
+    portraitChecks.hiddenContentSafe &&
+    portraitChecks.cycleSummary === "45 focus · 3 recall · 15 break" &&
+    portraitChecks.settingsLabels;
+  if (!portraitOkay) {
+    throw new Error("Rendered portrait checks failed: " + JSON.stringify(portraitChecks));
+  }
 
+  await assertSettingsNavigation(client);
   await assertInteractiveAccessibility(client);
 
   const minimalOkay = await evaluateValue(
@@ -378,7 +431,7 @@ async function assertResponsiveUI(client) {
         .split(" ")
         .filter(Boolean);
       return matchMedia("(orientation: landscape)").matches &&
-        columns.length === 2 &&
+        columns.length === 1 &&
         document.documentElement.scrollWidth <= window.innerWidth;
     })()`
   );

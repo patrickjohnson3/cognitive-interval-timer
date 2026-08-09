@@ -24,6 +24,8 @@ https://patrickjohnson3.github.io/cognitive-interval-timer/
 - Light and dark theme selector
 - Daily focus block tracking
 - Active session indicator (`Focus Block N of session`)
+- Compact cycle summary on the session view
+- Dedicated configuration view for infrequently changed settings
 - Unsaved settings indicator
 - Keyboard shortcuts for timer control
 - Fullscreen mode
@@ -115,6 +117,9 @@ Single-key shortcuts are enabled by default and can be disabled under **Behavior
 - `Esc` - Exit minimal mode
 
 ### Settings
+
+The timer opens on the session view. Use **Settings** to open configuration, then **Back to timer**
+or `Esc` to return without interrupting the active timer.
 
 General:
 

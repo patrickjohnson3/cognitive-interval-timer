@@ -7,10 +7,11 @@
   <text x="152" y="180" fill="#b6c3d8" font-family="Arial, sans-serif" font-size="24">Intensity. Recovery. Repeat.</text>
   <rect x="150" y="230" width="320" height="98" rx="28" fill="#1d2b44" stroke="#375072" />
   <text x="200" y="286" fill="#ff8a00" font-family="Arial, sans-serif" font-size="24" font-weight="700" letter-spacing="2">FOCUS BLOCK READY</text>
-  <rect x="150" y="374" width="560" height="196" rx="26" fill="#142039" stroke="#31415f" />
-  <text x="194" y="432" fill="#9fb0ca" font-family="Arial, sans-serif" font-size="26" font-weight="700" letter-spacing="2">PREP</text>
-  <text x="194" y="506" fill="#f8fafc" font-family="Arial, sans-serif" font-size="76" font-weight="800">02:00</text>
-  <rect x="760" y="374" width="330" height="196" rx="26" fill="#142039" stroke="#31415f" />
-  <text x="800" y="442" fill="#f8fafc" font-family="Arial, sans-serif" font-size="28" font-weight="700">Prepare your mind.</text>
-  <text x="800" y="486" fill="#b6c3d8" font-family="Arial, sans-serif" font-size="22">Choose one clear goal.</text>
+  <rect x="994" y="246" width="108" height="52" rx="16" fill="#263244" stroke="#375072" />
+  <text x="1012" y="279" fill="#b6c3d8" font-family="Arial, sans-serif" font-size="18" font-weight="700">Settings</text>
+  <rect x="360" y="356" width="560" height="242" rx="26" fill="#142039" stroke="#31415f" />
+  <text x="404" y="408" fill="#9fb0ca" font-family="Arial, sans-serif" font-size="24" font-weight="700" letter-spacing="2">PREP</text>
+  <text x="404" y="478" fill="#f8fafc" font-family="Arial, sans-serif" font-size="72" font-weight="800">02:00</text>
+  <text x="404" y="522" fill="#f8fafc" font-family="Arial, sans-serif" font-size="24" font-weight="700">Prepare your mind. Choose one clear goal.</text>
+  <text x="490" y="566" fill="#b6c3d8" font-family="Arial, sans-serif" font-size="19">45 focus  ·  3 recall  ·  15 break</text>
 </svg>

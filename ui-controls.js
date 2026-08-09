@@ -41,6 +41,7 @@
 
     function bindControls(handlers) {
       setMinimalPanelOpen(false);
+      setSettingsViewOpen(false, { focus: false });
       bindTooltips();
       dom.controls.start.addEventListener("click", handlers.onPrimaryAction);
       dom.controls.skip.addEventListener("click", handlers.onSkip);
@@ -52,7 +53,21 @@
       });
 
       dom.controls.defaults.addEventListener("click", handlers.onRestoreDefaults);
-      dom.controls.activateDisplayModes.addEventListener("click", handlers.onActivateDisplayModes);
+      dom.controls.openSettings.addEventListener("click", function openSettingsClick() {
+        setSettingsViewOpen(true);
+      });
+      dom.controls.closeSettings.addEventListener("click", function closeSettingsClick() {
+        setSettingsViewOpen(false);
+      });
+      dom.controls.activateDisplayModes.addEventListener(
+        "click",
+        function activateDisplayModesClick() {
+          if (dom.fields.minimal_mode_enabled.checked) {
+            setSettingsViewOpen(false, { focus: false });
+          }
+          handlers.onActivateDisplayModes();
+        }
+      );
       dom.controls.exitMinimalModeReveal.addEventListener(
         "click",
         function onMinimalRevealClick(event) {
@@ -114,6 +129,7 @@
         handlers.onFullscreenToggle(field.checked);
       });
       bindCheckbox(dom.fields.minimal_mode_enabled, function onMinimalModeInput(field) {
+        if (field.checked) setSettingsViewOpen(false, { focus: false });
         handlers.onSettingsInput(readSettingsForm());
         handlers.onMinimalModeToggle(field.checked);
       });
@@ -125,6 +141,10 @@
       window.addEventListener("keydown", function onKeydown(event) {
         if (event.key === "Escape") {
           if (dismissActiveTooltip()) return;
+          if (isSettingsViewOpen()) {
+            setSettingsViewOpen(false);
+            return;
+          }
           if (isMinimalPanelOpen()) {
             setMinimalPanelOpen(false);
             focusMinimalModeReveal();
@@ -134,6 +154,7 @@
           handlers.onExitMinimalMode();
           return;
         }
+        if (isSettingsViewOpen()) return;
         if (isInteractiveTarget(event.target)) return;
         if (event.ctrlKey || event.metaKey || event.altKey) return;
         if (!dom.fields.single_key_shortcuts_enabled.checked) return;
@@ -205,6 +226,23 @@
       window.addEventListener(eventName, function onMinimalSurfaceAction(event) {
         toggleMinimalTimer(event, handlers);
       });
+    }
+
+    function isSettingsViewOpen() {
+      return !dom.views.settings.hidden;
+    }
+
+    function setSettingsViewOpen(open, options) {
+      const config = Object.assign({ focus: true }, options || {});
+      dom.views.session.hidden = open;
+      dom.views.settings.hidden = !open;
+      dom.controls.openSettings.setAttribute("aria-expanded", String(open));
+      if (open) document.documentElement.setAttribute("data-settings-view", "true");
+      else document.documentElement.removeAttribute("data-settings-view");
+
+      if (!config.focus) return;
+      if (open) dom.views.settingsHeading.focus();
+      else dom.controls.openSettings.focus();
     }
 
     function isMinimalPanelTarget(target) {

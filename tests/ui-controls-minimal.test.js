@@ -6,10 +6,17 @@ const test = require("node:test");
 
 function createDom() {
   return {
+    views: {
+      session: eventTargetNode({ id: "session-view" }),
+      settings: eventTargetNode({ id: "settings-view", hidden: true }),
+      settingsHeading: eventTargetNode({ id: "settings-view-heading", tagName: "H2" }),
+    },
     controls: {
       start: eventTargetNode({ id: "start" }),
       skip: eventTargetNode({ id: "skip" }),
       reset: eventTargetNode({ id: "reset" }),
+      openSettings: eventTargetNode({ id: "open-settings" }),
+      closeSettings: eventTargetNode({ id: "close-settings" }),
       save: eventTargetNode({ id: "save" }),
       defaults: eventTargetNode({ id: "defaults" }),
       activateDisplayModes: eventTargetNode({ id: "activate-display-modes" }),
@@ -152,6 +159,47 @@ function bindWithBrowserStubs(options) {
   UIControls.create(dom, Core.SETTING_FIELDS).bindControls(handlers);
   return Object.assign({ calls, dom }, browser);
 }
+
+test("settings open as a dedicated view and return focus on close", function () {
+  const ctx = bindWithBrowserStubs();
+
+  assert.equal(ctx.dom.views.session.hidden, false);
+  assert.equal(ctx.dom.views.settings.hidden, true);
+  assert.equal(ctx.dom.controls.openSettings.getAttribute("aria-expanded"), "false");
+
+  ctx.dom.controls.openSettings.listeners.click();
+  assert.equal(ctx.dom.views.session.hidden, true);
+  assert.equal(ctx.dom.views.settings.hidden, false);
+  assert.equal(ctx.dom.views.settingsHeading.focusCount, 1);
+  assert.equal(ctx.dom.controls.openSettings.getAttribute("aria-expanded"), "true");
+  assert.equal(ctx.document.documentElement.getAttribute("data-settings-view"), "true");
+
+  ctx.dom.controls.closeSettings.listeners.click();
+  assert.equal(ctx.dom.views.session.hidden, false);
+  assert.equal(ctx.dom.views.settings.hidden, true);
+  assert.equal(ctx.dom.controls.openSettings.focusCount, 1);
+  assert.equal(ctx.document.documentElement.hasAttribute("data-settings-view"), false);
+});
+
+test("Escape closes settings and timer shortcuts stay inactive there", function () {
+  const ctx = bindWithBrowserStubs();
+  ctx.dom.controls.openSettings.listeners.click();
+
+  ctx.windowListeners.keydown({
+    key: "s",
+    target: ctx.document.documentElement,
+    preventDefault: function preventDefault() {},
+  });
+  assert.equal(ctx.calls.includes("shortcut:skip"), false);
+
+  ctx.windowListeners.keydown({
+    key: "Escape",
+    target: ctx.document.documentElement,
+    preventDefault: function preventDefault() {},
+  });
+  assert.equal(ctx.dom.views.settings.hidden, true);
+  assert.equal(ctx.dom.controls.openSettings.focusCount, 1);
+});
 
 test("minimal mode checkbox triggers minimal handler and dirty settings handler", function () {
   const ctx = bindWithBrowserStubs();

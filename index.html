@@ -48,39 +48,66 @@
           <h1>Cognitive Interval Timer</h1>
           <p class="subtitle" id="tagline"></p>
         </div>
-        <div class="focus-block-wrap">
-          <span class="focus-block-copy">
-            <span class="badge" id="focus-block-badge" aria-label="Focus Block Ready"
-              >Focus Block Ready</span
-            >
-            <span class="focus-block-context" id="focus-block-context" aria-hidden="true"
-              >Ready to begin session.</span
-            >
-          </span>
-          <span class="tip-wrap" data-tooltip-key="focusBlockDefinition">
-            <button type="button" class="tip-trigger" aria-describedby="focus-block-definition-tip">
-              ?
-            </button>
-            <span
-              class="tip-bubble tip-bubble--below tip-bubble--align-right"
-              id="focus-block-definition-tip"
-              role="tooltip"
-              hidden
-            >
-              <strong></strong>
-              <span></span>
+        <div class="header-actions">
+          <div class="focus-block-wrap">
+            <span class="focus-block-copy">
+              <span class="badge" id="focus-block-badge" aria-label="Focus Block Ready"
+                >Focus Block Ready</span
+              >
+              <span class="focus-block-context" id="focus-block-context" aria-hidden="true"
+                >Ready to begin session.</span
+              >
             </span>
-          </span>
+            <span class="tip-wrap" data-tooltip-key="focusBlockDefinition">
+              <button
+                type="button"
+                class="tip-trigger"
+                aria-describedby="focus-block-definition-tip"
+              >
+                ?
+              </button>
+              <span
+                class="tip-bubble tip-bubble--below tip-bubble--align-right"
+                id="focus-block-definition-tip"
+                role="tooltip"
+                hidden
+              >
+                <strong></strong>
+                <span></span>
+              </span>
+            </span>
+          </div>
+          <button
+            id="open-settings"
+            type="button"
+            class="settings-trigger"
+            aria-controls="settings-view"
+            aria-expanded="false"
+          >
+            Settings
+          </button>
         </div>
       </header>
 
-      <section class="main">
-        <article class="panel" aria-label="Timer panel">
+      <section id="session-view" class="main" aria-label="Current session">
+        <article class="panel session-panel" aria-label="Timer panel">
           <p class="state" id="state">State</p>
           <p class="time" id="time" role="timer" aria-live="off">00:00</p>
           <p class="transition-message" id="transition-message" hidden></p>
           <p class="hint" id="hint"></p>
           <p class="long-hint" id="long-hint"></p>
+
+          <p
+            id="cycle-summary"
+            class="cycle-summary"
+            aria-label="Cycle: 45 minutes focus, 3 minutes recall, 15 minutes short break"
+          >
+            <span><strong id="cycle-focus">45</strong> focus</span>
+            <span aria-hidden="true">·</span>
+            <span><strong id="cycle-recall">3</strong> recall</span>
+            <span aria-hidden="true">·</span>
+            <span><strong id="cycle-break">15</strong> break</span>
+          </p>
 
           <div class="controls" aria-label="Timer controls">
             <button id="start" type="button" class="primary" aria-label="Start timer">
@@ -107,8 +134,23 @@
             <div id="long">long break: 0 / 2</div>
           </div>
         </article>
+      </section>
 
-        <aside class="panel settings" aria-label="Settings panel">
+      <section
+        id="settings-view"
+        class="settings-view"
+        aria-labelledby="settings-view-heading"
+        hidden
+      >
+        <aside class="panel settings">
+          <div class="settings-view-header">
+            <div>
+              <p class="settings-eyebrow">Configuration</p>
+              <h2 id="settings-view-heading" tabindex="-1">Settings</h2>
+            </div>
+            <button id="close-settings" type="button">Back to timer</button>
+          </div>
+
           <section class="settings-section" aria-labelledby="appearance-heading">
             <h2 id="appearance-heading">Appearance</h2>
             <div class="settings-theme">

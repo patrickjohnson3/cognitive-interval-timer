@@ -98,6 +98,33 @@ body {
   align-items: center;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.settings-trigger {
+  position: relative;
+  padding: var(--space-2) var(--space-3);
+  color: var(--text-secondary, var(--color-muted));
+  background: transparent;
+  box-shadow: none;
+}
+
+.settings-trigger[data-dirty="true"]::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent-strong);
+}
+
 h1 {
   margin: 0;
   font-size: clamp(1.3rem, 2.2vw, 1.65rem);
@@ -147,10 +174,20 @@ h1 {
 
 .main {
   display: grid;
-  grid-template-columns: 1.35fr 1fr;
+  grid-template-columns: minmax(0, 32rem);
+  justify-content: center;
   gap: var(--space-4);
   padding: var(--space-5);
   min-width: 0;
+}
+
+.main[hidden],
+.settings-view[hidden] {
+  display: none;
+}
+
+.session-panel {
+  width: 100%;
 }
 
 .panel {
@@ -219,6 +256,24 @@ h1 {
   border-radius: 12px;
   background: var(--long-hint-bg);
   box-shadow: var(--elevation-2);
+}
+
+.cycle-summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+  color: var(--text-secondary, var(--color-muted));
+  font-size: 0.84rem;
+  letter-spacing: 0.02em;
+}
+
+.cycle-summary strong {
+  color: var(--text-primary, var(--color-text));
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .controls {
@@ -311,8 +366,47 @@ kbd {
 }
 
 .settings {
+  width: min(680px, 100%);
+  margin-inline: auto;
   padding: calc(var(--space-5) + var(--space-1));
   border-color: var(--settings-card-border, var(--border-subtle, var(--color-border)));
+}
+
+.settings-view {
+  padding: var(--space-5);
+}
+
+.settings-view-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin: calc(-1 * var(--space-2)) calc(-1 * var(--space-2)) var(--space-4);
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--border-subtle, var(--color-border));
+  background: var(--panel-bg);
+}
+
+.settings-view-header h2 {
+  margin: 0;
+  font-size: clamp(1.2rem, 2vw, 1.45rem);
+}
+
+.settings-eyebrow {
+  margin: 0 0 2px;
+  color: var(--text-tertiary, var(--sidebar-label-color));
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+#close-settings {
+  flex: 0 0 auto;
+  padding: var(--space-2) var(--space-3);
 }
 
 .settings-section {
@@ -551,6 +645,7 @@ select {
 .checks {
   margin-top: 0;
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-3);
 }
 
@@ -656,6 +751,7 @@ select {
 
 :root[data-minimal-mode="true"] .header,
 :root[data-minimal-mode="true"] .settings,
+:root[data-minimal-mode="true"] .cycle-summary,
 :root[data-minimal-mode="true"] .long-hint,
 :root[data-minimal-mode="true"] .controls,
 :root[data-minimal-mode="true"] .shortcut-hint,
@@ -831,12 +927,25 @@ select {
     grid-template-columns: 1fr;
   }
 
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
   .header {
     padding: var(--space-5);
   }
 
   .settings {
     padding: var(--space-5);
+  }
+
+  .settings-view {
+    padding: var(--space-4);
+  }
+
+  .settings-view-header {
+    margin-inline: 0;
   }
 
   .controls {
@@ -855,6 +964,7 @@ select {
   }
 
   .checks {
+    grid-template-columns: 1fr;
     gap: var(--space-4);
   }
 
@@ -938,7 +1048,8 @@ select {
   }
 
   .main {
-    grid-template-columns: minmax(16rem, 1.05fr) minmax(14rem, 0.95fr);
+    grid-template-columns: minmax(0, 34rem);
+    justify-content: center;
     gap: var(--space-3);
     padding: var(--space-4);
     align-items: start;

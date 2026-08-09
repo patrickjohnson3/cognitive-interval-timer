@@ -33,6 +33,10 @@ function createDeps() {
     time: textNode(),
     hint: textNode(),
     longHint: textNode(),
+    cycleSummary: textNode(),
+    cycleFocus: textNode(),
+    cycleRecall: textNode(),
+    cycleBreak: textNode(),
     today: textNode(),
     long: textNode(),
     focusBlockBadge: textNode(),
@@ -57,6 +61,7 @@ function createDeps() {
       start: controlButtonNode(),
       minimalPrimaryAction: controlButtonNode(),
       activateDisplayModes: { hidden: true },
+      openSettings: textNode(),
     },
     theme: { value: "dark" },
     tagline: textNode(),
@@ -152,6 +157,9 @@ function baseState() {
       focusBlocksSinceLong: 0,
     },
     settings: {
+      focus: 45,
+      recall: 3,
+      break: 15,
       blocks_per_ultradian: 2,
       quiet_mode_enabled: false,
     },
@@ -178,6 +186,22 @@ test("primary button shows Start before timer has started", function () {
   );
   assert.equal(deps.dom.controls.minimalPrimaryAction.label.textContent, "Start");
   assert.equal(deps.dom.controls.minimalPrimaryAction.attributes["aria-label"], "Start timer");
+});
+
+test("cycle summary reflects the active duration settings", function () {
+  const deps = createDeps();
+  const render = UIRender.create(deps);
+  const state = baseState();
+
+  render.render(state);
+
+  assert.equal(deps.dom.cycleFocus.textContent, "45");
+  assert.equal(deps.dom.cycleRecall.textContent, "3");
+  assert.equal(deps.dom.cycleBreak.textContent, "15");
+  assert.equal(
+    deps.dom.cycleSummary.attributes["aria-label"],
+    "Cycle: 45 minutes focus, 3 minutes recall, 15 minutes short break"
+  );
 });
 
 test("saved display activation control reflects availability", function () {
