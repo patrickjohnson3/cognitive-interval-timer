@@ -179,123 +179,8 @@
             <button id="close-settings" type="button">Back to timer</button>
           </div>
 
-          <section class="settings-section" aria-labelledby="appearance-heading">
-            <h2 id="appearance-heading">Appearance</h2>
-            <div class="settings-theme">
-              <label for="theme">Theme</label>
-              <select id="theme" aria-label="Theme selector">
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
-              </select>
-            </div>
-          </section>
-
-          <div class="settings-divider" aria-hidden="true"></div>
-
-          <section class="settings-section" aria-labelledby="behavior-heading">
-            <h2 id="behavior-heading">Behavior</h2>
-            <div class="checks">
-              <div class="settings-subgroup" aria-labelledby="label-timer-flow-settings">
-                <h3 id="label-timer-flow-settings">Timer Flow</h3>
-                <label
-                  ><input id="prep_enabled" type="checkbox" />
-                  <span id="label-prep-enabled">Start With Prep Phase</span></label
-                >
-                <label
-                  ><input id="auto_start" type="checkbox" />
-                  <span id="label-auto-start">Auto-Start Next Phase</span></label
-                >
-                <label
-                  ><input id="sound_enabled" type="checkbox" />
-                  <span id="label-sound-enabled">Play Sound On Phase Change</span></label
-                >
-                <div class="setting-option">
-                  <label
-                    ><input
-                      id="quiet_mode_enabled"
-                      type="checkbox"
-                      aria-describedby="help-quiet-mode-enabled"
-                    />
-                    <span id="label-quiet-mode-enabled">Quiet Mode</span></label
-                  >
-                  <p id="help-quiet-mode-enabled" class="setting-help">
-                    Suppresses phase sounds and vibration feedback.
-                  </p>
-                </div>
-                <div class="setting-option">
-                  <label
-                    ><input
-                      id="single_key_shortcuts_enabled"
-                      type="checkbox"
-                      aria-describedby="help-single-key-shortcuts-enabled"
-                    />
-                    <span id="label-single-key-shortcuts-enabled"
-                      >Enable Single-Key Shortcuts</span
-                    ></label
-                  >
-                  <p id="help-single-key-shortcuts-enabled" class="setting-help">
-                    Lets Space, S, and R control the timer when focus is outside a form control.
-                  </p>
-                </div>
-              </div>
-
-              <div class="settings-subgroup" aria-labelledby="label-display-settings">
-                <h3 id="label-display-settings">Display</h3>
-                <p class="setting-help display-settings-help">
-                  These switches apply immediately. Save settings to remember them after refresh.
-                </p>
-                <div class="setting-option">
-                  <label
-                    ><input
-                      id="fullscreen_enabled"
-                      type="checkbox"
-                      aria-describedby="help-fullscreen-enabled"
-                    />
-                    <span id="label-fullscreen-enabled">Fullscreen</span></label
-                  >
-                  <p id="help-fullscreen-enabled" class="setting-help">
-                    Expands the timer to the whole screen and keeps the screen awake.
-                  </p>
-                </div>
-                <div class="setting-option">
-                  <label
-                    ><input
-                      id="minimal_mode_enabled"
-                      type="checkbox"
-                      aria-describedby="help-minimal-mode-enabled"
-                    />
-                    <span id="label-minimal-mode-enabled">Minimal Mode</span></label
-                  >
-                  <p id="help-minimal-mode-enabled" class="setting-help">
-                    Hides settings and controls; tap the screen to start or pause.
-                  </p>
-                </div>
-                <div class="setting-option">
-                  <label
-                    ><input
-                      id="wake_lock_enabled"
-                      type="checkbox"
-                      aria-describedby="help-wake-lock-enabled"
-                    />
-                    <span id="label-wake-lock-enabled">Keep Screen Awake</span></label
-                  >
-                  <p id="help-wake-lock-enabled" class="setting-help">
-                    Prevents display sleep when your browser allows it.
-                  </p>
-                </div>
-                <button id="activate-display-modes" type="button" hidden>
-                  Activate Saved Display Settings
-                </button>
-              </div>
-            </div>
-          </section>
-          <div id="pwa-install-slot" class="pwa-install-slot" hidden></div>
-          <p id="app-version" class="app-version" aria-label="App version"></p>
-
-          <div class="settings-divider" aria-hidden="true"></div>
-
           <section class="settings-section" aria-labelledby="label-phase-settings-heading">
-            <h2 id="label-phase-settings-heading">Cycle Structure</h2>
+            <h2 id="label-phase-settings-heading">Session Timing</h2>
             <div class="cycle-paired-grid">
               <div class="cycle-col">
                 <h3 class="cycle-col-heading">Work</h3>
@@ -486,6 +371,139 @@
               </div>
             </div>
           </section>
+
+          <div class="settings-divider" aria-hidden="true"></div>
+
+          <section class="settings-section" aria-labelledby="label-timer-flow-settings">
+            <h2 id="label-timer-flow-settings">Automation</h2>
+            <div class="checks">
+              <label
+                ><input id="prep_enabled" type="checkbox" />
+                <span id="label-prep-enabled">Start With Prep Phase</span></label
+              >
+              <label
+                ><input id="auto_start" type="checkbox" />
+                <span id="label-auto-start">Auto-Start Next Phase</span></label
+              >
+            </div>
+          </section>
+
+          <div class="settings-divider" aria-hidden="true"></div>
+
+          <section class="settings-section" aria-labelledby="label-display-settings">
+            <h2 id="label-display-settings">Display</h2>
+            <p class="setting-help display-settings-help">
+              These settings apply immediately. Save settings to remember them after refresh.
+            </p>
+            <div class="checks">
+              <div class="setting-option">
+                <label
+                  ><input
+                    id="fullscreen_enabled"
+                    type="checkbox"
+                    aria-describedby="help-fullscreen-enabled"
+                  />
+                  <span id="label-fullscreen-enabled">Fullscreen</span></label
+                >
+                <p id="help-fullscreen-enabled" class="setting-help">
+                  Expands the timer to the whole screen and keeps the screen awake.
+                </p>
+              </div>
+              <div class="setting-option">
+                <label
+                  ><input
+                    id="minimal_mode_enabled"
+                    type="checkbox"
+                    aria-describedby="help-minimal-mode-enabled"
+                  />
+                  <span id="label-minimal-mode-enabled">Minimal Mode</span></label
+                >
+                <p id="help-minimal-mode-enabled" class="setting-help">
+                  Hides settings and controls; tap the screen to start or pause.
+                </p>
+              </div>
+              <div class="setting-option">
+                <label
+                  ><input
+                    id="wake_lock_enabled"
+                    type="checkbox"
+                    aria-describedby="help-wake-lock-enabled"
+                  />
+                  <span id="label-wake-lock-enabled">Keep Screen Awake</span></label
+                >
+                <p id="help-wake-lock-enabled" class="setting-help">
+                  Prevents display sleep when your browser allows it.
+                </p>
+              </div>
+              <button id="activate-display-modes" type="button" hidden>
+                Activate Saved Display Settings
+              </button>
+            </div>
+          </section>
+
+          <div class="settings-divider" aria-hidden="true"></div>
+
+          <section class="settings-section" aria-labelledby="sound-feedback-heading">
+            <h2 id="sound-feedback-heading">Sound &amp; Feedback</h2>
+            <div class="checks">
+              <label
+                ><input id="sound_enabled" type="checkbox" />
+                <span id="label-sound-enabled">Play Sound On Phase Change</span></label
+              >
+              <div class="setting-option">
+                <label
+                  ><input
+                    id="quiet_mode_enabled"
+                    type="checkbox"
+                    aria-describedby="help-quiet-mode-enabled"
+                  />
+                  <span id="label-quiet-mode-enabled">Quiet Mode</span></label
+                >
+                <p id="help-quiet-mode-enabled" class="setting-help">
+                  Suppresses phase sounds and vibration feedback.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <div class="settings-divider" aria-hidden="true"></div>
+
+          <section class="settings-section" aria-labelledby="appearance-heading">
+            <h2 id="appearance-heading">Appearance</h2>
+            <div class="settings-theme">
+              <label for="theme">Theme</label>
+              <select id="theme" aria-label="Theme selector">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+              </select>
+            </div>
+          </section>
+
+          <div class="settings-divider" aria-hidden="true"></div>
+
+          <section class="settings-section" aria-labelledby="keyboard-heading">
+            <h2 id="keyboard-heading">Keyboard</h2>
+            <div class="checks">
+              <div class="setting-option">
+                <label
+                  ><input
+                    id="single_key_shortcuts_enabled"
+                    type="checkbox"
+                    aria-describedby="help-single-key-shortcuts-enabled"
+                  />
+                  <span id="label-single-key-shortcuts-enabled"
+                    >Enable Single-Key Shortcuts</span
+                  ></label
+                >
+                <p id="help-single-key-shortcuts-enabled" class="setting-help">
+                  Lets Space, S, and R control the timer when focus is outside a form control.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <div id="pwa-install-slot" class="pwa-install-slot" hidden></div>
+          <p id="app-version" class="app-version" aria-label="App version"></p>
 
           <div class="settings-actions-wrap">
             <div class="settings-divider" aria-hidden="true"></div>

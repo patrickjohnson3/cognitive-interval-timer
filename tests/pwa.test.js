@@ -273,7 +273,7 @@ test("every service worker app-shell asset exists locally", function () {
 
 test("display settings explain their immediate and saved behavior", function () {
   const html = readProjectFile("index.html");
-  assert(html.includes("These switches apply immediately."));
+  assert(html.includes("These settings apply immediately."));
   assert(html.includes("Save settings to remember them after refresh."));
   assert(html.includes('id="activate-display-modes"'));
 });
