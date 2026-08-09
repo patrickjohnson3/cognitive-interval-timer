@@ -273,8 +273,10 @@ test("every service worker app-shell asset exists locally", function () {
 
 test("display settings explain their immediate and saved behavior", function () {
   const html = readProjectFile("index.html");
-  assert(html.includes("These settings apply immediately."));
-  assert(html.includes("Save settings to remember them after refresh."));
+  const normalizedHtml = html.replace(/\s+/g, " ");
+  assert(normalizedHtml.includes("Changes apply immediately."));
+  assert(normalizedHtml.includes("Saved fullscreen and minimal modes require activation after"));
+  assert(normalizedHtml.includes("Fullscreen turns it on; Minimal Mode uses it"));
   assert(html.includes('id="activate-display-modes"'));
 });
 

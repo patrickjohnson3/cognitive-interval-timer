@@ -370,7 +370,8 @@
           <section class="settings-section" aria-labelledby="label-display-settings">
             <h2 id="label-display-settings">Display</h2>
             <p class="setting-help display-settings-help">
-              These settings apply immediately. Save settings to remember them after refresh.
+              Changes apply immediately. Saved fullscreen and minimal modes require activation after
+              refresh.
             </p>
             <div class="checks">
               <div class="setting-option">
@@ -383,7 +384,7 @@
                   <span id="label-fullscreen-enabled">Fullscreen</span></label
                 >
                 <p id="help-fullscreen-enabled" class="setting-help">
-                  Expands the timer to the whole screen and keeps the screen awake.
+                  Expands the timer to the whole screen and turns on Keep Screen Awake.
                 </p>
               </div>
               <div class="setting-option">
@@ -396,7 +397,8 @@
                   <span id="label-minimal-mode-enabled">Minimal Mode</span></label
                 >
                 <p id="help-minimal-mode-enabled" class="setting-help">
-                  Hides settings and controls; tap the screen to start or pause.
+                  Uses fullscreen and keeps the screen awake while active. Previous display settings
+                  return when you exit.
                 </p>
               </div>
               <div class="setting-option">
@@ -409,7 +411,8 @@
                   <span id="label-wake-lock-enabled">Keep Screen Awake</span></label
                 >
                 <p id="help-wake-lock-enabled" class="setting-help">
-                  Prevents display sleep when your browser allows it.
+                  Prevents display sleep when supported. Fullscreen turns it on; Minimal Mode uses
+                  it while active.
                 </p>
               </div>
               <button id="activate-display-modes" type="button" hidden>
