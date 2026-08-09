@@ -174,8 +174,8 @@ body {
 }
 
 .settings-icon {
-  width: 1.375rem;
-  height: 1.375rem;
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 .settings-update-indicator {
@@ -1232,11 +1232,23 @@ select {
 
   .header-actions {
     width: 100%;
-    justify-content: space-between;
+    justify-content: flex-start;
   }
 
   .header {
+    position: relative;
+    row-gap: var(--space-2);
     padding: var(--space-5);
+  }
+
+  .header > div:first-child {
+    padding-right: calc(48px + var(--space-2));
+  }
+
+  .header .settings-trigger {
+    position: absolute;
+    top: var(--space-5);
+    right: var(--space-5);
   }
 
   .settings {

@@ -695,6 +695,9 @@ async function assertResponsiveUI(client) {
         (node) => node.querySelector("button, input, select, textarea, a[href], [tabindex]:not([tabindex='-1'])")
       );
       const cycleSummary = document.getElementById("cycle-summary");
+      const settingsTarget = document.getElementById("open-settings").getBoundingClientRect();
+      const headerTitle = document.querySelector(".header > div:first-child").getBoundingClientRect();
+      const focusStatus = document.querySelector(".focus-block-wrap").getBoundingClientRect();
       return {
         fitsViewport: document.documentElement.scrollWidth <= window.innerWidth,
         controlTargets: buttons.every((button) => button.getBoundingClientRect().height >= 48),
@@ -703,8 +706,13 @@ async function assertResponsiveUI(client) {
         mobileSwitches:
           getComputedStyle(document.getElementById("prep_enabled")).appearance === "none",
         cycleSummary: cycleSummary.textContent.replace(/\\s+/g, " ").trim(),
-        settingsLabels: Boolean(document.getElementById("label-timer-flow-settings")) &&
-          Boolean(document.getElementById("label-display-settings"))
+        settingsLabels:
+          Boolean(document.getElementById("label-timer-flow-settings")) &&
+          Boolean(document.getElementById("label-display-settings")),
+        settingsInTitleRow:
+          settingsTarget.top <= headerTitle.bottom &&
+          settingsTarget.bottom >= headerTitle.top &&
+          settingsTarget.bottom <= focusStatus.top
       };
     })()`
   );
@@ -715,7 +723,8 @@ async function assertResponsiveUI(client) {
     portraitChecks.hiddenContentSafe &&
     portraitChecks.mobileSwitches &&
     portraitChecks.cycleSummary === "45 focus · 3 recall · 15 break" &&
-    portraitChecks.settingsLabels;
+    portraitChecks.settingsLabels &&
+    portraitChecks.settingsInTitleRow;
   if (!portraitOkay) {
     throw new Error("Rendered portrait checks failed: " + JSON.stringify(portraitChecks));
   }
@@ -867,7 +876,7 @@ async function assertResponsiveUI(client) {
     themeState.focusTimerColor === "rgb(242, 238, 227)" &&
     themeState.focusEdgeColor === "rgb(32, 217, 232)" &&
     themeState.focusButtonColor === "rgb(32, 217, 232)" &&
-    themeState.settingsIconWidth === 22 &&
+    themeState.settingsIconWidth === 24 &&
     themeState.settingsTargetWidth >= 44 &&
     themeState.settingsTargetHeight >= 44 &&
     themeState.settingsRestingBorder === "rgba(0, 0, 0, 0)" &&
