@@ -148,6 +148,50 @@ test("ordinary ticks render only when the displayed second changes", function ()
   }
 });
 
+test("ticker completion advances the phase and honors auto-start", function () {
+  const originalSetInterval = global.setInterval;
+  let tick = null;
+  global.setInterval = function captureTicker(callback) {
+    tick = callback;
+    return 1;
+  };
+
+  try {
+    [true, false].forEach(function eachAutoStart(autoStart) {
+      const ctx = createTimerContext();
+      ctx.state.settings.auto_start = autoStart;
+      ctx.state.timer.remainingSec = 0.1;
+      ctx.timer.startTicker();
+      ctx.advanceClock(250);
+      tick();
+
+      assert.equal(ctx.state.timer.phase, Core.PHASE.RECALL);
+      assert.equal(ctx.state.stats.focusBlocksToday, 1);
+      assert.equal(ctx.state.stats.focusBlocksSinceLong, 1);
+      assert.equal(
+        ctx.state.timer.status,
+        autoStart ? Core.STATUS.RUNNING : Core.STATUS.PAUSED
+      );
+      assert.equal(ctx.phaseChanges.length, 1);
+      assert.deepEqual(ctx.phaseChanges[0], {
+        from: Core.PHASE.FOCUS,
+        to: Core.PHASE.RECALL,
+        reason: "timer",
+      });
+      assert.equal(ctx.stateChanges.length, 1);
+
+      if (autoStart) {
+        assert.ok(Math.abs(ctx.state.timer.remainingSec - 179.85) < Number.EPSILON);
+      } else {
+        assert.equal(ctx.state.timer.remainingSec, 180);
+        assert.equal(ctx.state.timer.lastTickMs, null);
+      }
+    });
+  } finally {
+    global.setInterval = originalSetInterval;
+  }
+});
+
 test("large or backward clock gaps do not complete unattended work", function () {
   const ctx = createTimerContext();
   const originalSetInterval = global.setInterval;
