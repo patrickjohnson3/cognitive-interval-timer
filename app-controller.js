@@ -148,12 +148,7 @@
 
     function hydrateFromStorage() {
       const storedSession = storage.getJSON(Core.STORAGE_KEYS.session, null);
-      const hasSession =
-        storedSession &&
-        storedSession.version === 1 &&
-        storedSession.settings &&
-        storedSession.stats &&
-        storedSession.timer;
+      const hasSession = isCoherentSession(storedSession);
       sessionNeedsMigration = !hasSession;
 
       const storedSettings = hasSession
@@ -181,6 +176,34 @@
       lastSavedSession = sessionSnapshot();
       appState.ui.storageCorruption =
         typeof storage.hadReadError === "function" && storage.hadReadError();
+    }
+
+    function isCoherentSession(storedSession) {
+      return Boolean(
+        storedSession &&
+          storedSession.version === 1 &&
+          storedSession.settings &&
+          storedSession.stats &&
+          storedSession.timer
+      );
+    }
+
+    function refreshSessionAfterLockHandoff() {
+      const storedSession = storage.getJSON(Core.STORAGE_KEYS.session, null);
+      if (!isCoherentSession(storedSession)) return false;
+
+      appState.settings = Core.normalizeSettings(storedSession.settings);
+      appState.stats = Core.normalizeStats(storedSession.stats, Core.dateKey());
+      appState.timer = Core.normalizeTimerState(storedSession.timer, appState.settings);
+      lastSavedSession = sessionSnapshot();
+      sessionNeedsMigration = false;
+
+      if (!appState.ui.settingsDirty) {
+        appState.draftSettings = Object.assign({}, appState.settings);
+        render.hydrateSettingsForm(appState.settings);
+      }
+      render.setDisplayActivationAvailable(savedDisplayModeNeedsActivation());
+      return true;
     }
 
     function cloneStats(stats) {
@@ -303,6 +326,8 @@
             render.render(appState);
             return false;
           }
+          refreshSessionAfterLockHandoff();
+          syncTimerSuspension();
           action();
           if (sessionNeedsMigration) onStateChange();
           return true;

@@ -63,6 +63,9 @@ function setup(options) {
   if (config.storedTimer) {
     stored[Core.STORAGE_KEYS.timer] = config.storedTimer;
   }
+  if (config.storedSession) {
+    stored[Core.STORAGE_KEYS.session] = config.storedSession;
+  }
   const fullscreenRequests = [];
   let boundHandlers = null;
   let bindCount = 0;
@@ -317,6 +320,71 @@ test("a second client cannot mutate an active timer session", async function () 
 
   assert(!ctx.timerCalls.includes("start"), "expected timer start to be denied");
   assert.equal(ctx.app.state.ui.sessionConflict, true);
+});
+
+test("a client refreshes persisted state after acquiring the session lock", async function () {
+  let held = false;
+  let resolveAcquisition;
+  const initialSession = {
+    version: 1,
+    settings: Object.assign({}, Core.DEFAULT_SETTINGS),
+    stats: {
+      dateKey: Core.dateKey(),
+      focusBlocksToday: 0,
+      focusBlocksSinceLong: 0,
+    },
+    timer: {
+      status: Core.STATUS.IDLE,
+      phase: Core.PHASE.PREP,
+      focusBlockNumber: 0,
+      remainingSec: 120,
+    },
+  };
+  const ctx = setup({
+    storedSession: initialSession,
+    sessionLock: {
+      hasLock: function hasLock() {
+        return held;
+      },
+      acquire: function acquire() {
+        return new Promise(function waitForAcquisition(resolve) {
+          resolveAcquisition = function acquireLock() {
+            held = true;
+            resolve(true);
+          };
+        });
+      },
+      release: function release() {
+        held = false;
+      },
+    },
+  });
+
+  ctx.boundHandlers.onPrimaryAction();
+  ctx.stored[Core.STORAGE_KEYS.session] = {
+    version: 1,
+    settings: Object.assign({}, Core.DEFAULT_SETTINGS, { focus: 30 }),
+    stats: {
+      dateKey: Core.dateKey(),
+      focusBlocksToday: 3,
+      focusBlocksSinceLong: 1,
+    },
+    timer: {
+      status: Core.STATUS.PAUSED,
+      phase: Core.PHASE.RECALL,
+      focusBlockNumber: 2,
+      remainingSec: 42,
+    },
+  };
+  resolveAcquisition();
+  await flushPromises();
+
+  assert.equal(ctx.app.state.settings.focus, 30);
+  assert.equal(ctx.app.state.stats.focusBlocksToday, 3);
+  assert.equal(ctx.app.state.timer.phase, Core.PHASE.RECALL);
+  assert.equal(ctx.app.state.timer.remainingSec, 42);
+  assert(ctx.timerCalls.includes("start"), "expected the queued action to run after refresh");
+  assert(ctx.announcementCalls.includes("timer_resumed"));
 });
 
 test("document visibility freezes and resynchronizes the timer clock", function () {
