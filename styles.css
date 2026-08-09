@@ -437,6 +437,73 @@ button.primary:hover {
   color: var(--text-secondary, var(--color-muted));
 }
 
+:root[data-theme="signal"] button:not(.primary):hover {
+  border-color: var(--signal-cyan);
+  background: var(--color-surface-raised);
+  color: var(--signal-cyan);
+  box-shadow: none;
+}
+
+:root[data-theme="signal"][data-phase="prep"][data-timer-status="idle"] #start,
+:root[data-theme="signal"][data-phase="prep"][data-timer-status="idle"] #minimal-primary-action,
+:root[data-theme="signal"][data-phase="prep"][data-timer-status="paused"] #start,
+:root[data-theme="signal"][data-phase="prep"][data-timer-status="paused"] #minimal-primary-action {
+  border-color: var(--signal-amber);
+  background: var(--signal-amber);
+  color: var(--color-bg);
+}
+
+:root[data-theme="signal"][data-phase="prep"][data-timer-status="idle"] #start:hover,
+:root[data-theme="signal"][data-phase="prep"][data-timer-status="idle"]
+  #minimal-primary-action:hover,
+:root[data-theme="signal"][data-phase="prep"][data-timer-status="paused"] #start:hover,
+:root[data-theme="signal"][data-phase="prep"][data-timer-status="paused"]
+  #minimal-primary-action:hover {
+  border-color: var(--color-attention-strong);
+  background: var(--color-attention-strong);
+  box-shadow: none;
+}
+
+:root[data-theme="signal"] .hint,
+:root[data-theme="signal"] .long-hint {
+  border-color: var(--color-border);
+  border-left: 2px solid var(--phase-accent);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--elevation-1);
+}
+
+:root[data-theme="signal"][data-phase="prep"] .hint,
+:root[data-theme="signal"][data-phase="prep"] .long-hint {
+  color: var(--text-secondary);
+}
+
+:root[data-theme="signal"][data-phase="focus"] .state {
+  color: var(--signal-cyan);
+}
+
+:root[data-theme="signal"] .session-status,
+:root[data-theme="signal"] .focus-block-wrap,
+:root[data-theme="signal"] .pwa-prompt-card,
+:root[data-theme="signal"] .tip-bubble,
+:root[data-theme="signal"] input[type="number"],
+:root[data-theme="signal"] select,
+:root[data-theme="signal"] .visual-status {
+  border-radius: var(--radius-sm);
+}
+
+:root[data-theme="signal"][data-phase="focus"][data-minimal-mode="true"] body::before,
+:root[data-theme="signal"][data-phase="focus"]:fullscreen body::before {
+  content: "";
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: var(--signal-cyan);
+  pointer-events: none;
+}
+
 #save.primary:hover {
   box-shadow: 0 4px 10px var(--glow-soft);
 }

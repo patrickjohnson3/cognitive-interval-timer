@@ -6,6 +6,11 @@
   }
 })(typeof self !== "undefined" ? self : this, function makeAppController(DisplayServices) {
   const RUNNING_SESSION_WRITE_INTERVAL_MS = 5000;
+  const SUPPORTED_THEMES = Object.freeze(["light", "dark", "signal"]);
+
+  function normalizeTheme(theme) {
+    return SUPPORTED_THEMES.includes(theme) ? theme : "dark";
+  }
 
   function create(deps) {
     const Core = deps.Core;
@@ -179,7 +184,7 @@
       appState.stats = Core.normalizeStats(storedStats, Core.dateKey());
 
       const storedTheme = storage.getText(Core.STORAGE_KEYS.theme, "dark");
-      appState.theme = storedTheme === "light" ? "light" : "dark";
+      appState.theme = normalizeTheme(storedTheme);
 
       const storedTimer = hasSession
         ? storedSession.timer
@@ -682,7 +687,7 @@
     }
 
     function setTheme(nextTheme) {
-      appState.theme = nextTheme === "dark" ? "dark" : "light";
+      appState.theme = normalizeTheme(nextTheme);
       persistTheme(appState.theme);
       render.hydrateTheme(appState.theme);
       onStateChange();

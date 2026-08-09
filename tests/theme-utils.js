@@ -5,7 +5,8 @@ function readStyles() {
   const shared = fs.readFileSync(path.join(__dirname, "..", "styles.css"), "utf8");
   const light = fs.readFileSync(path.join(__dirname, "..", "themes", "light.css"), "utf8");
   const dark = fs.readFileSync(path.join(__dirname, "..", "themes", "dark.css"), "utf8");
-  return light + "\n" + dark + "\n" + shared;
+  const signal = fs.readFileSync(path.join(__dirname, "..", "themes", "signal.css"), "utf8");
+  return light + "\n" + dark + "\n" + signal + "\n" + shared;
 }
 
 function extractThemeBlock(css, theme) {
@@ -37,6 +38,7 @@ function parseThemeTokens() {
   return {
     light: parseTokens(extractThemeBlock(css, "light")),
     dark: parseTokens(extractThemeBlock(css, "dark")),
+    signal: parseTokens(extractThemeBlock(css, "signal")),
   };
 }
 

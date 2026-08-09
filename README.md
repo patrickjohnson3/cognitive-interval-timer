@@ -8,7 +8,7 @@ A browser-based interval timer inspired by Pomodoro, designed around cognitive p
 - Short Break
 - Long Break
 
-The app is client-side only (no backend) and includes light/dark themes with restrained color accents, keyboard shortcuts, audio phase-change cues, and persistent timer/settings/stats state via local storage.
+The app is client-side only (no backend) and includes Light, Dark, and high-salience Signal themes, keyboard shortcuts, audio phase-change cues, and persistent timer/settings/stats state via local storage.
 
 ## Live Site
 
@@ -21,7 +21,7 @@ https://patrickjohnson3.github.io/cognitive-interval-timer/
 - Auto-start toggle for next phase
 - Audio chime on phase change
 - Best-effort mobile haptic feedback on timer actions and phase changes
-- Light and dark theme selector
+- Light, Dark, and Signal theme selector
 - Daily focus block tracking
 - Active session indicator (`Focus Block N of session`)
 - Compact cycle summary on the session view
@@ -40,6 +40,7 @@ https://patrickjohnson3.github.io/cognitive-interval-timer/
 - `styles.css` - shared layout and component styles
 - `themes/light.css` - light theme tokens
 - `themes/dark.css` - dark theme tokens
+- `themes/signal.css` - high-salience Signal theme tokens
 - `content.js` - phase copy/content and labels
 - `core.js` - timer/state business logic
 - `app.js` - app bootstrap/wiring
@@ -123,7 +124,7 @@ or `Esc` to return without interrupting the active timer.
 
 General:
 
-- Theme (`Light` / `Dark`)
+- Theme (`Light` / `Dark` / `Signal`)
 - Start with prep phase
 - Auto-start next phase
 - Play sound on phase change

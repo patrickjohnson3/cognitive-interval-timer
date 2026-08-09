@@ -44,4 +44,14 @@ test("theme base text/background colors match expected values", function () {
     themes.dark["--phase-focus-accent"] === "#64748b",
     "dark focus phase must use a neutral accent"
   );
+  assert(themes.signal["--color-bg"] === "#07111a", "signal background must be deep ink");
+  assert(themes.signal["--color-surface"] === "#0d1b26", "signal surfaces must be ink blue");
+  assert(themes.signal["--color-text"] === "#f2eee3", "signal text must be warm ivory");
+  assert(themes.signal["--color-border"] === "#29404d", "signal borders must remain visible");
+  assert(themes.signal["--signal-cyan"] === "#20d9e8", "signal primary accent must be cyan");
+  assert(themes.signal["--signal-amber"] === "#ffad32", "signal prep accent must be amber");
+  assert(themes.signal["--color-success"] === "#4bd37b", "signal success must be green");
+  assert(themes.signal["--color-error"] === "#ff5964", "signal errors must be red");
+  assert(themes.signal["--panel-bg"] === "var(--color-surface)", "signal cards must stay flat");
+  assert(themes.signal["--timer-glow"] === "transparent", "signal timer must not glow");
 });

@@ -1,0 +1,79 @@
+:root[data-theme="signal"] {
+  color-scheme: dark;
+
+  --color-bg: #07111a;
+  --color-bg-alt: #091722;
+  --color-surface: #0d1b26;
+  --color-surface-raised: #142633;
+  --color-text: #f2eee3;
+  --color-muted: #9aabb5;
+  --signal-cyan: #20d9e8;
+  --signal-amber: #ffad32;
+  --color-attention: #ffad32;
+  --color-attention-strong: #e58b18;
+  --color-attention-glow: rgba(255, 173, 50, 0.12);
+  --color-recovery: #3aa6ae;
+  --color-success: #4bd37b;
+  --color-error: #ff5964;
+  --color-error-bg: rgba(255, 89, 100, 0.08);
+  --color-accent: #20d9e8;
+  --color-accent-strong: #11b9c8;
+  --color-accent-glow: rgba(32, 217, 232, 0.12);
+  --color-break-accent: #3aa6ae;
+  --color-long-break-accent: #3aa6ae;
+  --color-border: #29404d;
+  --color-button: #10212d;
+  --color-button-hover: #142633;
+  --color-input: #08151f;
+  --color-primary-text: #07111a;
+  --color-focus-ring: #20d9e8;
+  --color-input-edge: rgba(242, 238, 227, 0.12);
+
+  --border-subtle: #29404d;
+  --border-strong: #20d9e8;
+
+  --text-primary: #f2eee3;
+  --text-secondary: #9aabb5;
+  --text-tertiary: #8298a4;
+  --sidebar-label-color: #9aabb5;
+  --settings-card-border: #29404d;
+  --settings-divider-color: #203744;
+
+  --radius-lg: 14px;
+  --radius-md: 10px;
+  --radius-sm: 7px;
+  --glow-soft: rgba(0, 0, 0, 0.26);
+  --glow-strong: rgba(0, 0, 0, 0.3);
+  --long-hint-border-width: 1px;
+
+  --elevation-1: 0 3px 10px rgba(0, 0, 0, 0.24);
+  --elevation-2: 0 6px 16px rgba(0, 0, 0, 0.3);
+  --elevation-3: 0 8px 20px rgba(0, 0, 0, 0.32);
+  --timer-text-color: #f2eee3;
+  --timer-glow: transparent;
+
+  --phase-prep-accent: #ffad32;
+  --phase-prep-hint-bg: #10202b;
+  --phase-prep-long-hint-bg: #10202b;
+  --phase-focus-accent: #20d9e8;
+  --phase-focus-hint-bg: #0d1b26;
+  --phase-focus-long-hint-bg: #0d1b26;
+  --phase-recovery-accent: #3aa6ae;
+  --phase-recovery-hint-bg: #10202b;
+  --phase-recovery-long-hint-bg: #10202b;
+
+  --hint-bg: var(--phase-prep-hint-bg);
+  --hint-border: var(--signal-amber);
+  --long-hint-bg: var(--phase-prep-long-hint-bg);
+  --long-hint-border: var(--color-border);
+  --badge-bg: var(--color-surface-raised);
+  --badge-border: var(--color-border);
+  --badge-text: var(--signal-cyan);
+  --button-primary-bg: var(--signal-cyan);
+  --button-primary-hover-bg: #53e6f0;
+  --theme-row-bg: #10212d;
+  --panel-bg: var(--color-surface);
+  --tagline-pill-bg: transparent;
+  --tagline-pill-border: transparent;
+  --bg-gradient: var(--color-bg);
+}

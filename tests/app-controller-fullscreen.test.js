@@ -76,6 +76,7 @@ function setup(options) {
   const transitionCalls = [];
   const announcementCalls = [];
   const visualStatusCalls = [];
+  const hydratedThemes = [];
   const historyCalls = [];
   let sessionWriteCount = 0;
   const browser = createBrowserFixture({
@@ -136,7 +137,9 @@ function setup(options) {
   const render = {
     setTagline: function setTagline() {},
     hydrateStaticContent: function hydrateStaticContent() {},
-    hydrateTheme: function hydrateTheme() {},
+    hydrateTheme: function hydrateTheme(theme) {
+      hydratedThemes.push(theme);
+    },
     hydrateSettingsForm: function hydrateSettingsForm(settings) {
       Object.keys(settings).forEach(function eachSetting(key) {
         if (!dom.fields[key]) return;
@@ -211,9 +214,11 @@ function setup(options) {
         return true;
       },
       getText: function getText(key, fallback) {
+        if (key === Core.STORAGE_KEYS.theme && config.storedTheme) return config.storedTheme;
         return fallback;
       },
-      setText: function setText() {
+      setText: function setText(key, value) {
+        stored[key] = value;
         if (Object.prototype.hasOwnProperty.call(config, "storageWriteResult")) {
           return config.storageWriteResult;
         }
@@ -277,6 +282,7 @@ function setup(options) {
     transitionCalls,
     announcementCalls,
     visualStatusCalls,
+    hydratedThemes,
     historyCalls,
     windowListeners: browser.windowListeners,
     documentListeners: browser.documentListeners,
@@ -300,6 +306,27 @@ test("application initialization is idempotent", function () {
     }).length,
     1
   );
+});
+
+test("signal theme survives storage and user selection", function () {
+  const restored = setup({ storedTheme: "signal" });
+  assert.equal(restored.app.state.theme, "signal");
+  assert.equal(restored.hydratedThemes.at(-1), "signal");
+
+  const selected = setup();
+  selected.boundHandlers.onThemeChange("signal");
+  assert.equal(selected.app.state.theme, "signal");
+  assert.equal(selected.stored[Core.STORAGE_KEYS.theme], "signal");
+  assert.equal(selected.hydratedThemes.at(-1), "signal");
+});
+
+test("unknown themes fall back to dark", function () {
+  const ctx = setup({ storedTheme: "neon" });
+  assert.equal(ctx.app.state.theme, "dark");
+
+  ctx.boundHandlers.onThemeChange("invalid");
+  assert.equal(ctx.app.state.theme, "dark");
+  assert.equal(ctx.stored[Core.STORAGE_KEYS.theme], "dark");
 });
 
 test("primary action starts before timer has started", function () {

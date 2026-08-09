@@ -156,13 +156,25 @@ test("manifest has installable app metadata and icons", function () {
 });
 
 test("themes declare color-scheme for browser chrome and controls", function () {
+  const html = readProjectFile("index.html");
   const darkTheme = readProjectFile("themes/dark.css");
   const lightTheme = readProjectFile("themes/light.css");
+  const signalTheme = readProjectFile("themes/signal.css");
+
+  assert(html.includes('href="themes/signal.css"'), "index should load the signal theme");
+  assert(
+    html.includes('<option value="signal">Signal</option>'),
+    "theme selector should offer Signal"
+  );
 
   assert(darkTheme.includes("color-scheme: dark;"), "dark theme should declare dark color-scheme");
   assert(
     lightTheme.includes("color-scheme: light;"),
     "light theme should declare light color-scheme"
+  );
+  assert(
+    signalTheme.includes("color-scheme: dark;"),
+    "signal theme should declare dark color-scheme"
   );
 });
 

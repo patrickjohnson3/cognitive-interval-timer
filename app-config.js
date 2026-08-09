@@ -18,6 +18,7 @@
     themeColors: {
       dark: "#0f172a",
       light: "#f2eee6",
+      signal: "#07111a",
     },
     manifestBackgroundColor: "#111827",
   };

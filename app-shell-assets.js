@@ -11,6 +11,7 @@
     "./manifest.webmanifest",
     "./themes/light.css",
     "./themes/dark.css",
+    "./themes/signal.css",
     "./styles.css",
     "./app-version.js",
     "./app-config.js",

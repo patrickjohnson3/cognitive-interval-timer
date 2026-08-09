@@ -806,17 +806,62 @@ async function assertResponsiveUI(client) {
     throw new Error("Minimal controls overlap the phase guidance in short landscape");
   }
 
-  const themesOkay = await evaluateValue(
+  const themeState = await evaluateValue(
     client,
     `(() => {
       document.documentElement.setAttribute("data-theme", "light");
       const lightScheme = getComputedStyle(document.documentElement).colorScheme;
       document.documentElement.setAttribute("data-theme", "dark");
       const darkScheme = getComputedStyle(document.documentElement).colorScheme;
-      return lightScheme === "light" && darkScheme === "dark";
+      document.documentElement.setAttribute("data-theme", "signal");
+      document.documentElement.setAttribute("data-phase", "focus");
+      document.documentElement.setAttribute("data-timer-status", "idle");
+      document.getElementById("start").style.transition = "none";
+      const signalScheme = getComputedStyle(document.documentElement).colorScheme;
+      const signalAccent = getComputedStyle(document.documentElement)
+        .getPropertyValue("--signal-cyan")
+        .trim();
+      const focusLabelColor = getComputedStyle(document.getElementById("state")).color;
+      const focusTimerColor = getComputedStyle(document.getElementById("time")).color;
+      const focusEdgeColor = getComputedStyle(document.getElementById("hint")).borderLeftColor;
+      const focusButtonColor = getComputedStyle(document.getElementById("start")).backgroundColor;
+      document.documentElement.setAttribute("data-minimal-mode", "true");
+      const focusLineHeight = getComputedStyle(document.body, "::before").height;
+      document.documentElement.removeAttribute("data-minimal-mode");
+
+      document.documentElement.setAttribute("data-phase", "prep");
+      const prepLabelColor = getComputedStyle(document.getElementById("state")).color;
+      const prepButtonColor = getComputedStyle(document.getElementById("start")).backgroundColor;
+      return {
+        lightScheme,
+        darkScheme,
+        signalScheme,
+        signalAccent,
+        focusLabelColor,
+        focusTimerColor,
+        focusEdgeColor,
+        focusButtonColor,
+        focusLineHeight,
+        prepLabelColor,
+        prepButtonColor,
+      };
     })()`
   );
-  if (!themesOkay) throw new Error("Rendered theme application checks failed");
+  const themesOkay =
+    themeState.lightScheme === "light" &&
+    themeState.darkScheme === "dark" &&
+    themeState.signalScheme === "dark" &&
+    themeState.signalAccent === "#20d9e8" &&
+    themeState.focusLabelColor === "rgb(32, 217, 232)" &&
+    themeState.focusTimerColor === "rgb(242, 238, 227)" &&
+    themeState.focusEdgeColor === "rgb(32, 217, 232)" &&
+    themeState.focusButtonColor === "rgb(32, 217, 232)" &&
+    themeState.focusLineHeight === "2px" &&
+    themeState.prepLabelColor === "rgb(255, 173, 50)" &&
+    themeState.prepButtonColor === "rgb(255, 173, 50)";
+  if (!themesOkay) {
+    throw new Error("Rendered theme application checks failed: " + JSON.stringify(themeState));
+  }
 }
 
 async function main() {

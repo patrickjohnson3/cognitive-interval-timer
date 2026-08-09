@@ -307,6 +307,12 @@ test("hydrateTheme updates browser theme color", function () {
     "expected dark browser theme color"
   );
 
+  render.hydrateTheme("signal");
+  assert(
+    themeColor.attributes.content === AppConfig.themeColors.signal,
+    "expected signal browser theme color"
+  );
+
   delete document.nodes["theme-color-meta"];
 });
 
