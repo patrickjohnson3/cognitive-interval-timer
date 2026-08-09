@@ -209,6 +209,16 @@ async function waitForPageReady(client) {
   throw new Error("App page did not become service-worker ready");
 }
 
+async function waitForCondition(client, expression, message) {
+  for (let attempt = 0; attempt < 50; attempt += 1) {
+    if (await evaluateAfterNavigation(client, expression)) return;
+    await new Promise(function waitForConditionRetry(resolve) {
+      setTimeout(resolve, 100);
+    });
+  }
+  throw new Error(message);
+}
+
 async function settleLayout(client) {
   await evaluateValue(
     client,
@@ -307,6 +317,64 @@ async function assertInteractiveAccessibility(client) {
       document.documentElement.removeAttribute("data-minimal-mode");
       return true;
     })()`
+  );
+}
+
+async function assertTimerPersistence(client, appUrl) {
+  const persisted = await evaluateValue(
+    client,
+    `(() => {
+      const label = document.querySelector("#start .control-label");
+      if (label.textContent !== "Start") return null;
+      document.getElementById("start").click();
+      return true;
+    })()`
+  );
+  if (!persisted) throw new Error("Timer persistence workflow did not begin from idle");
+
+  await waitForCondition(
+    client,
+    'document.querySelector("#start .control-label")?.textContent === "Pause"',
+    "Timer did not start"
+  );
+  await evaluateValue(client, 'document.getElementById("start").click(); true');
+  await waitForCondition(
+    client,
+    `(() => {
+      const saved = JSON.parse(localStorage.getItem("better_pomodoro_session_v2"));
+      return document.querySelector("#start .control-label")?.textContent === "Resume" &&
+        saved.timer.status === "paused" && saved.timer.focusBlockNumber === 1 &&
+        saved.timer.remainingSec > 0;
+    })()`,
+    "Paused timer state was not persisted"
+  );
+  const remainingBeforeReload = await evaluateValue(
+    client,
+    'JSON.parse(localStorage.getItem("better_pomodoro_session_v2")).timer.remainingSec'
+  );
+
+  await client.send("Page.navigate", { url: appUrl });
+  await waitForPageReady(client);
+  await waitForCondition(
+    client,
+    'document.querySelector("#start .control-label")?.textContent === "Resume"',
+    "Reloaded timer did not restore the paused state"
+  );
+  const restored = await evaluateValue(
+    client,
+    `(() => {
+      const saved = JSON.parse(localStorage.getItem("better_pomodoro_session_v2"));
+      return saved.timer.status === "paused" && saved.timer.focusBlockNumber === 1 &&
+        Math.abs(saved.timer.remainingSec - ${JSON.stringify(remainingBeforeReload)}) < 0.001;
+    })()`
+  );
+  if (!restored) throw new Error("Reloaded timer did not preserve its remaining time");
+
+  await evaluateValue(client, 'document.getElementById("reset").click(); true');
+  await waitForCondition(
+    client,
+    'document.querySelector("#start .control-label")?.textContent === "Start"',
+    "Timer did not return to idle after persistence workflow"
   );
 }
 
@@ -660,6 +728,7 @@ async function main() {
       client,
       "navigator.serviceWorker.ready.then(function () { return true; })"
     );
+    await assertTimerPersistence(client, appUrl);
     await assertResponsiveUI(client);
     await client.send("Page.navigate", { url: appUrl });
     await new Promise(function waitForController(resolve) {
