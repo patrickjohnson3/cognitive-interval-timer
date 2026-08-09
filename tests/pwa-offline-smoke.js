@@ -384,6 +384,41 @@ async function assertSettingsNavigation(client) {
 }
 
 async function assertResponsiveUI(client) {
+  for (const viewport of [
+    { width: 320, height: 568, type: "portraitPrimary", angle: 0 },
+    { width: 568, height: 320, type: "landscapePrimary", angle: 90 },
+  ]) {
+    await client.send("Emulation.setDeviceMetricsOverride", {
+      width: viewport.width,
+      height: viewport.height,
+      deviceScaleFactor: 1,
+      mobile: true,
+      screenOrientation: { type: viewport.type, angle: viewport.angle },
+    });
+    await settleLayout(client);
+    const primaryAction = await evaluateValue(
+      client,
+      `(() => {
+        const rect = document.getElementById("start").getBoundingClientRect();
+        return {
+          top: rect.top,
+          bottom: rect.bottom,
+          viewportHeight: window.innerHeight,
+          headerBottom: document.querySelector(".header").getBoundingClientRect().bottom,
+          panelTop: document.querySelector(".session-panel").getBoundingClientRect().top,
+          hintBottom: document.getElementById("hint").getBoundingClientRect().bottom,
+          summaryBottom: document.getElementById("cycle-summary").getBoundingClientRect().bottom
+        };
+      })()`
+    );
+    if (primaryAction.top < 0 || primaryAction.bottom > primaryAction.viewportHeight) {
+      throw new Error(
+        "Primary timer action is below the initial compact viewport: " +
+          JSON.stringify({ viewport: viewport, action: primaryAction })
+      );
+    }
+  }
+
   await client.send("Emulation.setDeviceMetricsOverride", {
     width: 390,
     height: 844,

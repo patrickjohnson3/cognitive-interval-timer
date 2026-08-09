@@ -245,7 +245,7 @@ h1 {
 }
 
 .long-hint {
-  margin: 0 0 var(--space-3);
+  margin: var(--space-3) 0 0;
   color: var(--text-primary, var(--color-text));
   line-height: 1.5;
   font-size: 0.98rem;
@@ -967,7 +967,6 @@ select {
 
   .long-hint {
     line-height: 1.58;
-    margin-bottom: var(--space-4);
   }
 
   .checks {
@@ -1051,7 +1050,18 @@ select {
   }
 
   .header {
+    flex-wrap: nowrap;
     padding: var(--space-4) var(--space-5);
+  }
+
+  .header-actions {
+    width: auto;
+    flex-wrap: nowrap;
+  }
+
+  .subtitle,
+  .focus-block-context {
+    display: none;
   }
 
   .main {
