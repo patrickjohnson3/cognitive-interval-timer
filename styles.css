@@ -498,9 +498,7 @@ kbd {
 }
 
 .settings-section {
-  background: var(--theme-row-bg);
-  border-radius: 10px;
-  padding: var(--settings-group-padding);
+  padding: 0;
 }
 
 .settings-section h2 {
