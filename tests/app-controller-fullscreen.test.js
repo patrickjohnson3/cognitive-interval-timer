@@ -92,6 +92,9 @@ function setup(options) {
     pushState: function pushState(state, title) {
       historyCalls.push({ type: "pushState", state, title });
     },
+    replaceState: function replaceState(state, title) {
+      historyCalls.push({ type: "replaceState", state, title });
+    },
     back: function back() {
       historyCalls.push({ type: "back" });
     },
@@ -627,6 +630,16 @@ test("minimal mode pushes a single back-button history entry", function () {
     pushes[0].state.appState === "minimal-mode",
     "expected minimal mode marker in history state"
   );
+});
+
+test("minimal mode accepts ownership of the Settings history entry", function () {
+  const ctx = setup();
+
+  ctx.boundHandlers.onMinimalModeToggle(true, { reuseHistoryEntry: true });
+
+  assert.equal(ctx.historyCalls.length, 1);
+  assert.equal(ctx.historyCalls[0].type, "replaceState");
+  assert.equal(ctx.historyCalls[0].state.appState, "minimal-mode");
 });
 
 test("Android back exits minimal mode before leaving the app", function () {

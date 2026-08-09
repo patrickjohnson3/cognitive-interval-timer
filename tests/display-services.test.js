@@ -174,6 +174,37 @@ test("display mode service owns minimal fullscreen wake lock and history state",
   assert(events.includes("minimal:external-exit"));
 });
 
+test("minimal mode can replace a Settings history entry", async function () {
+  const historyCalls = [];
+  const service = DisplayServices.createDisplayModeService({
+    documentRef: { documentElement: {}, fullscreenElement: {} },
+    windowRef: {
+      history: {
+        pushState: function pushState(state) {
+          historyCalls.push({ type: "push", state: state });
+        },
+        replaceState: function replaceState(state) {
+          historyCalls.push({ type: "replace", state: state });
+        },
+        back: function back() {},
+      },
+      addEventListener: function addEventListener() {},
+    },
+    wakeLock: { setEnabled: function setEnabled() {} },
+    onMinimalModeChange: function onMinimalModeChange() {},
+  });
+
+  await service.setMinimalMode(
+    true,
+    { fullscreen_enabled: true, wake_lock_enabled: false },
+    { reuseHistoryEntry: true }
+  );
+
+  assert.equal(historyCalls.length, 1);
+  assert.equal(historyCalls[0].type, "replace");
+  assert.equal(historyCalls[0].state.appState, "minimal-mode");
+});
+
 test("temporary wake lock failures use the non-destructive failure callback", async function () {
   const events = [];
   const service = DisplayServices.createDisplayModeService({

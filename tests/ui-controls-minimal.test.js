@@ -102,6 +102,16 @@ function bindWithBrowserStubs(options) {
     querySelectorAll: config.querySelectorAll,
   });
   const calls = [];
+  const historyCalls = [];
+  browser.window.history.pushState = function pushState(state) {
+    historyCalls.push({ type: "push", state: state });
+  };
+  browser.window.history.replaceState = function replaceState(state) {
+    historyCalls.push({ type: "replace", state: state });
+  };
+  browser.window.history.back = function back() {
+    historyCalls.push({ type: "back" });
+  };
   const handlers = {
     onStart: function onStart() {
       calls.push("start");
@@ -139,8 +149,11 @@ function bindWithBrowserStubs(options) {
     onFullscreenChange: function onFullscreenChange(enabled) {
       calls.push("fullscreen-change:" + enabled);
     },
-    onMinimalModeToggle: function onMinimalModeToggle(enabled) {
+    onMinimalModeToggle: function onMinimalModeToggle(enabled, displayModeOptions) {
       calls.push("minimal:" + enabled);
+      if (displayModeOptions && displayModeOptions.reuseHistoryEntry) {
+        calls.push("minimal:reuse-history");
+      }
     },
     onWakeLockToggle: function onWakeLockToggle(enabled) {
       calls.push("wake-lock:" + enabled);
@@ -157,7 +170,7 @@ function bindWithBrowserStubs(options) {
   global.window = browser.window;
 
   UIControls.create(dom, Core.SETTING_FIELDS).bindControls(handlers);
-  return Object.assign({ calls, dom }, browser);
+  return Object.assign({ calls, dom, historyCalls }, browser);
 }
 
 test("settings open as a dedicated view and return focus on close", function () {
@@ -173,12 +186,27 @@ test("settings open as a dedicated view and return focus on close", function () 
   assert.equal(ctx.dom.views.settingsHeading.focusCount, 1);
   assert.equal(ctx.dom.controls.openSettings.getAttribute("aria-expanded"), "true");
   assert.equal(ctx.document.documentElement.getAttribute("data-settings-view"), "true");
+  assert.equal(ctx.historyCalls[0].type, "push");
+  assert.equal(ctx.historyCalls[0].state.appState, "settings");
 
   ctx.dom.controls.closeSettings.listeners.click();
   assert.equal(ctx.dom.views.session.hidden, false);
   assert.equal(ctx.dom.views.settings.hidden, true);
   assert.equal(ctx.dom.controls.openSettings.focusCount, 1);
   assert.equal(ctx.document.documentElement.hasAttribute("data-settings-view"), false);
+  assert.equal(ctx.historyCalls[1].type, "back");
+});
+
+test("browser Back closes settings and restores timer focus", function () {
+  const ctx = bindWithBrowserStubs();
+  ctx.dom.controls.openSettings.listeners.click();
+
+  ctx.windowListeners.popstate({ state: null });
+
+  assert.equal(ctx.dom.views.session.hidden, false);
+  assert.equal(ctx.dom.views.settings.hidden, true);
+  assert.equal(ctx.dom.controls.openSettings.focusCount, 1);
+  assert.equal(ctx.historyCalls.length, 1, "Back handling must not navigate twice");
 });
 
 test("Escape closes settings and timer shortcuts stay inactive there", function () {
@@ -208,6 +236,18 @@ test("minimal mode checkbox triggers minimal handler and dirty settings handler"
 
   assert(ctx.calls.includes("minimal:true"), "expected minimal mode toggle handler");
   assert(ctx.calls.includes("settings"), "expected settings dirty handler");
+});
+
+test("minimal mode reuses the open Settings history entry", function () {
+  const ctx = bindWithBrowserStubs();
+  ctx.dom.controls.openSettings.listeners.click();
+  ctx.dom.fields.minimal_mode_enabled.checked = true;
+
+  ctx.dom.fields.minimal_mode_enabled.listeners.change();
+
+  assert(ctx.calls.includes("minimal:reuse-history"));
+  assert.equal(ctx.dom.views.settings.hidden, true);
+  assert.equal(ctx.historyCalls.length, 1, "Settings should not issue a competing Back call");
 });
 
 test("saved display activation button invokes its handler", function () {

@@ -171,7 +171,12 @@
 
     function setMinimalMode(enabled, preferences, options) {
       const config = Object.assign(
-        { updateHistory: true, restoreFullscreen: true, wakeLockBeforeMinimal: null },
+        {
+          updateHistory: true,
+          restoreFullscreen: true,
+          wakeLockBeforeMinimal: null,
+          reuseHistoryEntry: false,
+        },
         options || {}
       );
       if (enabled) {
@@ -184,7 +189,7 @@
         minimalPreferences = preferences;
         minimalModeActive = true;
         onMinimalModeChange(true);
-        if (config.updateHistory) enterMinimalModeHistory();
+        if (config.updateHistory) enterMinimalModeHistory(config.reuseHistoryEntry);
         setWakeLock(true);
         return setFullscreen(true);
       }
@@ -232,15 +237,17 @@
       );
     }
 
-    function enterMinimalModeHistory() {
+    function enterMinimalModeHistory(reuseHistoryEntry) {
       if (minimalModeHistoryActive || !canUseHistory()) return;
       try {
         minimalModeHistoryToken = nextMinimalModeHistoryToken;
         nextMinimalModeHistoryToken += 1;
-        win.history.pushState(
-          { appState: "minimal-mode", minimalModeToken: minimalModeHistoryToken },
-          ""
-        );
+        const state = { appState: "minimal-mode", minimalModeToken: minimalModeHistoryToken };
+        if (reuseHistoryEntry && typeof win.history.replaceState === "function") {
+          win.history.replaceState(state, "");
+        } else {
+          win.history.pushState(state, "");
+        }
         minimalModeHistoryActive = true;
       } catch {
         minimalModeHistoryActive = false;

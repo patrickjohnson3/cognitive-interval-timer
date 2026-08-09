@@ -6,6 +6,10 @@
   }
 })(typeof self !== "undefined" ? self : this, function makeUIControls() {
   function create(dom, settingFields) {
+    let settingsHistoryActive = false;
+    let settingsHistoryToken = null;
+    let nextSettingsHistoryToken = 1;
+
     function isInteractiveTarget(target) {
       if (!target) return false;
       const tag = target.tagName;
@@ -41,7 +45,7 @@
 
     function bindControls(handlers) {
       setMinimalPanelOpen(false);
-      setSettingsViewOpen(false, { focus: false });
+      setSettingsViewOpen(false, { focus: false, updateHistory: false });
       bindTooltips();
       dom.controls.start.addEventListener("click", handlers.onPrimaryAction);
       dom.controls.skip.addEventListener("click", handlers.onSkip);
@@ -62,10 +66,11 @@
       dom.controls.activateDisplayModes.addEventListener(
         "click",
         function activateDisplayModesClick() {
+          let displayModeOptions = null;
           if (dom.fields.minimal_mode_enabled.checked) {
-            setSettingsViewOpen(false, { focus: false });
+            displayModeOptions = closeSettingsForMinimalMode();
           }
-          handlers.onActivateDisplayModes();
+          handlers.onActivateDisplayModes(displayModeOptions);
         }
       );
       dom.controls.exitMinimalModeReveal.addEventListener(
@@ -129,9 +134,9 @@
         handlers.onFullscreenToggle(field.checked);
       });
       bindCheckbox(dom.fields.minimal_mode_enabled, function onMinimalModeInput(field) {
-        if (field.checked) setSettingsViewOpen(false, { focus: false });
+        const displayModeOptions = field.checked ? closeSettingsForMinimalMode() : null;
         handlers.onSettingsInput(readSettingsForm());
-        handlers.onMinimalModeToggle(field.checked);
+        handlers.onMinimalModeToggle(field.checked, displayModeOptions);
       });
       bindCheckbox(dom.fields.wake_lock_enabled, function onWakeLockInput(field) {
         handlers.onSettingsInput(readSettingsForm());
@@ -166,6 +171,15 @@
         }
         if (key === "s") handlers.onShortcut("skip");
         if (key === "r") handlers.onShortcut("reset");
+      });
+
+      window.addEventListener("popstate", function onSettingsPopState(event) {
+        if (!settingsHistoryActive) return;
+        const activeToken = event && event.state && event.state.settingsViewToken;
+        if (activeToken === settingsHistoryToken) return;
+        settingsHistoryActive = false;
+        settingsHistoryToken = null;
+        if (isSettingsViewOpen()) setSettingsViewOpen(false, { updateHistory: false });
       });
 
       bindMinimalModeSurface(handlers);
@@ -233,16 +247,58 @@
     }
 
     function setSettingsViewOpen(open, options) {
-      const config = Object.assign({ focus: true }, options || {});
+      const config = Object.assign({ focus: true, updateHistory: true }, options || {});
       dom.views.session.hidden = open;
       dom.views.settings.hidden = !open;
       dom.controls.openSettings.setAttribute("aria-expanded", String(open));
       if (open) document.documentElement.setAttribute("data-settings-view", "true");
       else document.documentElement.removeAttribute("data-settings-view");
 
+      if (config.updateHistory) updateSettingsHistory(open);
+
       if (!config.focus) return;
       if (open) dom.views.settingsHeading.focus();
       else dom.controls.openSettings.focus();
+    }
+
+    function updateSettingsHistory(open) {
+      if (!window.history) return;
+      if (open && !settingsHistoryActive && typeof window.history.pushState === "function") {
+        try {
+          settingsHistoryToken = nextSettingsHistoryToken;
+          nextSettingsHistoryToken += 1;
+          window.history.pushState(
+            { appState: "settings", settingsViewToken: settingsHistoryToken },
+            ""
+          );
+          settingsHistoryActive = true;
+        } catch {
+          settingsHistoryToken = null;
+        }
+        return;
+      }
+      if (!open && settingsHistoryActive && typeof window.history.back === "function") {
+        settingsHistoryActive = false;
+        settingsHistoryToken = null;
+        try {
+          window.history.back();
+        } catch {
+          // The visible Settings view has still closed.
+        }
+      }
+    }
+
+    function closeSettingsForMinimalMode() {
+      const reuseHistoryEntry =
+        settingsHistoryActive &&
+        window.history &&
+        typeof window.history.replaceState === "function";
+      if (reuseHistoryEntry) {
+        settingsHistoryActive = false;
+        settingsHistoryToken = null;
+      }
+      setSettingsViewOpen(false, { focus: false, updateHistory: !reuseHistoryEntry });
+      return { reuseHistoryEntry: reuseHistoryEntry };
     }
 
     function isMinimalPanelTarget(target) {

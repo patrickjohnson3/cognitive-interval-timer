@@ -434,7 +434,7 @@
       displayModes.handleFullscreenChange(isFullscreen);
     }
 
-    function onMinimalModeToggle(enabled) {
+    function onMinimalModeToggle(enabled, options) {
       let wakeLockBeforeMinimal = null;
       if (enabled) {
         wakeLockBeforeMinimal = controls.readSettingsForm().wake_lock_enabled;
@@ -443,6 +443,7 @@
       }
       const result = displayModes.setMinimalMode(enabled, appState.draftSettings, {
         wakeLockBeforeMinimal: wakeLockBeforeMinimal,
+        reuseHistoryEntry: Boolean(options && options.reuseHistoryEntry),
       });
       if (enabled) controls.focusMinimalModeReveal();
       return result;
@@ -460,10 +461,10 @@
       );
     }
 
-    function onActivateDisplayModes() {
+    function onActivateDisplayModes(options) {
       render.setDisplayActivationAvailable(false);
       if (appState.settings.minimal_mode_enabled) {
-        onMinimalModeToggle(true);
+        onMinimalModeToggle(true, options);
       } else if (appState.settings.fullscreen_enabled) {
         onFullscreenToggle(true);
       } else {
