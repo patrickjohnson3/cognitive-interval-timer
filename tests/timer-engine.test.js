@@ -91,17 +91,37 @@ test("skipping before start initializes a one-based focus block", function () {
   });
 });
 
-test("suspension discards hidden elapsed time", function () {
+test("suspension discards hidden elapsed time without completing work", function () {
   const ctx = createTimerContext();
-  ctx.timer.setSuspended(true);
-  assert(ctx.state.timer.lastTickMs === null, "expected suspension to clear the wall-clock anchor");
+  const originalSetInterval = global.setInterval;
+  let tick = null;
+  global.setInterval = function captureTicker(callback) {
+    tick = callback;
+    return 1;
+  };
 
-  ctx.timer.setSuspended(false);
-  assert(
-    typeof ctx.state.timer.lastTickMs === "number",
-    "expected resume to establish a fresh wall-clock anchor"
-  );
-  assert(ctx.state.stats.focusBlocksToday === 0, "expected no focus completion while suspended");
+  try {
+    ctx.state.timer.remainingSec = 1;
+    ctx.timer.startTicker();
+    ctx.timer.setSuspended(true);
+    ctx.advanceClock(120000);
+    tick();
+
+    assert.equal(ctx.state.timer.phase, Core.PHASE.FOCUS);
+    assert.equal(ctx.state.timer.remainingSec, 1);
+    assert.equal(ctx.state.stats.focusBlocksToday, 0);
+    assert.equal(ctx.stateChanges.length, 0);
+
+    ctx.timer.setSuspended(false);
+    ctx.advanceClock(250);
+    tick();
+
+    assert.equal(ctx.state.timer.phase, Core.PHASE.FOCUS);
+    assert.equal(ctx.state.timer.remainingSec, 0.75);
+    assert.equal(ctx.state.stats.focusBlocksToday, 0);
+  } finally {
+    global.setInterval = originalSetInterval;
+  }
 });
 
 test("ordinary ticks render only when the displayed second changes", function () {
