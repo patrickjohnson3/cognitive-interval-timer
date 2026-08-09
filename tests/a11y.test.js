@@ -55,6 +55,15 @@ test("document headings do not skip hierarchy levels", function () {
   });
 });
 
+test("icon-only Settings control keeps an accessible name", function () {
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const settingsButton = html.match(/<button\s+id="open-settings"[\s\S]*?<\/button>/)[0];
+
+  assert.match(settingsButton, /aria-label="Settings"/);
+  assert.match(settingsButton, /class="settings-icon"/);
+  assert.match(settingsButton, /aria-hidden="true"/);
+});
+
 test("platform failures have readable announcements", function () {
   const a11y = A11y.create({ Content });
 
