@@ -978,6 +978,18 @@ select {
     gap: var(--space-3);
   }
 
+  .settings button,
+  .settings input[type="number"],
+  .settings select,
+  .settings .checks label {
+    min-height: 44px;
+  }
+
+  .settings .tip-trigger {
+    width: 44px;
+    height: 44px;
+  }
+
   .setting-option {
     gap: var(--space-1);
   }

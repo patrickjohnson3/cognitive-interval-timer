@@ -367,6 +367,19 @@ async function assertSettingsNavigation(client) {
   );
   if (!settingsScaleOkay) throw new Error("Settings header clips controls at 200% text size");
 
+  const settingsTargetsOkay = await evaluateValue(
+    client,
+    `(() => {
+      const controls = Array.from(
+        document.querySelectorAll(
+          ".settings button, .settings input[type='number'], .settings select, .settings .checks label"
+        )
+      ).filter((node) => !node.hidden && getComputedStyle(node).display !== "none");
+      return controls.length > 0 && controls.every((node) => node.getBoundingClientRect().height >= 44);
+    })()`
+  );
+  if (!settingsTargetsOkay) throw new Error("A mobile Settings target is smaller than 44px");
+
   await evaluateValue(client, 'document.getElementById("settings-view-heading").focus(); true');
 
   await pressKey(client, "Escape", "Escape", 27);
