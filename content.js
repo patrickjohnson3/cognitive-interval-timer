@@ -55,6 +55,8 @@
     fullscreenMode: "Fullscreen",
     minimalMode: "Minimal Mode",
     keepScreenAwake: "Keep Screen Awake",
+    restoreDefaultsConfirmation:
+      "Restore all settings to their defaults and restart the current block?",
     labels: {
       focusBlocksTodayPrefix: "today: ",
       focusBlocksTodaySuffix: " focus blocks",

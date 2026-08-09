@@ -29,6 +29,13 @@
     const wakeLock = deps.wakeLock;
     const a11y = deps.a11y;
     const doc = deps.documentRef || document;
+    const confirmAction =
+      deps.confirmAction ||
+      function confirmInDocument(message) {
+        const view = (doc && doc.defaultView) || deps.windowRef;
+        if (!view || typeof view.confirm !== "function") return true;
+        return view.confirm(message);
+      };
 
     const appState = {
       settings: Core.normalizeSettings(null),
@@ -614,6 +621,13 @@
     }
 
     function restoreDefaults() {
+      try {
+        if (!confirmAction(Content.UI_COPY.restoreDefaultsConfirmation)) {
+          return Promise.resolve(false);
+        }
+      } catch {
+        return Promise.resolve(false);
+      }
       return ensureSessionAccess(function restoreSessionDefaults() {
         appState.settings = Core.normalizeSettings(Core.DEFAULT_SETTINGS);
         appState.draftSettings = Object.assign({}, appState.settings);

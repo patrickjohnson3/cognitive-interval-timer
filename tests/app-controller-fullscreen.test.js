@@ -255,6 +255,7 @@ function setup(options) {
     },
     dom,
     windowRef: browser.window,
+    confirmAction: config.confirmAction,
   });
 
   app.controller.initialize();
@@ -466,6 +467,33 @@ test("restart announces the reset timer state", function () {
 
   assert(ctx.timerCalls.includes("reset"));
   assert(ctx.announcementCalls.includes("block_restarted"));
+});
+
+test("restore defaults requires confirmation before resetting", async function () {
+  const ctx = setup({
+    confirmAction: function rejectConfirmation(message) {
+      assert.equal(message, Content.UI_COPY.restoreDefaultsConfirmation);
+      return false;
+    },
+  });
+
+  const restored = await ctx.app.restoreDefaults();
+
+  assert.equal(restored, false);
+  assert(!ctx.timerCalls.includes("reset"));
+});
+
+test("confirmed restore defaults resets the block", async function () {
+  const ctx = setup({
+    confirmAction: function acceptConfirmation() {
+      return true;
+    },
+  });
+
+  const restored = await ctx.app.restoreDefaults();
+
+  assert.equal(restored, true);
+  assert(ctx.timerCalls.includes("reset"));
 });
 
 test("phase changes trigger phase haptic feedback", function () {
