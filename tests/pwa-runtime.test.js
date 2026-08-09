@@ -174,6 +174,11 @@ function loadPWA(options) {
     id: "pwa-update-indicator",
     hidden: true,
   };
+  nodes["pwa-capability-status"] = {
+    id: "pwa-capability-status",
+    textContent: "",
+    hidden: true,
+  };
   nodes["open-settings"] = {
     id: "open-settings",
     attributes: {},
@@ -456,6 +461,11 @@ test("PWA registration failure renders a visible status card", async function ()
     card.children[0].textContent === "Offline support is unavailable right now.",
     "expected registration failure copy"
   );
+  assert.equal(runtime.nodes["pwa-capability-status"].hidden, false);
+  assert.equal(
+    runtime.nodes["pwa-capability-status"].textContent,
+    "Offline support is unavailable right now."
+  );
 });
 
 test("PWA unsupported browser renders a visible status card", async function () {
@@ -472,6 +482,11 @@ test("PWA unsupported browser renders a visible status card", async function () 
   assert(
     card.children[0].textContent === "Offline support is unavailable in this browser.",
     "expected unsupported browser copy"
+  );
+  assert.equal(runtime.nodes["pwa-capability-status"].hidden, false);
+  assert.equal(
+    runtime.nodes["pwa-capability-status"].textContent,
+    "Offline support is unavailable in this browser."
   );
 });
 

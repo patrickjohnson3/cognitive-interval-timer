@@ -43,6 +43,10 @@
 
   function showServiceWorkerStatus(message) {
     prompts.showStatus(message);
+    const timerStatus = document.getElementById("pwa-capability-status");
+    if (!timerStatus) return;
+    timerStatus.textContent = message;
+    timerStatus.hidden = false;
   }
 
   function showInstallPrompt() {

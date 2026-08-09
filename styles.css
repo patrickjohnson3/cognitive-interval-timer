@@ -835,6 +835,7 @@ select {
 :root[data-minimal-mode="true"] .controls,
 :root[data-minimal-mode="true"] .shortcut-hint,
 :root[data-minimal-mode="true"] .stats,
+:root[data-minimal-mode="true"] .pwa-capability-status,
 :root[data-minimal-mode="true"] .settings-actions-wrap,
 :root[data-minimal-mode="true"] .settings-state,
 :root[data-minimal-mode="true"] .ok {
