@@ -378,6 +378,43 @@ async function assertTimerPersistence(client, appUrl) {
   );
 }
 
+async function assertCombinedBackNavigation(client) {
+  const entered = await evaluateValue(
+    client,
+    `(() => {
+      window.__smokePopstateCount = 0;
+      window.addEventListener("popstate", function countSmokePopstate() {
+        window.__smokePopstateCount += 1;
+      }, { once: true });
+      document.getElementById("open-settings").click();
+      const minimal = document.getElementById("minimal_mode_enabled");
+      minimal.checked = true;
+      minimal.dispatchEvent(new Event("change", { bubbles: true }));
+      return document.documentElement.hasAttribute("data-minimal-mode") &&
+        history.state?.appState === "minimal-mode";
+    })()`
+  );
+  if (!entered) throw new Error("Settings-to-minimal history workflow did not initialize");
+
+  await evaluateValue(client, "history.back(); true");
+  await waitForCondition(
+    client,
+    `!document.documentElement.hasAttribute("data-minimal-mode") &&
+      history.state === null && window.__smokePopstateCount === 1`,
+    "One Back action did not exit minimal mode cleanly"
+  );
+  const restored = await evaluateValue(
+    client,
+    `(() => {
+      return !document.getElementById("session-view").hidden &&
+        document.getElementById("settings-view").hidden &&
+        !document.getElementById("minimal_mode_enabled").checked &&
+        document.activeElement?.id === "start";
+    })()`
+  );
+  if (!restored) throw new Error("Back did not restore the timer after minimal mode");
+}
+
 async function assertSettingsNavigation(client) {
   const initialStateOkay = await evaluateValue(
     client,
@@ -729,6 +766,7 @@ async function main() {
       "navigator.serviceWorker.ready.then(function () { return true; })"
     );
     await assertTimerPersistence(client, appUrl);
+    await assertCombinedBackNavigation(client);
     await assertResponsiveUI(client);
     await client.send("Page.navigate", { url: appUrl });
     await new Promise(function waitForController(resolve) {
