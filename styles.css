@@ -1046,12 +1046,19 @@ select {
 
 #defaults {
   min-height: 44px;
-  padding: var(--space-2) 0;
-  color: var(--text-secondary, var(--color-muted));
-  background: transparent;
+  padding: var(--space-2) var(--space-3);
+  border-color: var(--border-subtle, var(--color-border));
+  color: var(--text-primary, var(--color-text));
+  background: var(--color-button);
   box-shadow: none;
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
+  text-decoration: none;
+}
+
+#defaults:hover {
+  border-color: var(--border-strong, var(--color-border));
+  background: var(--color-button-hover);
+  box-shadow: none;
+  transform: none;
 }
 
 .ok {
