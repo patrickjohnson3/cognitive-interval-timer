@@ -186,6 +186,13 @@ test("all phases have short and long guidance text", function () {
   });
 });
 
+test("Focus guidance stays concise", function () {
+  assert.equal(
+    Content.PHASE_CONFIG.focus.longHint,
+    "One task. Slightly challenging. No switching."
+  );
+});
+
 test("normalizeSettings preserves wake lock preference", function () {
   const settings = Core.normalizeSettings({ wake_lock_enabled: true });
   assert(settings.wake_lock_enabled === true, "expected wake lock preference to normalize");

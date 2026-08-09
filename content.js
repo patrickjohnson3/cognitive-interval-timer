@@ -16,8 +16,7 @@
     focus: {
       displayName: "Focus",
       shortHint: "One task. Everything else closed.",
-      longHint:
-        "Work on one clearly defined task with notifications off and no multitasking. Stay slightly challenged, don’t switch tabs, and keep going until the timer ends — depth over busyness.",
+      longHint: "One task. Slightly challenging. No switching.",
     },
     recall: {
       displayName: "Recall",
