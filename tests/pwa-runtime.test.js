@@ -311,6 +311,41 @@ test("PWA update prompt renders in settings slot and posts skip-waiting", async 
   assert(runtime.reloads.length === 1, "expected accepted update to reload once");
 });
 
+test("newly installed service worker exposes the update prompt", async function () {
+  const registrationListeners = {};
+  const workerListeners = {};
+  const worker = {
+    state: "installing",
+    addEventListener: function addEventListener(type, handler) {
+      workerListeners[type] = handler;
+    },
+  };
+  const registration = {
+    waiting: null,
+    installing: null,
+    addEventListener: function addEventListener(type, handler) {
+      registrationListeners[type] = handler;
+    },
+  };
+  const runtime = loadPWA({ registration, controlled: true });
+
+  runtime.listeners["window:load"]();
+  await flushPromises();
+  assert.equal(runtime.nodes["pwa-update"], undefined);
+
+  registration.installing = worker;
+  registrationListeners.updatefound();
+  registration.waiting = {
+    postMessage: function postMessage() {},
+  };
+  worker.state = "installed";
+  workerListeners.statechange();
+
+  assert.equal(runtime.slot.hidden, false);
+  assert.equal(runtime.nodes["pwa-update-button"].textContent, "Update");
+  assert.equal(runtime.nodes["pwa-update-indicator"].hidden, false);
+});
+
 test("first service worker control does not reload the app", function () {
   const runtime = loadPWA();
 
