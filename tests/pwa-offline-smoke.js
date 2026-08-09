@@ -415,6 +415,58 @@ async function assertCombinedBackNavigation(client) {
   if (!restored) throw new Error("Back did not restore the timer after minimal mode");
 }
 
+async function assertSettingsPersistence(client, appUrl) {
+  await evaluateValue(
+    client,
+    `(() => {
+      document.getElementById("open-settings").click();
+      const focus = document.getElementById("focus");
+      focus.value = "37";
+      focus.dispatchEvent(new Event("input", { bubbles: true }));
+      document.getElementById("save").click();
+      return true;
+    })()`
+  );
+  await waitForCondition(
+    client,
+    `(() => {
+      const saved = JSON.parse(localStorage.getItem("better_pomodoro_session_v2"));
+      return saved.settings.focus === 37 &&
+        document.getElementById("open-settings").getAttribute("data-dirty") === "false";
+    })()`,
+    "Valid Settings changes were not saved"
+  );
+
+  await client.send("Page.navigate", { url: appUrl });
+  await waitForPageReady(client);
+  const restored = await evaluateValue(
+    client,
+    `(() => {
+      document.getElementById("open-settings").click();
+      return document.getElementById("focus").value === "37" &&
+        JSON.parse(localStorage.getItem("better_pomodoro_session_v2")).settings.focus === 37;
+    })()`
+  );
+  if (!restored) throw new Error("Saved Settings did not survive reload");
+
+  await evaluateValue(
+    client,
+    `(() => {
+      const focus = document.getElementById("focus");
+      focus.value = "45";
+      focus.dispatchEvent(new Event("input", { bubbles: true }));
+      document.getElementById("save").click();
+      return true;
+    })()`
+  );
+  await waitForCondition(
+    client,
+    `JSON.parse(localStorage.getItem("better_pomodoro_session_v2")).settings.focus === 45`,
+    "Settings workflow did not restore the default Focus duration"
+  );
+  await evaluateValue(client, 'document.getElementById("close-settings").click(); true');
+}
+
 async function assertSettingsNavigation(client) {
   const initialStateOkay = await evaluateValue(
     client,
@@ -767,6 +819,7 @@ async function main() {
     );
     await assertTimerPersistence(client, appUrl);
     await assertCombinedBackNavigation(client);
+    await assertSettingsPersistence(client, appUrl);
     await assertResponsiveUI(client);
     await client.send("Page.navigate", { url: appUrl });
     await new Promise(function waitForController(resolve) {
