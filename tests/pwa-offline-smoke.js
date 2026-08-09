@@ -825,6 +825,12 @@ async function assertResponsiveUI(client) {
       const focusTimerColor = getComputedStyle(document.getElementById("time")).color;
       const focusEdgeColor = getComputedStyle(document.getElementById("hint")).borderLeftColor;
       const focusButtonColor = getComputedStyle(document.getElementById("start")).backgroundColor;
+      const settingsButton = document.getElementById("open-settings");
+      const settingsButtonStyle = getComputedStyle(settingsButton);
+      const settingsIcon = settingsButton.querySelector("svg").getBoundingClientRect();
+      const settingsTarget = settingsButton.getBoundingClientRect();
+      const settingsRestingBorder = settingsButtonStyle.borderTopColor;
+      const settingsIsRound = settingsButtonStyle.borderRadius === "50%";
       document.documentElement.setAttribute("data-minimal-mode", "true");
       const focusLineHeight = getComputedStyle(document.body, "::before").height;
       document.documentElement.removeAttribute("data-minimal-mode");
@@ -841,6 +847,11 @@ async function assertResponsiveUI(client) {
         focusTimerColor,
         focusEdgeColor,
         focusButtonColor,
+        settingsIconWidth: settingsIcon.width,
+        settingsTargetWidth: settingsTarget.width,
+        settingsTargetHeight: settingsTarget.height,
+        settingsRestingBorder,
+        settingsIsRound,
         focusLineHeight,
         prepLabelColor,
         prepButtonColor,
@@ -856,6 +867,11 @@ async function assertResponsiveUI(client) {
     themeState.focusTimerColor === "rgb(242, 238, 227)" &&
     themeState.focusEdgeColor === "rgb(32, 217, 232)" &&
     themeState.focusButtonColor === "rgb(32, 217, 232)" &&
+    themeState.settingsIconWidth === 22 &&
+    themeState.settingsTargetWidth >= 44 &&
+    themeState.settingsTargetHeight >= 44 &&
+    themeState.settingsRestingBorder === "rgba(0, 0, 0, 0)" &&
+    themeState.settingsIsRound &&
     themeState.focusLineHeight === "2px" &&
     themeState.prepLabelColor === "rgb(255, 173, 50)" &&
     themeState.prepButtonColor === "rgb(255, 173, 50)";
