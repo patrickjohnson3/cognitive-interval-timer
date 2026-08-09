@@ -466,6 +466,34 @@ async function assertResponsiveUI(client) {
           JSON.stringify({ viewport: viewport, action: primaryAction })
       );
     }
+
+    if (viewport.type === "landscapePrimary") {
+      const enlargedTextChecks = await evaluateValue(
+        client,
+        `(() => {
+          document.documentElement.style.fontSize = "200%";
+          const targets = [
+            document.querySelector(".app"),
+            document.querySelector(".header"),
+            document.querySelector(".header-actions"),
+            document.getElementById("open-settings"),
+            document.querySelector(".main"),
+            document.querySelector(".session-panel"),
+            document.querySelector(".controls")
+          ];
+          const rectsFit = targets.every((target) => {
+            const rect = target.getBoundingClientRect();
+            return rect.left >= 0 && rect.right <= window.innerWidth;
+          });
+          const fits = document.documentElement.scrollWidth <= window.innerWidth && rectsFit;
+          document.documentElement.style.fontSize = "";
+          return fits;
+        })()`
+      );
+      if (!enlargedTextChecks) {
+        throw new Error("Short-landscape layout clips content at 200% text size");
+      }
+    }
   }
 
   await client.send("Emulation.setDeviceMetricsOverride", {

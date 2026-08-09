@@ -75,6 +75,7 @@ body {
 .app {
   width: min(760px, 100%);
   max-width: 100%;
+  min-width: 0;
   background: var(--color-surface);
   border-radius: var(--radius-lg);
   box-shadow: var(--elevation-3);
@@ -104,6 +105,11 @@ body {
   justify-content: flex-end;
   gap: var(--space-2);
   flex-wrap: wrap;
+  min-width: 0;
+}
+
+.header > div:first-child {
+  min-width: 0;
 }
 
 .settings-trigger {
@@ -144,6 +150,7 @@ h1 {
   margin: 0;
   font-size: clamp(1.3rem, 2.2vw, 1.65rem);
   letter-spacing: 0.01em;
+  overflow-wrap: break-word;
 }
 
 .subtitle {
@@ -1169,13 +1176,15 @@ select {
   }
 
   .header {
-    flex-wrap: nowrap;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     padding: var(--space-4) var(--space-5);
   }
 
   .header-actions {
     width: auto;
-    flex-wrap: nowrap;
+    max-width: 100%;
+    flex-wrap: wrap;
   }
 
   .subtitle,
