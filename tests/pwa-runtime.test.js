@@ -180,6 +180,9 @@ function loadPWA(options) {
     setAttribute: function setAttribute(name, value) {
       this.attributes[name] = String(value);
     },
+    getAttribute: function getAttribute(name) {
+      return this.attributes[name];
+    },
   };
 
   const registration = config.registration || {};
@@ -191,6 +194,7 @@ function loadPWA(options) {
   };
   if (config.serviceWorkerSupported !== false) {
     navigatorRef.serviceWorker = {
+      controller: config.controlled ? {} : null,
       addEventListener: function addServiceWorkerListener(type, handler) {
         listeners["serviceWorker:" + type] = handler;
       },
@@ -226,6 +230,10 @@ function loadPWA(options) {
       },
       matchMedia: function matchMedia(query) {
         return { matches: Boolean(config.displayModes && config.displayModes[query]) };
+      },
+      confirm: function confirm(message) {
+        if (config.confirmations) config.confirmations.push(message);
+        return config.confirmResult !== false;
       },
       setTimeout: function setTimeout(callback) {
         const id = nextTimeoutId;
@@ -304,6 +312,56 @@ test("first service worker control does not reload the app", function () {
   runtime.listeners["serviceWorker:controllerchange"]();
 
   assert(runtime.reloads.length === 0, "expected initial service worker control not to reload");
+});
+
+test("PWA update does not discard dirty settings without confirmation", async function () {
+  const messages = [];
+  const confirmations = [];
+  const registration = {
+    waiting: {
+      postMessage: function postMessage(message) {
+        messages.push(message);
+      },
+    },
+    addEventListener: function addEventListener() {},
+  };
+  const runtime = loadPWA({
+    registration,
+    controlled: true,
+    confirmResult: false,
+    confirmations,
+  });
+  runtime.nodes["open-settings"].setAttribute("data-dirty", "true");
+  runtime.listeners["window:load"]();
+  await flushPromises();
+
+  runtime.nodes["pwa-update-button"].listeners.click();
+
+  assert.equal(confirmations.length, 1);
+  assert.equal(messages.length, 0);
+  assert.equal(runtime.nodes["pwa-update-button"].disabled, false);
+});
+
+test("an update activated by another client reloads a clean page", function () {
+  const runtime = loadPWA({ controlled: true });
+
+  runtime.listeners["serviceWorker:controllerchange"]();
+
+  assert.equal(runtime.reloads.length, 1);
+});
+
+test("an update activated by another client defers reload for dirty settings", function () {
+  const confirmations = [];
+  const runtime = loadPWA({ controlled: true, confirmations });
+  runtime.nodes["open-settings"].setAttribute("data-dirty", "true");
+
+  runtime.listeners["serviceWorker:controllerchange"]();
+
+  assert.equal(runtime.reloads.length, 0);
+  assert.equal(runtime.nodes["pwa-update-button"].textContent, "Reload");
+  runtime.nodes["pwa-update-button"].listeners.click();
+  assert.equal(confirmations.length, 1);
+  assert.equal(runtime.reloads.length, 1);
 });
 
 test("PWA update click tolerates a missing waiting worker", async function () {

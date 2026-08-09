@@ -8,6 +8,7 @@
   let updateRequested = false;
   let updateTimeoutId = null;
   let deferredInstallPrompt = null;
+  let hasControlledPage = Boolean(supportsServiceWorker && navigator.serviceWorker.controller);
 
   if (!prompts) {
     throw new Error("Missing PWA prompt helpers. Ensure pwa-prompts.js loads before pwa.js");
@@ -95,6 +96,7 @@
       ariaLabel: pwaCopy.updateAriaLabel || "Update app to the latest version",
       onUpdate: function updateApp(button) {
         if (!registration.waiting) return false;
+        if (!confirmDiscardingSettings()) return false;
         try {
           updateRequested = true;
           registration.waiting.postMessage({ type: "SKIP_WAITING" });
@@ -106,6 +108,45 @@
           resetUpdateRequest(button, true);
           return false;
         }
+      },
+    });
+  }
+
+  function settingsAreDirty() {
+    const settingsButton = document.getElementById("open-settings");
+    return Boolean(settingsButton && settingsButton.getAttribute("data-dirty") === "true");
+  }
+
+  function confirmDiscardingSettings() {
+    if (!settingsAreDirty()) return true;
+    try {
+      return window.confirm(
+        pwaCopy.updateDiscardConfirmation || "Reload and discard unsaved settings changes?"
+      );
+    } catch {
+      return false;
+    }
+  }
+
+  function reloadApp() {
+    if (refreshing) return false;
+    refreshing = true;
+    window.location.reload();
+    return true;
+  }
+
+  function showReloadPrompt() {
+    prompts.removeCard("pwa-update");
+    prompts.showUpdate({
+      copyText:
+        pwaCopy.reloadCopy ||
+        "The update is ready. Save settings before reloading if you want to keep them.",
+      buttonText: pwaCopy.reloadButton || "Reload",
+      pendingText: pwaCopy.reloadPending || "Reloading...",
+      ariaLabel: pwaCopy.reloadAriaLabel || "Reload app to use the latest version",
+      onUpdate: function reloadUpdatedApp() {
+        if (!confirmDiscardingSettings()) return false;
+        return reloadApp();
       },
     });
   }
@@ -125,11 +166,20 @@
 
   if (supportsServiceWorker) {
     navigator.serviceWorker.addEventListener("controllerchange", function reloadAfterUpdate() {
-      if (!updateRequested || refreshing) return;
+      if (refreshing) return;
+      if (!updateRequested && !hasControlledPage) {
+        hasControlledPage = true;
+        return;
+      }
       if (updateTimeoutId) window.clearTimeout(updateTimeoutId);
       updateTimeoutId = null;
-      refreshing = true;
-      window.location.reload();
+      updateRequested = false;
+      hasControlledPage = true;
+      if (settingsAreDirty()) {
+        showReloadPrompt();
+        return;
+      }
+      reloadApp();
     });
     navigator.serviceWorker.addEventListener("message", function handleWorkerMessage(event) {
       if (!event.data || event.data.type !== "SKIP_WAITING_RESULT" || event.data.ok !== false)
