@@ -1,5 +1,16 @@
 # TODO
 
+## Adaptive Prep Duration
+
+- Test reducing Prep to 60–90 seconds for subsequent focus blocks so an internalized routine does
+  not become ceremony.
+- Keep a 2-minute Prep for the first focus block of the session, where a fuller transition remains
+  useful.
+- Preserve enough time to downshift physiologically, remove distractions, encode one explicit
+  target, and begin.
+- Validate 60 versus 90 seconds through observed use before changing the default or adding
+  automatic first-block behavior.
+
 ## Phase-Aware Suspended Time
 
 - Continue freezing Prep, Focus, and Recall while the app is hidden or suspended.
