@@ -344,6 +344,20 @@ test("primary action button triggers primary action handler", function () {
   assert(ctx.calls.includes("primary"), "expected primary action handler");
 });
 
+test("secondary timer buttons invoke their named actions", function () {
+  const ctx = bindWithBrowserStubs();
+
+  ctx.dom.controls.skip.listeners.click();
+  ctx.dom.controls.reset.listeners.click();
+
+  assert.deepEqual(
+    ctx.calls.filter(function timerAction(call) {
+      return call === "skip" || call === "reset";
+    }),
+    ["skip", "reset"]
+  );
+});
+
 test("minimal primary action uses the primary action handler", function () {
   const ctx = bindWithBrowserStubs();
   ctx.dom.controls.minimalPrimaryAction.listeners.click({
@@ -476,6 +490,30 @@ test("timer shortcuts do not intercept native button keyboard actions", function
     }),
     "expected no global timer shortcut from a focused button"
   );
+});
+
+test("timer shortcuts dispatch toggle, skip, and reset actions", function () {
+  const ctx = bindWithBrowserStubs();
+  const target = eventTargetNode({ tagName: "BODY" });
+  let prevented = 0;
+
+  [" ", "S", "r"].forEach(function eachShortcut(key) {
+    ctx.windowListeners.keydown({
+      key,
+      target,
+      preventDefault: function preventDefault() {
+        prevented += 1;
+      },
+    });
+  });
+
+  assert.deepEqual(
+    ctx.calls.filter(function isShortcut(call) {
+      return call.startsWith("shortcut:");
+    }),
+    ["shortcut:toggle", "shortcut:skip", "shortcut:reset"]
+  );
+  assert.equal(prevented, 1, "only Space should suppress its browser default");
 });
 
 test("single-key shortcuts can be disabled", function () {

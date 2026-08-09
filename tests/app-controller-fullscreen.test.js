@@ -185,7 +185,9 @@ function setup(options) {
       pause: function pause() {
         timerCalls.push("pause");
       },
-      skip: function skip() {},
+      skip: function skip() {
+        timerCalls.push("skip");
+      },
       reset: function reset() {
         timerCalls.push("reset");
       },
@@ -306,6 +308,18 @@ test("primary action starts before timer has started", function () {
 
   assert(ctx.timerCalls.includes("start"), "expected primary action to start timer");
   assert(ctx.hapticCalls.includes("tap"), "expected primary action haptic tap");
+});
+
+test("shortcut actions map to timer operations", function () {
+  const ctx = setup();
+
+  ctx.boundHandlers.onShortcut("toggle");
+  ctx.boundHandlers.onShortcut("skip");
+  ctx.boundHandlers.onShortcut("reset");
+
+  assert(ctx.timerCalls.includes("start"));
+  assert(ctx.timerCalls.includes("skip"));
+  assert(ctx.timerCalls.includes("reset"));
 });
 
 test("a second client cannot mutate an active timer session", async function () {
