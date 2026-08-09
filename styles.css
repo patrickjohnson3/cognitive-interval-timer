@@ -1298,6 +1298,24 @@ select {
   display: none;
 }
 
+@media (min-width: 761px) {
+  .main {
+    grid-template-columns: minmax(0, 36.25rem);
+  }
+
+  .session-panel {
+    padding: var(--space-5) var(--space-8) var(--space-7);
+  }
+
+  .session-panel .hint {
+    margin-bottom: calc(var(--space-4) + var(--space-nudge));
+  }
+
+  .session-panel .shortcut-hint {
+    margin-top: var(--space-4);
+  }
+}
+
 @media (max-width: 760px) {
   .app {
     overflow: visible;

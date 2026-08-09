@@ -681,6 +681,50 @@ async function assertResponsiveUI(client) {
     throw new Error("Desktop Settings should retain native checkboxes");
   }
 
+  await client.send("Emulation.setDeviceMetricsOverride", {
+    width: 1024,
+    height: 900,
+    deviceScaleFactor: 1,
+    mobile: false,
+    screenOrientation: { type: "landscapePrimary", angle: 90 },
+  });
+  await settleLayout(client);
+  const desktopSpacing = await evaluateValue(
+    client,
+    `(() => {
+      const panel = document.querySelector(".session-panel");
+      const panelRect = panel.getBoundingClientRect();
+      const panelStyle = getComputedStyle(panel);
+      return {
+        panelWidth: panelRect.width,
+        paddingTop: parseFloat(panelStyle.paddingTop),
+        paddingRight: parseFloat(panelStyle.paddingRight),
+        paddingBottom: parseFloat(panelStyle.paddingBottom),
+        paddingLeft: parseFloat(panelStyle.paddingLeft),
+        hintMarginBottom: parseFloat(getComputedStyle(document.getElementById("hint")).marginBottom),
+        metadataMarginTop: parseFloat(
+          getComputedStyle(document.querySelector(".shortcut-hint")).marginTop
+        )
+      };
+    })()`
+  );
+  if (
+    desktopSpacing.panelWidth < 560 ||
+    desktopSpacing.panelWidth > 600 ||
+    desktopSpacing.paddingTop > 16 ||
+    desktopSpacing.paddingRight < 20 ||
+    desktopSpacing.paddingRight > 24 ||
+    desktopSpacing.paddingBottom < 16 ||
+    desktopSpacing.paddingBottom > 20 ||
+    desktopSpacing.paddingLeft < 20 ||
+    desktopSpacing.paddingLeft > 24 ||
+    desktopSpacing.hintMarginBottom < 13 ||
+    desktopSpacing.metadataMarginTop < 10 ||
+    desktopSpacing.metadataMarginTop > 12
+  ) {
+    throw new Error("Desktop timer spacing regressed: " + JSON.stringify(desktopSpacing));
+  }
+
   await client.send("Emulation.setTouchEmulationEnabled", {
     enabled: true,
     maxTouchPoints: 5,
