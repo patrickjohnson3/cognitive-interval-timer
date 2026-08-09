@@ -576,26 +576,9 @@ kbd {
   min-width: 110px;
 }
 
-.cycle-paired-grid {
+.timing-list {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-3);
-  align-items: start;
-}
-
-.cycle-col {
-  display: grid;
-  gap: var(--space-1);
-  align-content: start;
-}
-
-.cycle-col-heading {
-  margin: 0 0 var(--space-1);
-  font-size: 0.72rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--text-tertiary, var(--sidebar-label-color));
-  font-weight: 600;
+  gap: 0;
 }
 
 label {
@@ -607,13 +590,17 @@ label {
 
 .cycle-field {
   display: grid;
-  gap: var(--space-1);
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 52px;
+  padding: var(--space-1) 0;
   font-size: var(--font-size-label);
   color: var(--sidebar-label-color);
 }
 
-.long-break-row {
-  gap: calc(var(--space-1) - 1px);
+.cycle-field + .cycle-field {
+  border-top: 1px solid var(--settings-divider-color, var(--border-subtle, var(--color-border)));
 }
 
 .field-label {
@@ -628,7 +615,7 @@ label {
 
 .duration-field {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: 5rem minmax(3.35rem, auto);
   align-items: center;
   gap: var(--space-2);
 }
@@ -694,12 +681,6 @@ label {
 }
 
 .tip-bubble--align-right {
-  --tip-left: auto;
-  --tip-right: 0;
-  --tip-shift-x: 0;
-}
-
-.cycle-col:last-child .tip-bubble {
   --tip-left: auto;
   --tip-right: 0;
   --tip-shift-x: 0;
@@ -1132,14 +1113,6 @@ select {
   #pwa-install-button,
   #pwa-update-button {
     width: 100%;
-  }
-
-  .cycle-paired-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .cycle-col-heading {
-    margin-top: var(--space-1);
   }
 
   .settings .tip-wrap {

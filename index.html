@@ -181,193 +181,170 @@
 
           <section class="settings-section" aria-labelledby="label-phase-settings-heading">
             <h2 id="label-phase-settings-heading">Session Timing</h2>
-            <div class="cycle-paired-grid">
-              <div class="cycle-col">
-                <h3 class="cycle-col-heading">Work</h3>
-
-                <div class="cycle-field">
-                  <span class="field-label">
-                    <label id="label-prep" for="prep">Prep</label>
-                    <span class="tip-wrap" data-tooltip-key="prepDefault">
-                      <button type="button" class="tip-trigger" aria-describedby="prep-default-tip">
-                        ?
-                      </button>
-                      <span class="tip-bubble" id="prep-default-tip" role="tooltip" hidden>
-                        <strong></strong>
-                        <span></span>
-                      </span>
+            <div class="timing-list">
+              <div class="cycle-field">
+                <span class="field-label">
+                  <label id="label-prep" for="prep">Prep</label>
+                  <span class="tip-wrap" data-tooltip-key="prepDefault">
+                    <button type="button" class="tip-trigger" aria-describedby="prep-default-tip">
+                      ?
+                    </button>
+                    <span class="tip-bubble" id="prep-default-tip" role="tooltip" hidden>
+                      <strong></strong>
+                      <span></span>
                     </span>
                   </span>
-                  <span class="duration-field">
-                    <input
-                      id="prep"
-                      type="number"
-                      min="0"
-                      max="60"
-                      step="1"
-                      aria-describedby="prep-unit"
-                      required
-                    />
-                    <span id="prep-unit" class="field-unit">minutes</span>
-                  </span>
-                </div>
-                <div class="cycle-field">
-                  <span class="field-label">
-                    <label id="label-focus" for="focus">Focus</label>
-                    <span class="tip-wrap" data-tooltip-key="focusDefault">
-                      <button
-                        type="button"
-                        class="tip-trigger"
-                        aria-describedby="focus-default-tip"
-                      >
-                        ?
-                      </button>
-                      <span class="tip-bubble" id="focus-default-tip" role="tooltip" hidden>
-                        <strong></strong>
-                        <span></span>
-                      </span>
-                    </span>
-                  </span>
-                  <span class="duration-field">
-                    <input
-                      id="focus"
-                      type="number"
-                      min="1"
-                      max="180"
-                      step="1"
-                      aria-describedby="focus-unit"
-                      required
-                    />
-                    <span id="focus-unit" class="field-unit">minutes</span>
-                  </span>
-                </div>
-                <div class="cycle-field">
-                  <span class="field-label">
-                    <label id="label-recall" for="recall">Recall</label>
-                    <span class="tip-wrap" data-tooltip-key="recallDefault">
-                      <button
-                        type="button"
-                        class="tip-trigger"
-                        aria-describedby="recall-default-tip"
-                      >
-                        ?
-                      </button>
-                      <span class="tip-bubble" id="recall-default-tip" role="tooltip" hidden>
-                        <strong></strong>
-                        <span></span>
-                      </span>
-                    </span>
-                  </span>
-                  <span class="duration-field">
-                    <input
-                      id="recall"
-                      type="number"
-                      min="0"
-                      max="30"
-                      step="1"
-                      aria-describedby="recall-unit"
-                      required
-                    />
-                    <span id="recall-unit" class="field-unit">minutes</span>
-                  </span>
-                </div>
+                </span>
+                <span class="duration-field">
+                  <input
+                    id="prep"
+                    type="number"
+                    min="0"
+                    max="60"
+                    step="1"
+                    aria-describedby="prep-unit"
+                    required
+                  />
+                  <span id="prep-unit" class="field-unit">minutes</span>
+                </span>
               </div>
-
-              <div class="cycle-col">
-                <h3 class="cycle-col-heading">Breaks</h3>
-
-                <div class="cycle-field">
-                  <span class="field-label">
-                    <label id="label-break" for="break">Short Break</label>
-                    <span class="tip-wrap" data-tooltip-key="shortBreakDefault">
-                      <button
-                        type="button"
-                        class="tip-trigger"
-                        aria-describedby="short-break-default-tip"
-                      >
-                        ?
-                      </button>
-                      <span class="tip-bubble" id="short-break-default-tip" role="tooltip" hidden>
-                        <strong></strong>
-                        <span></span>
-                      </span>
+              <div class="cycle-field">
+                <span class="field-label">
+                  <label id="label-focus" for="focus">Focus</label>
+                  <span class="tip-wrap" data-tooltip-key="focusDefault">
+                    <button type="button" class="tip-trigger" aria-describedby="focus-default-tip">
+                      ?
+                    </button>
+                    <span class="tip-bubble" id="focus-default-tip" role="tooltip" hidden>
+                      <strong></strong>
+                      <span></span>
                     </span>
                   </span>
-                  <span class="duration-field">
-                    <input
-                      id="break"
-                      type="number"
-                      min="1"
-                      max="60"
-                      step="1"
-                      aria-describedby="break-unit"
-                      required
-                    />
-                    <span id="break-unit" class="field-unit">minutes</span>
-                  </span>
-                </div>
-                <div class="cycle-field long-break-row">
-                  <span class="field-label">
-                    <label id="label-long_break" for="long_break">Long Break</label>
-                    <span class="tip-wrap" data-tooltip-key="longBreakDefault">
-                      <button
-                        type="button"
-                        class="tip-trigger"
-                        aria-describedby="long-break-default-tip"
-                      >
-                        ?
-                      </button>
-                      <span class="tip-bubble" id="long-break-default-tip" role="tooltip" hidden>
-                        <strong></strong>
-                        <span></span>
-                      </span>
+                </span>
+                <span class="duration-field">
+                  <input
+                    id="focus"
+                    type="number"
+                    min="1"
+                    max="180"
+                    step="1"
+                    aria-describedby="focus-unit"
+                    required
+                  />
+                  <span id="focus-unit" class="field-unit">minutes</span>
+                </span>
+              </div>
+              <div class="cycle-field">
+                <span class="field-label">
+                  <label id="label-recall" for="recall">Recall</label>
+                  <span class="tip-wrap" data-tooltip-key="recallDefault">
+                    <button type="button" class="tip-trigger" aria-describedby="recall-default-tip">
+                      ?
+                    </button>
+                    <span class="tip-bubble" id="recall-default-tip" role="tooltip" hidden>
+                      <strong></strong>
+                      <span></span>
                     </span>
                   </span>
-                  <span class="duration-field">
-                    <input
-                      id="long_break"
-                      type="number"
-                      min="1"
-                      max="90"
-                      step="1"
-                      aria-describedby="long-break-unit"
-                      required
-                    />
-                    <span id="long-break-unit" class="field-unit">minutes</span>
-                  </span>
-                </div>
-                <div class="cycle-field">
-                  <span class="field-label">
-                    <label id="label-blocks" for="blocks_per_ultradian"
-                      >Focus Blocks Before Long Break</label
+                </span>
+                <span class="duration-field">
+                  <input
+                    id="recall"
+                    type="number"
+                    min="0"
+                    max="30"
+                    step="1"
+                    aria-describedby="recall-unit"
+                    required
+                  />
+                  <span id="recall-unit" class="field-unit">minutes</span>
+                </span>
+              </div>
+              <div class="cycle-field">
+                <span class="field-label">
+                  <label id="label-break" for="break">Short Break</label>
+                  <span class="tip-wrap" data-tooltip-key="shortBreakDefault">
+                    <button
+                      type="button"
+                      class="tip-trigger"
+                      aria-describedby="short-break-default-tip"
                     >
-                    <span class="tip-wrap" data-tooltip-key="blocksDefault">
-                      <button
-                        type="button"
-                        class="tip-trigger"
-                        aria-describedby="blocks-default-tip"
-                      >
-                        ?
-                      </button>
-                      <span class="tip-bubble" id="blocks-default-tip" role="tooltip" hidden>
-                        <strong></strong>
-                        <span></span>
-                      </span>
+                      ?
+                    </button>
+                    <span class="tip-bubble" id="short-break-default-tip" role="tooltip" hidden>
+                      <strong></strong>
+                      <span></span>
                     </span>
                   </span>
-                  <span class="duration-field">
-                    <input
-                      id="blocks_per_ultradian"
-                      type="number"
-                      min="1"
-                      max="8"
-                      step="1"
-                      aria-describedby="blocks-per-ultradian-unit"
-                      required
-                    />
-                    <span id="blocks-per-ultradian-unit" class="field-unit">blocks</span>
+                </span>
+                <span class="duration-field">
+                  <input
+                    id="break"
+                    type="number"
+                    min="1"
+                    max="60"
+                    step="1"
+                    aria-describedby="break-unit"
+                    required
+                  />
+                  <span id="break-unit" class="field-unit">minutes</span>
+                </span>
+              </div>
+              <div class="cycle-field long-break-row">
+                <span class="field-label">
+                  <label id="label-long_break" for="long_break">Long Break</label>
+                  <span class="tip-wrap" data-tooltip-key="longBreakDefault">
+                    <button
+                      type="button"
+                      class="tip-trigger"
+                      aria-describedby="long-break-default-tip"
+                    >
+                      ?
+                    </button>
+                    <span class="tip-bubble" id="long-break-default-tip" role="tooltip" hidden>
+                      <strong></strong>
+                      <span></span>
+                    </span>
                   </span>
-                </div>
+                </span>
+                <span class="duration-field">
+                  <input
+                    id="long_break"
+                    type="number"
+                    min="1"
+                    max="90"
+                    step="1"
+                    aria-describedby="long-break-unit"
+                    required
+                  />
+                  <span id="long-break-unit" class="field-unit">minutes</span>
+                </span>
+              </div>
+              <div class="cycle-field">
+                <span class="field-label">
+                  <label id="label-blocks" for="blocks_per_ultradian">Long Break After</label>
+                  <span class="tip-wrap" data-tooltip-key="blocksDefault">
+                    <button type="button" class="tip-trigger" aria-describedby="blocks-default-tip">
+                      ?
+                    </button>
+                    <span class="tip-bubble" id="blocks-default-tip" role="tooltip" hidden>
+                      <strong></strong>
+                      <span></span>
+                    </span>
+                  </span>
+                </span>
+                <span class="duration-field">
+                  <input
+                    id="blocks_per_ultradian"
+                    type="number"
+                    min="1"
+                    max="8"
+                    step="1"
+                    aria-describedby="blocks-per-ultradian-unit"
+                    required
+                  />
+                  <span id="blocks-per-ultradian-unit" class="field-unit">focus blocks</span>
+                </span>
               </div>
             </div>
           </section>
