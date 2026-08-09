@@ -598,6 +598,23 @@ test("confirmed restore defaults resets the block", async function () {
   assert(ctx.timerCalls.includes("reset"));
 });
 
+test("recommended timing restores only timing fields as an unsaved draft", function () {
+  const ctx = setup();
+  ctx.dom.fields.focus.value = "30";
+  ctx.dom.fields.break.value = "5";
+  ctx.dom.fields.quiet_mode_enabled.checked = true;
+
+  ctx.boundHandlers.onRestoreRecommendedTiming();
+
+  Core.TIMING_SETTING_KEYS.forEach(function timingMatchesRecommendation(key) {
+    assert.equal(ctx.app.state.draftSettings[key], Core.DEFAULT_SETTINGS[key]);
+  });
+  assert.equal(ctx.app.state.draftSettings.quiet_mode_enabled, true);
+  assert.equal(ctx.app.state.settings.quiet_mode_enabled, false);
+  assert.equal(ctx.app.state.ui.settingsDirty, true);
+  assert(!ctx.timerCalls.includes("reset"));
+});
+
 test("phase changes trigger phase haptic feedback", function () {
   const ctx = setup();
   ctx.app.onPhaseChange({ from: Core.PHASE.FOCUS, to: Core.PHASE.RECALL, label: "Recall" });

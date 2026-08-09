@@ -99,6 +99,7 @@
       visualStatus: byId("visual-status"),
       tagline: byId("tagline"),
       appVersion: byId("app-version"),
+      protocolStatus: byId("protocol-status"),
       views: {
         session: byId("session-view"),
         settings: byId("settings-view"),
@@ -110,6 +111,7 @@
         reset: byId("reset"),
         save: byId("save"),
         defaults: byId("defaults"),
+        restoreRecommendedTiming: byId("restore-recommended-timing"),
         activateDisplayModes: byId("activate-display-modes"),
         openSettings: byId("open-settings"),
         closeSettings: byId("close-settings"),

@@ -174,11 +174,16 @@
               <p class="settings-eyebrow">Configuration</p>
               <h2 id="settings-view-heading" tabindex="-1">Settings</h2>
             </div>
-            <button id="close-settings" type="button">Back to timer</button>
+            <button id="close-settings" type="button" aria-label="Back to timer">← Timer</button>
           </div>
 
           <section class="settings-section" aria-labelledby="label-phase-settings-heading">
-            <h2 id="label-phase-settings-heading">Session Timing</h2>
+            <div class="timing-heading">
+              <h2 id="label-phase-settings-heading">Session Timing</h2>
+              <span id="protocol-status" class="protocol-status" aria-live="polite"
+                >Recommended protocol</span
+              >
+            </div>
             <div class="timing-list">
               <div class="cycle-field">
                 <span class="field-label">
@@ -345,22 +350,30 @@
                 </span>
               </div>
             </div>
+            <button id="restore-recommended-timing" type="button" hidden>
+              Restore recommended timing
+            </button>
           </section>
 
           <div class="settings-divider" aria-hidden="true"></div>
 
-          <section class="settings-section" aria-labelledby="label-timer-flow-settings">
-            <h2 id="label-timer-flow-settings">Automation</h2>
-            <div class="checks">
-              <label
-                ><input id="prep_enabled" type="checkbox" />
-                <span id="label-prep-enabled">Start With Prep Phase</span></label
-              >
-              <label
-                ><input id="auto_start" type="checkbox" />
-                <span id="label-auto-start">Auto-Start Next Phase</span></label
-              >
-            </div>
+          <section
+            class="settings-section settings-disclosure"
+            aria-labelledby="label-timer-flow-settings"
+          >
+            <details>
+              <summary id="label-timer-flow-settings">Automation</summary>
+              <div class="disclosure-content checks">
+                <label
+                  ><input id="prep_enabled" type="checkbox" />
+                  <span id="label-prep-enabled">Start With Prep Phase</span></label
+                >
+                <label
+                  ><input id="auto_start" type="checkbox" />
+                  <span id="label-auto-start">Auto-Start Next Phase</span></label
+                >
+              </div>
+            </details>
           </section>
 
           <div class="settings-divider" aria-hidden="true"></div>
@@ -428,41 +441,51 @@
 
           <div class="settings-divider" aria-hidden="true"></div>
 
-          <section class="settings-section" aria-labelledby="sound-feedback-heading">
-            <h2 id="sound-feedback-heading">Sound &amp; Feedback</h2>
-            <div class="checks">
-              <label
-                ><input id="sound_enabled" type="checkbox" />
-                <span id="label-sound-enabled">Play Sound On Phase Change</span></label
-              >
-              <div class="setting-option">
+          <section
+            class="settings-section settings-disclosure"
+            aria-labelledby="sound-feedback-heading"
+          >
+            <details>
+              <summary id="sound-feedback-heading">Sound &amp; Feedback</summary>
+              <div class="disclosure-content checks">
                 <label
-                  ><input
-                    id="quiet_mode_enabled"
-                    type="checkbox"
-                    aria-describedby="help-quiet-mode-enabled"
-                  />
-                  <span id="label-quiet-mode-enabled">Quiet Mode</span></label
+                  ><input id="sound_enabled" type="checkbox" />
+                  <span id="label-sound-enabled">Play Sound On Phase Change</span></label
                 >
-                <p id="help-quiet-mode-enabled" class="setting-help">
-                  Suppresses phase sounds and vibration feedback.
-                </p>
+                <div class="setting-option">
+                  <label
+                    ><input
+                      id="quiet_mode_enabled"
+                      type="checkbox"
+                      aria-describedby="help-quiet-mode-enabled"
+                    />
+                    <span id="label-quiet-mode-enabled">Quiet Mode</span></label
+                  >
+                  <p id="help-quiet-mode-enabled" class="setting-help">
+                    Suppresses phase sounds and vibration feedback.
+                  </p>
+                </div>
               </div>
-            </div>
+            </details>
           </section>
 
           <div class="settings-divider" aria-hidden="true"></div>
 
-          <section class="settings-section" aria-labelledby="appearance-heading">
-            <h2 id="appearance-heading">Appearance</h2>
-            <div class="settings-theme">
-              <label for="theme">Theme</label>
-              <select id="theme" aria-label="Theme selector">
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
-                <option value="signal">Signal</option>
-              </select>
-            </div>
+          <section
+            class="settings-section settings-disclosure"
+            aria-labelledby="appearance-heading"
+          >
+            <details>
+              <summary id="appearance-heading">Appearance</summary>
+              <div class="disclosure-content settings-theme">
+                <label for="theme">Theme</label>
+                <select id="theme" aria-label="Theme selector">
+                  <option value="light">Light</option>
+                  <option value="dark">Dark</option>
+                  <option value="signal">Signal</option>
+                </select>
+              </div>
+            </details>
           </section>
 
           <div class="settings-divider" aria-hidden="true"></div>
@@ -514,7 +537,7 @@
                   Restores all timing and preferences, then restarts the current block.
                 </p>
                 <button id="defaults" type="button" aria-describedby="help-restore-defaults">
-                  Restore defaults
+                  Restore all defaults
                 </button>
                 <p id="app-version" class="app-version" aria-label="App version"></p>
               </div>

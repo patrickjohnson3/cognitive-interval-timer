@@ -81,6 +81,9 @@
       const sessionStarted = statusKey !== Core.STATUS.IDLE;
       const phaseCopy = phaseConfig[state.timer.phase];
       const phaseLabel = phaseCopy.displayName;
+      const recommendedTiming =
+        state.ui.settingsInputValid !== false &&
+        Core.usesRecommendedTiming(state.draftSettings || state.settings);
 
       return {
         stateText: phaseLabel,
@@ -119,6 +122,8 @@
             " " +
             labels.focusBlockSessionSuffix
           : labels.focusBlockReady.replace(/\s+/g, " "),
+        recommendedTiming,
+        protocolStatusText: recommendedTiming ? labels.recommendedProtocol : labels.customTiming,
         dirtyText: state.ui.sessionConflict
           ? labels.sessionInUse
           : state.ui.storageCorruption
@@ -159,6 +164,9 @@
       dom.focusBlockBadge.textContent = vm.focusBlockText;
       dom.focusBlockContext.textContent = vm.focusBlockContextText;
       dom.focusBlockBadge.setAttribute("aria-label", vm.focusBlockAriaLabel);
+      dom.protocolStatus.textContent = vm.protocolStatusText;
+      dom.protocolStatus.setAttribute("data-recommended", String(vm.recommendedTiming));
+      dom.controls.restoreRecommendedTiming.hidden = vm.recommendedTiming;
       dom.dirtyIndicator.textContent = vm.dirtyText;
       dom.sessionStatus.textContent = vm.sessionStatusText;
       dom.sessionStatus.hidden = !vm.sessionStatusText;

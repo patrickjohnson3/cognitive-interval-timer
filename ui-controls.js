@@ -59,6 +59,10 @@
       });
 
       dom.controls.defaults.addEventListener("click", handlers.onRestoreDefaults);
+      dom.controls.restoreRecommendedTiming.addEventListener(
+        "click",
+        handlers.onRestoreRecommendedTiming
+      );
       dom.controls.openSettings.addEventListener("click", function openSettingsClick() {
         setSettingsViewOpen(true);
       });

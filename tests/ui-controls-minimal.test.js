@@ -19,6 +19,7 @@ function createDom() {
       closeSettings: eventTargetNode({ id: "close-settings" }),
       save: eventTargetNode({ id: "save" }),
       defaults: eventTargetNode({ id: "defaults" }),
+      restoreRecommendedTiming: eventTargetNode({ id: "restore-recommended-timing" }),
       activateDisplayModes: eventTargetNode({ id: "activate-display-modes" }),
       exitMinimalModeWrap: eventTargetNode({ id: "minimal-exit-wrap" }),
       exitMinimalModeReveal: eventTargetNode({ id: "minimal-exit-reveal" }),
@@ -135,6 +136,9 @@ function bindWithBrowserStubs(options) {
     onRestoreDefaults: function onRestoreDefaults() {
       calls.push("defaults");
     },
+    onRestoreRecommendedTiming: function onRestoreRecommendedTiming() {
+      calls.push("recommended-timing");
+    },
     onThemeChange: function onThemeChange(value) {
       calls.push("theme:" + value);
     },
@@ -196,6 +200,15 @@ test("settings open as a dedicated view and return focus on close", function () 
   assert.equal(ctx.dom.controls.openSettings.focusCount, 1);
   assert.equal(ctx.document.documentElement.hasAttribute("data-settings-view"), false);
   assert.equal(ctx.historyCalls[1].type, "back");
+});
+
+test("recommended timing control invokes its dedicated draft handler", function () {
+  const ctx = bindWithBrowserStubs();
+
+  ctx.dom.controls.restoreRecommendedTiming.listeners.click();
+
+  assert(ctx.calls.includes("recommended-timing"));
+  assert(!ctx.calls.includes("defaults"));
 });
 
 test("startup clears a stale Settings history entry", function () {

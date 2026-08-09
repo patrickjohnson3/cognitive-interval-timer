@@ -60,6 +60,7 @@
       },
       ui: {
         settingsDirty: false,
+        settingsInputValid: true,
         storageWarning: false,
         storageCorruption: false,
         sessionConflict: false,
@@ -110,6 +111,7 @@
       onStateChange,
       handleShortcut,
       onSettingsInput,
+      restoreRecommendedTiming,
       restoreDefaults,
     };
 
@@ -130,6 +132,7 @@
         onSkip: controller.skip,
         onReset: controller.reset,
         onSaveSettings: controller.saveSettings,
+        onRestoreRecommendedTiming: restoreRecommendedTiming,
         onRestoreDefaults: restoreDefaults,
         onThemeChange: controller.setTheme,
         onShortcut: handleShortcut,
@@ -219,6 +222,7 @@
 
       if (!appState.ui.settingsDirty) {
         appState.draftSettings = Object.assign({}, appState.settings);
+        appState.ui.settingsInputValid = true;
         render.hydrateSettingsForm(appState.settings);
       }
       render.setDisplayActivationAvailable(savedDisplayModeNeedsActivation());
@@ -436,10 +440,11 @@
 
     function onSettingsInput(rawSettings) {
       const normalized = Core.normalizeSettings(rawSettings);
+      const settingsInputValid = rawNumericSettingsAreValid(rawSettings, normalized);
       appState.draftSettings = normalized;
+      appState.ui.settingsInputValid = settingsInputValid;
       appState.ui.settingsDirty =
-        !rawNumericSettingsAreValid(rawSettings, normalized) ||
-        !sameSettings(normalized, appState.settings);
+        !settingsInputValid || !sameSettings(normalized, appState.settings);
       onStateChange();
     }
 
@@ -461,6 +466,7 @@
       if (config.hydrateForm) {
         render.hydrateSettingsForm(appState.settings);
         appState.draftSettings = Object.assign({}, appState.settings);
+        appState.ui.settingsInputValid = true;
       }
       if (!config.activateDisplayModes) {
         displayModes.setWakeLock(appState.settings.wake_lock_enabled);
@@ -648,6 +654,7 @@
       const elapsedInPhase = Math.max(0, oldPhaseDuration - appState.timer.remainingSec);
       const next = Core.normalizeSettings(rawSettings);
       appState.draftSettings = Object.assign({}, next);
+      appState.ui.settingsInputValid = true;
 
       appState.settings = next;
 
@@ -678,12 +685,20 @@
         appState.draftSettings = Object.assign({}, appState.settings);
 
         appState.ui.settingsDirty = false;
+        appState.ui.settingsInputValid = true;
 
         applySettingsSideEffects();
         timer.reset();
         sessionLock.release();
         announce.flashMessage(a11y.formatAnnouncement("defaults_restored"));
       });
+    }
+
+    function restoreRecommendedTiming() {
+      Core.TIMING_SETTING_KEYS.forEach(function restoreTimingField(key) {
+        render.setSettingField(key, Core.DEFAULT_SETTINGS[key]);
+      });
+      onSettingsInput(controls.readSettingsForm());
     }
 
     function setTheme(nextTheme) {
@@ -700,8 +715,14 @@
     }
 
     function updateDraftFromForm() {
-      appState.draftSettings = Core.normalizeSettings(controls.readSettingsForm());
-      appState.ui.settingsDirty = !sameSettings(appState.draftSettings, appState.settings);
+      const rawSettings = controls.readSettingsForm();
+      appState.draftSettings = Core.normalizeSettings(rawSettings);
+      appState.ui.settingsInputValid = rawNumericSettingsAreValid(
+        rawSettings,
+        appState.draftSettings
+      );
+      appState.ui.settingsDirty =
+        !appState.ui.settingsInputValid || !sameSettings(appState.draftSettings, appState.settings);
     }
   }
 

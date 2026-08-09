@@ -64,6 +64,8 @@
       focusBlockReady: "Focus Block\nReady",
       focusBlockSessionSuffix: "of session",
       focusBlockReadyContext: "Ready to begin session.",
+      recommendedProtocol: "Recommended protocol",
+      customTiming: "Custom timing",
       unsavedChanges: "Unsaved Changes",
       allSettingsSaved: "All Settings Saved",
       storageUnavailable: "Settings are not being saved in this browser.",

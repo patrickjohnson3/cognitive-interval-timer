@@ -42,6 +42,14 @@
     minimal_mode_enabled: false,
     wake_lock_enabled: false,
   };
+  const TIMING_SETTING_KEYS = Object.freeze([
+    "prep",
+    "focus",
+    "recall",
+    "break",
+    "long_break",
+    "blocks_per_ultradian",
+  ]);
   const SETTING_FIELDS = Object.freeze(
     Object.keys(DEFAULT_SETTINGS).map(function describeSetting(key) {
       return Object.freeze({
@@ -115,6 +123,13 @@
           ? merged.wake_lock_enabled
           : DEFAULT_SETTINGS.wake_lock_enabled,
     };
+  }
+
+  function usesRecommendedTiming(source) {
+    const settings = normalizeSettings(source);
+    return TIMING_SETTING_KEYS.every(function timingMatchesDefault(key) {
+      return settings[key] === DEFAULT_SETTINGS[key];
+    });
   }
 
   function dateKey(date) {
@@ -297,11 +312,13 @@
     PHASES,
     STATUS,
     DEFAULT_SETTINGS,
+    TIMING_SETTING_KEYS,
     SETTING_FIELDS,
     STORAGE_KEYS,
     TICK_INTERVAL_MS,
     MAX_PHASE_TRANSITIONS_PER_TICK,
     normalizeSettings,
+    usesRecommendedTiming,
     normalizeStats,
     dateKey,
     rolloverStats,

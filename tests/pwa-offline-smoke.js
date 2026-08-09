@@ -444,17 +444,32 @@ async function assertSettingsPersistence(client, appUrl) {
     `(() => {
       document.getElementById("open-settings").click();
       return document.getElementById("focus").value === "37" &&
+        document.getElementById("protocol-status").textContent === "Custom timing" &&
+        !document.getElementById("restore-recommended-timing").hidden &&
         JSON.parse(localStorage.getItem("better_pomodoro_session_v2")).settings.focus === 37;
     })()`
   );
   if (!restored) throw new Error("Saved Settings did not survive reload");
 
+  const recommendedDraft = await evaluateValue(
+    client,
+    `(() => {
+      document.getElementById("restore-recommended-timing").click();
+      const stored = JSON.parse(localStorage.getItem("better_pomodoro_session_v2"));
+      return document.getElementById("focus").value === "45" &&
+        document.getElementById("protocol-status").textContent === "Recommended protocol" &&
+        document.getElementById("restore-recommended-timing").hidden &&
+        document.getElementById("open-settings").getAttribute("data-dirty") === "true" &&
+        stored.settings.focus === 37;
+    })()`
+  );
+  if (!recommendedDraft) {
+    throw new Error("Recommended timing did not remain an explicit unsaved draft");
+  }
+
   await evaluateValue(
     client,
     `(() => {
-      const focus = document.getElementById("focus");
-      focus.value = "45";
-      focus.dispatchEvent(new Event("input", { bubbles: true }));
       document.getElementById("save").click();
       return true;
     })()`
@@ -557,6 +572,34 @@ async function assertSettingsNavigation(client) {
     );
   }
 
+  const mobileSettingsDensity = await evaluateValue(
+    client,
+    `(() => {
+      const rows = Array.from(document.querySelectorAll(".cycle-field")).map((row) =>
+        row.getBoundingClientRect().height
+      );
+      const input = document.getElementById("focus").getBoundingClientRect();
+      const back = document.getElementById("close-settings").getBoundingClientRect();
+      return {
+        rows,
+        inputWidth: input.width,
+        inputHeight: input.height,
+        backWidth: back.width,
+        backHeight: back.height
+      };
+    })()`
+  );
+  if (
+    mobileSettingsDensity.rows.some((height) => height < 56 || height > 64) ||
+    mobileSettingsDensity.inputWidth > 72 ||
+    mobileSettingsDensity.inputHeight < 44 ||
+    mobileSettingsDensity.inputHeight > 48 ||
+    mobileSettingsDensity.backWidth > 100 ||
+    mobileSettingsDensity.backHeight < 44
+  ) {
+    throw new Error("Mobile Settings density regressed: " + JSON.stringify(mobileSettingsDensity));
+  }
+
   await client.send("Emulation.setDeviceMetricsOverride", {
     width: 800,
     height: 800,
@@ -565,22 +608,37 @@ async function assertSettingsNavigation(client) {
     screenOrientation: { type: "portraitPrimary", angle: 0 },
   });
   await settleLayout(client);
-  const wideSettingsTooltipFits = await evaluateValue(
+  const wideSettingsLayout = await evaluateValue(
     client,
     `(() => {
       const bubble = document.getElementById("focus-default-tip");
       const trigger = document.querySelector('[aria-describedby="focus-default-tip"]');
       const settings = document.getElementById("settings-view").getBoundingClientRect();
+      const timing = document.querySelector(".timing-list").getBoundingClientRect();
+      const label = document.getElementById("label-focus").getBoundingClientRect();
+      const input = document.getElementById("focus").getBoundingClientRect();
       trigger.scrollIntoView({ block: "center" });
       trigger.focus();
       const rect = bubble.getBoundingClientRect();
       const fits = !bubble.hidden && rect.left >= settings.left && rect.right <= settings.right;
       trigger.blur();
-      return fits;
+      return {
+        tooltipFits: fits,
+        timingWidth: timing.width,
+        labelToInput: input.left - label.left,
+        inputWidth: input.width
+      };
     })()`
   );
-  if (!wideSettingsTooltipFits) {
-    throw new Error("A Settings tooltip is clipped above the mobile layout breakpoint");
+  if (
+    !wideSettingsLayout.tooltipFits ||
+    wideSettingsLayout.timingWidth > 370 ||
+    wideSettingsLayout.labelToInput > 200 ||
+    wideSettingsLayout.inputWidth > 82
+  ) {
+    throw new Error(
+      "Wide Settings timing grid is stretched or clipped: " + JSON.stringify(wideSettingsLayout)
+    );
   }
 
   await client.send("Emulation.setDeviceMetricsOverride", {
@@ -673,12 +731,17 @@ async function assertSettingsNavigation(client) {
 }
 
 async function assertResponsiveUI(client) {
-  const desktopCheckboxesAreNative = await evaluateValue(
+  const desktopSwitchIsCompact = await evaluateValue(
     client,
-    'getComputedStyle(document.getElementById("prep_enabled")).appearance !== "none"'
+    `(() => {
+      const field = document.getElementById("prep_enabled");
+      const style = getComputedStyle(field);
+      return style.appearance === "none" &&
+        parseFloat(style.width) === 42 && parseFloat(style.height) === 24;
+    })()`
   );
-  if (!desktopCheckboxesAreNative) {
-    throw new Error("Desktop Settings should retain native checkboxes");
+  if (!desktopSwitchIsCompact) {
+    throw new Error("Desktop Settings should use compact switches");
   }
 
   await client.send("Emulation.setDeviceMetricsOverride", {
@@ -829,6 +892,8 @@ async function assertResponsiveUI(client) {
         (node) => node.querySelector("button, input, select, textarea, a[href], [tabindex]:not([tabindex='-1'])")
       );
       const cycleSummary = document.getElementById("cycle-summary");
+      const mobileSwitch = document.getElementById("prep_enabled");
+      const mobileSwitchStyle = getComputedStyle(mobileSwitch);
       const settingsTarget = document.getElementById("open-settings").getBoundingClientRect();
       const headerTitle = document.querySelector(".header > div:first-child").getBoundingClientRect();
       const focusStatus = document.querySelector(".focus-block-wrap").getBoundingClientRect();
@@ -838,7 +903,9 @@ async function assertResponsiveUI(client) {
         readableGuidance: parseFloat(longHint.lineHeight) / parseFloat(longHint.fontSize) >= 1.5,
         hiddenContentSafe: !hiddenFocusable,
         mobileSwitches:
-          getComputedStyle(document.getElementById("prep_enabled")).appearance === "none",
+          mobileSwitchStyle.appearance === "none" &&
+          parseFloat(mobileSwitchStyle.width) === 48 &&
+          parseFloat(mobileSwitchStyle.height) === 28,
         cycleSummary: cycleSummary.textContent.replace(/\\s+/g, " ").trim(),
         settingsLabels:
           Boolean(document.getElementById("label-timer-flow-settings")) &&

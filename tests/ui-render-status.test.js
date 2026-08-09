@@ -41,6 +41,7 @@ function createDeps() {
     long: textNode(),
     focusBlockBadge: textNode(),
     focusBlockContext: textNode(),
+    protocolStatus: textNode(),
     sessionStatus: Object.assign(textNode(), { hidden: true }),
     dirtyIndicator: textNode(),
     copy: {
@@ -62,6 +63,7 @@ function createDeps() {
       start: controlButtonNode(),
       minimalPrimaryAction: controlButtonNode(),
       activateDisplayModes: { hidden: true },
+      restoreRecommendedTiming: { hidden: true },
       openSettings: textNode(),
     },
     theme: { value: "dark" },
@@ -92,6 +94,9 @@ function createDeps() {
     },
     formatTime: function formatTime() {
       return "00:10";
+    },
+    usesRecommendedTiming: function usesRecommendedTiming(settings) {
+      return settings.focus === 45;
     },
   };
 
@@ -125,6 +130,8 @@ function createDeps() {
         focusBlockReady: "Focus Block\nReady",
         focusBlockSessionSuffix: "of session",
         focusBlockReadyContext: "Ready to begin session.",
+        recommendedProtocol: "Recommended protocol",
+        customTiming: "Custom timing",
         unsavedChanges: "Unsaved Changes",
         allSettingsSaved: "All Settings Saved",
         storageUnavailable: "Settings are not being saved in this browser.",
@@ -323,6 +330,22 @@ test("stats use compact lowercase labels", function () {
   render.render(state);
   assert(deps.dom.today.textContent === "today: 0 focus blocks", "expected compact today stats");
   assert(deps.dom.long.textContent === "long break: 0 / 2", "expected compact long break stats");
+});
+
+test("recommended protocol marker follows the settings draft", function () {
+  const deps = createDeps();
+  const render = UIRender.create(deps);
+  const state = baseState();
+  state.draftSettings = Object.assign({}, state.settings);
+
+  render.render(state);
+  assert.equal(deps.dom.protocolStatus.textContent, "Recommended protocol");
+  assert.equal(deps.dom.controls.restoreRecommendedTiming.hidden, true);
+
+  state.draftSettings.focus = 30;
+  render.render(state);
+  assert.equal(deps.dom.protocolStatus.textContent, "Custom timing");
+  assert.equal(deps.dom.controls.restoreRecommendedTiming.hidden, false);
 });
 
 test("storage warning overrides saved settings text", function () {

@@ -67,11 +67,16 @@ test("icon-only Settings control keeps an accessible name", function () {
 test("secondary Settings use native keyboard-accessible disclosure", function () {
   const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
 
-  ["label-display-settings", "keyboard-heading", "maintenance-heading"].forEach(
-    function hasCollapsedSummary(id) {
-      assert.match(html, new RegExp('<summary id="' + id + '">'));
-    }
-  );
+  [
+    "label-timer-flow-settings",
+    "label-display-settings",
+    "sound-feedback-heading",
+    "appearance-heading",
+    "keyboard-heading",
+    "maintenance-heading",
+  ].forEach(function hasCollapsedSummary(id) {
+    assert.match(html, new RegExp('<summary id="' + id + '">'));
+  });
   assert(!/<details\s+open/.test(html));
 });
 

@@ -12,6 +12,19 @@ test("setting field metadata covers every normalized setting", function () {
   );
 });
 
+test("recommended timing ignores unrelated preferences", function () {
+  assert.equal(Core.usesRecommendedTiming({ quiet_mode_enabled: true, prep_enabled: false }), true);
+  assert.equal(Core.usesRecommendedTiming({ focus: 30 }), false);
+  assert.deepEqual(Core.TIMING_SETTING_KEYS, [
+    "prep",
+    "focus",
+    "recall",
+    "break",
+    "long_break",
+    "blocks_per_ultradian",
+  ]);
+});
+
 test("nextPhase chooses long_break after ultradian threshold", function () {
   const settings = Core.normalizeSettings({ blocks_per_ultradian: 2 });
   const stats = Core.normalizeStats({
