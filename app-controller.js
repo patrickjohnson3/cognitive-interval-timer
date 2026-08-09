@@ -188,10 +188,10 @@
     function isCoherentSession(storedSession) {
       return Boolean(
         storedSession &&
-          storedSession.version === 1 &&
-          storedSession.settings &&
-          storedSession.stats &&
-          storedSession.timer
+        storedSession.version === 1 &&
+        storedSession.settings &&
+        storedSession.stats &&
+        storedSession.timer
       );
     }
 
