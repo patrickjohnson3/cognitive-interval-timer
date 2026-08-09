@@ -816,6 +816,60 @@ label {
   font-weight: 700;
 }
 
+.settings .field-label .tip-wrap {
+  flex: 0 0 24px;
+  width: 24px;
+}
+
+.settings .tip-trigger {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  margin-inline: -10px;
+  border-color: transparent;
+  color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.settings .tip-trigger::before {
+  content: "?";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border: 1px solid var(--border-subtle, var(--color-border));
+  border-radius: 50%;
+  color: var(--text-secondary, var(--color-muted));
+  background: var(--color-button);
+  transform: translate(-50%, -50%);
+}
+
+.settings .tip-trigger:hover {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+.settings .tip-trigger:hover::before {
+  border-color: var(--border-strong, var(--color-border));
+  color: var(--text-primary, var(--color-text));
+  background: var(--color-button-hover);
+}
+
+.settings .tip-trigger:focus-visible {
+  outline: none;
+}
+
+.settings .tip-trigger:focus-visible::before {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
 .tip-bubble {
   --tip-left: 50%;
   --tip-right: auto;
@@ -1260,7 +1314,13 @@ select {
   }
 
   .settings-view-header {
-    margin-inline: 0;
+    gap: var(--space-2);
+    margin: calc(-1 * var(--space-5)) calc(-1 * var(--space-5)) var(--space-3);
+    padding: var(--space-3) var(--space-5);
+  }
+
+  .settings-eyebrow {
+    display: none;
   }
 
   .controls {
@@ -1397,10 +1457,15 @@ select {
     min-height: 48px;
   }
 
-  .tip-trigger,
-  .settings .tip-trigger {
+  .tip-trigger {
     width: 48px;
     height: 48px;
+  }
+
+  .settings .tip-trigger {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
   }
 }
 

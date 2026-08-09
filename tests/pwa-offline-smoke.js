@@ -521,6 +521,42 @@ async function assertSettingsNavigation(client) {
   );
   if (!tooltipsFit) throw new Error("A mobile settings tooltip extends past the viewport");
 
+  const settingsChromeOkay = await evaluateValue(
+    client,
+    `(() => {
+      const panel = document.querySelector(".settings").getBoundingClientRect();
+      const header = document.querySelector(".settings-view-header").getBoundingClientRect();
+      const trigger = document.querySelector(".settings .tip-trigger");
+      const triggerRect = trigger.getBoundingClientRect();
+      const wrapperRect = trigger.closest(".tip-wrap").getBoundingClientRect();
+      const glyph = getComputedStyle(trigger, "::before");
+      return {
+        panelLeft: panel.left,
+        panelRight: panel.right,
+        headerLeft: header.left,
+        headerRight: header.right,
+        eyebrowDisplay: getComputedStyle(document.querySelector(".settings-eyebrow")).display,
+        triggerWidth: triggerRect.width,
+        triggerHeight: triggerRect.height,
+        wrapperWidth: wrapperRect.width,
+        glyphWidth: parseFloat(glyph.width)
+      };
+    })()`
+  );
+  if (
+    Math.abs(settingsChromeOkay.headerLeft - settingsChromeOkay.panelLeft) > 1.1 ||
+    Math.abs(settingsChromeOkay.headerRight - settingsChromeOkay.panelRight) > 1.1 ||
+    settingsChromeOkay.eyebrowDisplay !== "none" ||
+    settingsChromeOkay.triggerWidth < 44 ||
+    settingsChromeOkay.triggerHeight < 44 ||
+    settingsChromeOkay.wrapperWidth > 24 ||
+    settingsChromeOkay.glyphWidth > 24
+  ) {
+    throw new Error(
+      "Mobile Settings chrome is not compact or edge-to-edge: " + JSON.stringify(settingsChromeOkay)
+    );
+  }
+
   const settingsScaleOkay = await evaluateValue(
     client,
     `(() => {
