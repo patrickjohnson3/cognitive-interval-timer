@@ -487,10 +487,22 @@ async function assertSettingsNavigation(client) {
       return document.getElementById("session-view").hidden &&
         !document.getElementById("settings-view").hidden &&
         trigger.getAttribute("aria-expanded") === "true" &&
-        document.activeElement?.id === "settings-view-heading";
+        document.activeElement?.id === "settings-view-heading" &&
+        Array.from(document.querySelectorAll(".settings-disclosure details"))
+          .every((details) => !details.open);
     })()`
   );
   if (!openedStateOkay) throw new Error("Settings did not open as a focused dedicated view");
+
+  await evaluateValue(
+    client,
+    `(() => {
+      document.querySelectorAll(".settings-disclosure details").forEach((details) => {
+        details.open = true;
+      });
+      return true;
+    })()`
+  );
 
   const tooltipsFit = await evaluateValue(
     client,

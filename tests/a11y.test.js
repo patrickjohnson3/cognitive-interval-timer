@@ -64,6 +64,17 @@ test("icon-only Settings control keeps an accessible name", function () {
   assert.match(settingsButton, /aria-hidden="true"/);
 });
 
+test("secondary Settings use native keyboard-accessible disclosure", function () {
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+
+  ["label-display-settings", "keyboard-heading", "maintenance-heading"].forEach(
+    function hasCollapsedSummary(id) {
+      assert.match(html, new RegExp('<summary id="' + id + '">'));
+    }
+  );
+  assert(!/<details\s+open/.test(html));
+});
+
 test("platform failures have readable announcements", function () {
   const a11y = A11y.create({ Content });
 

@@ -367,58 +367,65 @@
 
           <div class="settings-divider" aria-hidden="true"></div>
 
-          <section class="settings-section" aria-labelledby="label-display-settings">
-            <h2 id="label-display-settings">Display</h2>
-            <p class="setting-help display-settings-help">
-              Changes apply immediately. Saved fullscreen and minimal modes require activation after
-              refresh.
-            </p>
-            <div class="checks">
-              <div class="setting-option">
-                <label
-                  ><input
-                    id="fullscreen_enabled"
-                    type="checkbox"
-                    aria-describedby="help-fullscreen-enabled"
-                  />
-                  <span id="label-fullscreen-enabled">Fullscreen</span></label
-                >
-                <p id="help-fullscreen-enabled" class="setting-help">
-                  Expands the timer to the whole screen and turns on Keep Screen Awake.
+          <section
+            class="settings-section settings-disclosure"
+            aria-labelledby="label-display-settings"
+          >
+            <details>
+              <summary id="label-display-settings">Display</summary>
+              <div class="disclosure-content">
+                <p class="setting-help display-settings-help">
+                  Changes apply immediately. Saved fullscreen and minimal modes require activation
+                  after refresh.
                 </p>
+                <div class="checks">
+                  <div class="setting-option">
+                    <label
+                      ><input
+                        id="fullscreen_enabled"
+                        type="checkbox"
+                        aria-describedby="help-fullscreen-enabled"
+                      />
+                      <span id="label-fullscreen-enabled">Fullscreen</span></label
+                    >
+                    <p id="help-fullscreen-enabled" class="setting-help">
+                      Expands the timer to the whole screen and turns on Keep Screen Awake.
+                    </p>
+                  </div>
+                  <div class="setting-option">
+                    <label
+                      ><input
+                        id="minimal_mode_enabled"
+                        type="checkbox"
+                        aria-describedby="help-minimal-mode-enabled"
+                      />
+                      <span id="label-minimal-mode-enabled">Minimal Mode</span></label
+                    >
+                    <p id="help-minimal-mode-enabled" class="setting-help">
+                      Uses fullscreen and keeps the screen awake while active. Previous display
+                      settings return when you exit.
+                    </p>
+                  </div>
+                  <div class="setting-option">
+                    <label
+                      ><input
+                        id="wake_lock_enabled"
+                        type="checkbox"
+                        aria-describedby="help-wake-lock-enabled"
+                      />
+                      <span id="label-wake-lock-enabled">Keep Screen Awake</span></label
+                    >
+                    <p id="help-wake-lock-enabled" class="setting-help">
+                      Prevents display sleep when supported. Fullscreen turns it on; Minimal Mode
+                      uses it while active.
+                    </p>
+                  </div>
+                  <button id="activate-display-modes" type="button" hidden>
+                    Activate Saved Display Settings
+                  </button>
+                </div>
               </div>
-              <div class="setting-option">
-                <label
-                  ><input
-                    id="minimal_mode_enabled"
-                    type="checkbox"
-                    aria-describedby="help-minimal-mode-enabled"
-                  />
-                  <span id="label-minimal-mode-enabled">Minimal Mode</span></label
-                >
-                <p id="help-minimal-mode-enabled" class="setting-help">
-                  Uses fullscreen and keeps the screen awake while active. Previous display settings
-                  return when you exit.
-                </p>
-              </div>
-              <div class="setting-option">
-                <label
-                  ><input
-                    id="wake_lock_enabled"
-                    type="checkbox"
-                    aria-describedby="help-wake-lock-enabled"
-                  />
-                  <span id="label-wake-lock-enabled">Keep Screen Awake</span></label
-                >
-                <p id="help-wake-lock-enabled" class="setting-help">
-                  Prevents display sleep when supported. Fullscreen turns it on; Minimal Mode uses
-                  it while active.
-                </p>
-              </div>
-              <button id="activate-display-modes" type="button" hidden>
-                Activate Saved Display Settings
-              </button>
-            </div>
+            </details>
           </section>
 
           <div class="settings-divider" aria-hidden="true"></div>
@@ -461,25 +468,27 @@
 
           <div class="settings-divider" aria-hidden="true"></div>
 
-          <section class="settings-section" aria-labelledby="keyboard-heading">
-            <h2 id="keyboard-heading">Keyboard</h2>
-            <div class="checks">
-              <div class="setting-option">
-                <label
-                  ><input
-                    id="single_key_shortcuts_enabled"
-                    type="checkbox"
-                    aria-describedby="help-single-key-shortcuts-enabled"
-                  />
-                  <span id="label-single-key-shortcuts-enabled"
-                    >Enable Single-Key Shortcuts</span
-                  ></label
-                >
-                <p id="help-single-key-shortcuts-enabled" class="setting-help">
-                  Lets Space, S, and R control the timer when focus is outside a form control.
-                </p>
+          <section class="settings-section settings-disclosure" aria-labelledby="keyboard-heading">
+            <details>
+              <summary id="keyboard-heading">Keyboard</summary>
+              <div class="disclosure-content checks">
+                <div class="setting-option">
+                  <label
+                    ><input
+                      id="single_key_shortcuts_enabled"
+                      type="checkbox"
+                      aria-describedby="help-single-key-shortcuts-enabled"
+                    />
+                    <span id="label-single-key-shortcuts-enabled"
+                      >Enable Single-Key Shortcuts</span
+                    ></label
+                  >
+                  <p id="help-single-key-shortcuts-enabled" class="setting-help">
+                    Lets Space, S, and R control the timer when focus is outside a form control.
+                  </p>
+                </div>
               </div>
-            </div>
+            </details>
           </section>
 
           <div id="pwa-install-slot" class="pwa-install-slot" hidden></div>
@@ -496,17 +505,21 @@
           <div class="settings-divider" aria-hidden="true"></div>
 
           <section
-            class="settings-section maintenance-section"
+            class="settings-section settings-disclosure maintenance-section"
             aria-labelledby="maintenance-heading"
           >
-            <h2 id="maintenance-heading">Maintenance</h2>
-            <p id="help-restore-defaults" class="setting-help">
-              Restores all timing and preferences, then restarts the current block.
-            </p>
-            <button id="defaults" type="button" aria-describedby="help-restore-defaults">
-              Restore defaults
-            </button>
-            <p id="app-version" class="app-version" aria-label="App version"></p>
+            <details>
+              <summary id="maintenance-heading">Maintenance</summary>
+              <div class="disclosure-content">
+                <p id="help-restore-defaults" class="setting-help">
+                  Restores all timing and preferences, then restarts the current block.
+                </p>
+                <button id="defaults" type="button" aria-describedby="help-restore-defaults">
+                  Restore defaults
+                </button>
+                <p id="app-version" class="app-version" aria-label="App version"></p>
+              </div>
+            </details>
           </section>
         </aside>
       </section>
