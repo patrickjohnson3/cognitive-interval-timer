@@ -205,6 +205,28 @@ test("minimal mode can replace a Settings history entry", async function () {
   assert.equal(historyCalls[0].state.appState, "minimal-mode");
 });
 
+test("display mode binding clears a stale minimal-mode history entry", function () {
+  const replacements = [];
+  const service = DisplayServices.createDisplayModeService({
+    documentRef: { documentElement: {}, fullscreenElement: null },
+    windowRef: {
+      history: {
+        state: { appState: "minimal-mode", minimalModeToken: 2 },
+        replaceState: function replaceState(state) {
+          replacements.push(state);
+        },
+      },
+      addEventListener: function addEventListener() {},
+    },
+    wakeLock: { setEnabled: function setEnabled() {} },
+    onMinimalModeChange: function onMinimalModeChange() {},
+  });
+
+  service.bind();
+
+  assert.deepEqual(replacements, [null]);
+});
+
 test("temporary wake lock failures use the non-destructive failure callback", async function () {
   const events = [];
   const service = DisplayServices.createDisplayModeService({

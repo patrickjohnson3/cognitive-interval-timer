@@ -105,6 +105,7 @@
 
     function bind() {
       if (!win || typeof win.addEventListener !== "function") return;
+      clearStaleMinimalHistory();
       win.addEventListener("popstate", function onPopState(event) {
         const poppedToken = event && event.state && event.state.minimalModeToken;
         if (
@@ -134,6 +135,22 @@
         exitMinimalMode({ updateHistory: false });
         onMinimalModeExited();
       });
+    }
+
+    function clearStaleMinimalHistory() {
+      if (
+        !win.history ||
+        !win.history.state ||
+        win.history.state.appState !== "minimal-mode" ||
+        typeof win.history.replaceState !== "function"
+      ) {
+        return;
+      }
+      try {
+        win.history.replaceState(null, "");
+      } catch {
+        // History cleanup must not prevent display-mode controls from binding.
+      }
     }
 
     function isMinimalModeActive() {

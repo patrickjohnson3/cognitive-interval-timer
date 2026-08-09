@@ -46,6 +46,7 @@
     function bindControls(handlers) {
       setMinimalPanelOpen(false);
       setSettingsViewOpen(false, { focus: false, updateHistory: false });
+      clearStaleSettingsHistory();
       bindTooltips();
       dom.controls.start.addEventListener("click", handlers.onPrimaryAction);
       dom.controls.skip.addEventListener("click", handlers.onSkip);
@@ -187,6 +188,22 @@
       document.addEventListener("fullscreenchange", function onFullscreenChange() {
         handlers.onFullscreenChange(Boolean(document.fullscreenElement));
       });
+    }
+
+    function clearStaleSettingsHistory() {
+      if (
+        !window.history ||
+        !window.history.state ||
+        window.history.state.appState !== "settings" ||
+        typeof window.history.replaceState !== "function"
+      ) {
+        return;
+      }
+      try {
+        window.history.replaceState(null, "");
+      } catch {
+        // History cleanup must not prevent the timer from starting.
+      }
     }
 
     function bindNumberField(field, handlers) {

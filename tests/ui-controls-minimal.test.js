@@ -103,6 +103,7 @@ function bindWithBrowserStubs(options) {
   });
   const calls = [];
   const historyCalls = [];
+  browser.window.history.state = config.historyState || null;
   browser.window.history.pushState = function pushState(state) {
     historyCalls.push({ type: "push", state: state });
   };
@@ -195,6 +196,16 @@ test("settings open as a dedicated view and return focus on close", function () 
   assert.equal(ctx.dom.controls.openSettings.focusCount, 1);
   assert.equal(ctx.document.documentElement.hasAttribute("data-settings-view"), false);
   assert.equal(ctx.historyCalls[1].type, "back");
+});
+
+test("startup clears a stale Settings history entry", function () {
+  const ctx = bindWithBrowserStubs({
+    historyState: { appState: "settings", settingsViewToken: 4 },
+  });
+
+  assert.equal(ctx.dom.views.session.hidden, false);
+  assert.equal(ctx.dom.views.settings.hidden, true);
+  assert.deepEqual(ctx.historyCalls, [{ type: "replace", state: null }]);
 });
 
 test("browser Back closes settings and restores timer focus", function () {
