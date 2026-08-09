@@ -168,10 +168,7 @@ test("ticker completion advances the phase and honors auto-start", function () {
       assert.equal(ctx.state.timer.phase, Core.PHASE.RECALL);
       assert.equal(ctx.state.stats.focusBlocksToday, 1);
       assert.equal(ctx.state.stats.focusBlocksSinceLong, 1);
-      assert.equal(
-        ctx.state.timer.status,
-        autoStart ? Core.STATUS.RUNNING : Core.STATUS.PAUSED
-      );
+      assert.equal(ctx.state.timer.status, autoStart ? Core.STATUS.RUNNING : Core.STATUS.PAUSED);
       assert.equal(ctx.phaseChanges.length, 1);
       assert.deepEqual(ctx.phaseChanges[0], {
         from: Core.PHASE.FOCUS,
