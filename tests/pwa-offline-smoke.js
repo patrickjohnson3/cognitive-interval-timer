@@ -506,6 +506,21 @@ async function assertResponsiveUI(client) {
   );
   if (!landscapeOkay) throw new Error("Rendered short-landscape layout checks failed");
 
+  const minimalLandscapeOkay = await evaluateValue(
+    client,
+    `(() => {
+      document.documentElement.setAttribute("data-minimal-mode", "true");
+      const hint = document.getElementById("hint").getBoundingClientRect();
+      const reveal = document.getElementById("minimal-exit-reveal").getBoundingClientRect();
+      const separated = hint.bottom + 4 <= reveal.top;
+      document.documentElement.removeAttribute("data-minimal-mode");
+      return separated;
+    })()`
+  );
+  if (!minimalLandscapeOkay) {
+    throw new Error("Minimal controls overlap the phase guidance in short landscape");
+  }
+
   const themesOkay = await evaluateValue(
     client,
     `(() => {

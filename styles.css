@@ -1088,6 +1088,14 @@ select {
   .long-hint {
     line-height: 1.42;
   }
+
+  .minimal-exit-reveal {
+    bottom: max(var(--space-2), env(safe-area-inset-bottom, 0px));
+  }
+
+  .minimal-exit-panel {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 54px);
+  }
 }
 
 @media (orientation: landscape) and (max-height: 600px) and (max-width: 640px) {
