@@ -7,6 +7,7 @@
 })(typeof self !== "undefined" ? self : this, function makeUIAnnounce() {
   function create(dom) {
     let transitionTimeoutId = null;
+    let visualStatusTimeoutId = null;
 
     function flashMessage(message) {
       dom.saveMsg.textContent = message;
@@ -36,9 +37,24 @@
       }, 10);
     }
 
+    function showVisualStatus(message) {
+      if (!dom.visualStatus) return;
+      if (visualStatusTimeoutId) clearTimeout(visualStatusTimeoutId);
+
+      dom.visualStatus.hidden = false;
+      dom.visualStatus.textContent = message;
+      visualStatusTimeoutId = setTimeout(function clearVisualStatus() {
+        if (dom.visualStatus.textContent === message) {
+          dom.visualStatus.textContent = "";
+          dom.visualStatus.hidden = true;
+        }
+      }, 5000);
+    }
+
     return {
       flashMessage,
       showTransition,
+      showVisualStatus,
       announce,
     };
   }

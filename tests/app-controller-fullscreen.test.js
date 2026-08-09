@@ -72,6 +72,7 @@ function setup(options) {
   const audioCalls = [];
   const transitionCalls = [];
   const announcementCalls = [];
+  const visualStatusCalls = [];
   const historyCalls = [];
   const browser = createBrowserFixture({
     requestFullscreen: function requestFullscreen() {
@@ -160,6 +161,9 @@ function setup(options) {
       flashMessage: function flashMessage() {},
       showTransition: function showTransition(message) {
         transitionCalls.push(message);
+      },
+      showVisualStatus: function showVisualStatus(message) {
+        visualStatusCalls.push(message);
       },
       announce: function announce(message) {
         announcementCalls.push(message);
@@ -263,6 +267,7 @@ function setup(options) {
     audioCalls,
     transitionCalls,
     announcementCalls,
+    visualStatusCalls,
     historyCalls,
     windowListeners: browser.windowListeners,
     documentListeners: browser.documentListeners,
@@ -547,6 +552,7 @@ test("fullscreen rejection clears fullscreen field", async function () {
     "expected auto-enabled wake lock to remain unsaved"
   );
   assert(ctx.announcementCalls.includes("fullscreen_unavailable"));
+  assert(ctx.visualStatusCalls.includes("fullscreen_unavailable"));
 });
 
 test("fullscreen exit rejection restores the actual enabled field", async function () {
@@ -786,6 +792,7 @@ test("temporary wake lock rejection preserves wake lock field", async function (
     "expected temporary rejection to preserve wake lock preference"
   );
   assert(ctx.announcementCalls.includes("wake_lock_request_failed"));
+  assert(ctx.visualStatusCalls.includes("wake_lock_request_failed"));
 });
 
 test("wake lock rejection leaves fullscreen enabled", async function () {
@@ -858,6 +865,7 @@ test("unsupported wake lock clears the unavailable preference", async function (
     "expected unsupported preference to clear"
   );
   assert(ctx.announcementCalls.includes("wake_lock_unavailable"));
+  assert(ctx.visualStatusCalls.includes("wake_lock_unavailable"));
 });
 
 test("saving minimal mode preserves the explicit wake lock preference", function () {

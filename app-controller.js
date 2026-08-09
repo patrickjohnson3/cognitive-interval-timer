@@ -512,7 +512,7 @@
 
       updateDraftFromForm();
       onStateChange();
-      announce.announce(a11y.formatAnnouncement("fullscreen_unavailable"));
+      announceDisplayFailure("fullscreen_unavailable");
     }
 
     function reconcileWakeLockUnavailable() {
@@ -528,11 +528,17 @@
 
       updateDraftFromForm();
       onStateChange();
-      announce.announce(a11y.formatAnnouncement("wake_lock_unavailable"));
+      announceDisplayFailure("wake_lock_unavailable");
     }
 
     function announceWakeLockFailure() {
-      announce.announce(a11y.formatAnnouncement("wake_lock_request_failed"));
+      announceDisplayFailure("wake_lock_request_failed");
+    }
+
+    function announceDisplayFailure(type) {
+      const message = a11y.formatAnnouncement(type);
+      announce.announce(message);
+      announce.showVisualStatus(message);
     }
 
     function bindTimerVisibility() {

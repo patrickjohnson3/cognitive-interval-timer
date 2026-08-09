@@ -96,6 +96,7 @@
       dirtyIndicator: byId("dirty-indicator"),
       theme: byId("theme"),
       live: byId("live-announcer"),
+      visualStatus: byId("visual-status"),
       tagline: byId("tagline"),
       appVersion: byId("app-version"),
       views: {
