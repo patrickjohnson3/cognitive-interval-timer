@@ -17,7 +17,7 @@
     manifestOrientation: "any",
     themeColors: {
       dark: "#0f172a",
-      light: "#f5f7f9",
+      light: "#f2eee6",
     },
     manifestBackgroundColor: "#111827",
   };

@@ -10,6 +10,10 @@ test("light contrast ratios meet minimum thresholds for key pairs", function () 
     { fg: "--text-secondary", bg: "--color-surface", min: 4.5 },
     { fg: "--color-focus-ring", bg: "--color-surface", min: 4.5 },
     { fg: "--color-primary-text", bg: "--color-accent", min: 4.5 },
+    { fg: "--timer-text-color", bg: "--color-surface", min: 7.0 },
+    { fg: "--color-recovery", bg: "--color-surface", min: 4.5 },
+    { fg: "--color-success", bg: "--color-surface", min: 4.5 },
+    { fg: "--color-error", bg: "--color-surface", min: 4.5 },
   ];
 
   pairs.forEach((pair) => {

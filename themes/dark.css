@@ -12,6 +12,7 @@
   --color-recovery: #8995a3;
   --color-success: #6f9b78;
   --color-error: #dc7373;
+  --color-error-bg: rgba(220, 115, 115, 0.08);
   --color-accent: #d28a2e;
   --color-accent-strong: #b86514;
   --color-accent-glow: rgba(210, 138, 46, 0.18);

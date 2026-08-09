@@ -32,6 +32,7 @@
   --color-attention-glow: var(--color-accent-glow);
   --color-recovery: var(--text-secondary, var(--color-muted));
   --color-error: var(--color-accent-strong);
+  --color-error-bg: var(--hint-bg);
   --phase-accent: var(--color-attention);
   --phase-hint-bg: var(--hint-bg);
   --phase-long-hint-bg: var(--long-hint-bg);
@@ -39,21 +40,21 @@
   --tagline-pill-border: transparent;
 }
 
-:root[data-theme="dark"][data-phase="prep"] {
+:root[data-phase="prep"] {
   --phase-accent: var(--phase-prep-accent);
   --phase-hint-bg: var(--phase-prep-hint-bg);
   --phase-long-hint-bg: var(--phase-prep-long-hint-bg);
 }
 
-:root[data-theme="dark"][data-phase="focus"] {
+:root[data-phase="focus"] {
   --phase-accent: var(--phase-focus-accent);
   --phase-hint-bg: var(--phase-focus-hint-bg);
   --phase-long-hint-bg: var(--phase-focus-long-hint-bg);
 }
 
-:root[data-theme="dark"][data-phase="recall"],
-:root[data-theme="dark"][data-phase="break"],
-:root[data-theme="dark"][data-phase="long_break"] {
+:root[data-phase="recall"],
+:root[data-phase="break"],
+:root[data-phase="long_break"] {
   --phase-accent: var(--phase-recovery-accent);
   --phase-hint-bg: var(--phase-recovery-hint-bg);
   --phase-long-hint-bg: var(--phase-recovery-long-hint-bg);
@@ -358,7 +359,7 @@ h1 {
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-error, var(--color-accent-strong));
   border-radius: 10px;
-  background: var(--hint-bg);
+  background: var(--color-error-bg, var(--hint-bg));
   color: var(--text-primary, var(--color-text));
   font-size: 0.9rem;
   font-weight: 700;
@@ -407,32 +408,32 @@ button.primary:hover {
   box-shadow: 0 5px 12px var(--glow-strong);
 }
 
-:root[data-theme="dark"][data-timer-status="running"] #start,
-:root[data-theme="dark"][data-timer-status="running"] #minimal-primary-action {
+:root[data-timer-status="running"] #start,
+:root[data-timer-status="running"] #minimal-primary-action {
   border-color: var(--border-subtle, var(--color-border));
   background: var(--color-button);
   color: var(--text-primary, var(--color-text));
 }
 
-:root[data-theme="dark"][data-timer-status="running"] #start:hover,
-:root[data-theme="dark"][data-timer-status="running"] #minimal-primary-action:hover {
+:root[data-timer-status="running"] #start:hover,
+:root[data-timer-status="running"] #minimal-primary-action:hover {
   background: var(--color-button-hover);
   box-shadow: 0 4px 10px var(--glow-soft);
 }
 
-:root[data-theme="dark"][data-phase="prep"] .state,
-:root[data-theme="dark"][data-phase="recall"] .state,
-:root[data-theme="dark"][data-phase="break"] .state,
-:root[data-theme="dark"][data-phase="long_break"] .state {
+:root[data-phase="prep"] .state,
+:root[data-phase="recall"] .state,
+:root[data-phase="break"] .state,
+:root[data-phase="long_break"] .state {
   color: var(--phase-accent);
 }
 
-:root[data-theme="dark"][data-phase="focus"] .hint {
+:root[data-phase="focus"] .hint {
   color: var(--text-secondary, var(--color-muted));
   font-weight: 700;
 }
 
-:root[data-theme="dark"][data-phase="focus"] .long-hint {
+:root[data-phase="focus"] .long-hint {
   color: var(--text-secondary, var(--color-muted));
 }
 
