@@ -468,6 +468,32 @@ test("closed tooltips are hidden from assistive technology", function () {
   assert.equal(bubble.hidden, true);
 });
 
+test("activating a focused tooltip toggles it closed on the second activation", function () {
+  const bubble = eventTargetNode({ tagName: "SPAN", hidden: true });
+  const trigger = eventTargetNode({ tagName: "BUTTON" });
+  const wrapper = eventTargetNode({ tagName: "SPAN" });
+  wrapper.querySelector = function querySelector(selector) {
+    if (selector === ".tip-trigger") return trigger;
+    if (selector === ".tip-bubble") return bubble;
+    return null;
+  };
+  const ctx = bindWithBrowserStubs({
+    querySelectorAll: function querySelectorAll() {
+      return [wrapper];
+    },
+  });
+
+  ctx.document.activeElement = trigger;
+  trigger.listeners.focus();
+  trigger.listeners.click();
+  assert.equal(bubble.hidden, false, "first activation should keep the focused tooltip open");
+  assert.equal(wrapper.getAttribute("data-open"), "true");
+
+  trigger.listeners.click();
+  assert.equal(bubble.hidden, true, "second activation should close the tooltip");
+  assert.equal(wrapper.getAttribute("data-open"), "false");
+});
+
 test("timer shortcuts do not intercept native button keyboard actions", function () {
   const ctx = bindWithBrowserStubs();
   const button = eventTargetNode({ tagName: "BUTTON" });

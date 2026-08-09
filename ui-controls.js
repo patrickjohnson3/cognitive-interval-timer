@@ -9,6 +9,7 @@
     let settingsHistoryActive = false;
     let settingsHistoryToken = null;
     let nextSettingsHistoryToken = 1;
+    const activatedTooltips = new WeakSet();
 
     function isInteractiveTarget(target) {
       if (!target) return false;
@@ -235,6 +236,14 @@
         trigger.addEventListener("focus", function showFocusedTooltip() {
           showTooltip(wrapper, bubble);
         });
+        trigger.addEventListener("click", function toggleActivatedTooltip() {
+          if (activatedTooltips.has(wrapper)) {
+            hideTooltip(wrapper, bubble);
+            return;
+          }
+          activatedTooltips.add(wrapper);
+          showTooltip(wrapper, bubble);
+        });
         trigger.addEventListener("blur", function hideBlurredTooltip() {
           hideTooltip(wrapper, bubble);
         });
@@ -247,6 +256,7 @@
     }
 
     function hideTooltip(wrapper, bubble) {
+      activatedTooltips.delete(wrapper);
       bubble.hidden = true;
       wrapper.setAttribute("data-open", "false");
     }
