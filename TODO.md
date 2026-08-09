@@ -1,5 +1,18 @@
 # TODO
 
+## Evaluate Signal As Default
+
+- Keep Dark as the default while Signal is evaluated through one week of normal use, including
+  days with roughly six 45-minute focus blocks.
+- Judge sustained comfort rather than initial visual appeal: determine whether cyan still improves
+  phase recognition after repeated blocks or becomes continuously stimulating.
+- If Signal causes visual fatigue, reduce saturation frequency or colored surface area before
+  abandoning its deep-ink, warm-ivory, cyan, and amber identity.
+- Make Signal the default only if it provides high state discriminability without high continuous
+  stimulation.
+- Preserve the name `Signal`; it describes the theme's semantic purpose better than generic names
+  such as Vibrant or Colorful.
+
 ## Adaptive Prep Duration
 
 - Test reducing Prep to 60–90 seconds for subsequent focus blocks so an internalized routine does
