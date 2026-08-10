@@ -130,7 +130,7 @@ function createDeps() {
         focusBlockReady: "Focus Block\nReady",
         focusBlockSessionSuffix: "of session",
         focusBlockReadyContext: "Ready to begin session.",
-        recommendedProtocol: "Recommended protocol",
+        recommendedProtocol: "Default protocol",
         customTiming: "Custom timing",
         unsavedChanges: "Unsaved Changes",
         allSettingsSaved: "All Settings Saved",
@@ -332,14 +332,14 @@ test("stats use compact lowercase labels", function () {
   assert(deps.dom.long.textContent === "long break: 0 / 2", "expected compact long break stats");
 });
 
-test("recommended protocol marker follows the settings draft", function () {
+test("default protocol marker follows the settings draft", function () {
   const deps = createDeps();
   const render = UIRender.create(deps);
   const state = baseState();
   state.draftSettings = Object.assign({}, state.settings);
 
   render.render(state);
-  assert.equal(deps.dom.protocolStatus.textContent, "Recommended protocol");
+  assert.equal(deps.dom.protocolStatus.textContent, "Default protocol");
   assert.equal(deps.dom.controls.restoreRecommendedTiming.hidden, true);
 
   state.draftSettings.focus = 30;

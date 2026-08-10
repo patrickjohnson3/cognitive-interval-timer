@@ -64,7 +64,7 @@
       focusBlockReady: "Focus Block\nReady",
       focusBlockSessionSuffix: "of session",
       focusBlockReadyContext: "Ready to begin session.",
-      recommendedProtocol: "Recommended protocol",
+      recommendedProtocol: "Default protocol",
       customTiming: "Custom timing",
       unsavedChanges: "Unsaved Changes",
       allSettingsSaved: "All Settings Saved",
@@ -129,32 +129,32 @@
       prepDefault: {
         triggerLabel: "Why 2 minutes for Prep?",
         heading: "Why 2 Minutes?",
-        body: 'Two minutes is enough to define what "done" looks like without turning preparation into procrastination.',
+        body: "The default allows a brief setup to define a clear outcome without making preparation a separate task.",
       },
       focusDefault: {
         triggerLabel: "Why 45 minutes for Focus?",
         heading: "Why 45 Minutes?",
-        body: "Long enough to enter deep focus, short enough to avoid mental fatigue. Most people can sustain 1-2 strong blocks before performance drops.",
+        body: "The default provides a substantial, bounded work interval. Adjust it to match the task and your ability to stay engaged.",
       },
       recallDefault: {
         triggerLabel: "Why reflect in Recall?",
         heading: "Why Reflect?",
-        body: "Writing what you did and learned strengthens memory and reduces cognitive residue before the next block.",
+        body: "The recall phase creates a deliberate pause to record what changed and identify the next step before moving on.",
       },
       shortBreakDefault: {
         triggerLabel: "Why 15 minutes for Short Break?",
         heading: "Why 15 Minutes?",
-        body: "Brief movement and screen-free time restore attention better than quick dopamine hits.",
+        body: "The default leaves time to step away, move, hydrate, and return without rushing.",
       },
       longBreakDefault: {
         triggerLabel: "Why a longer reset for Long Break?",
         heading: "Why a Longer Reset?",
-        body: "After two deep focus blocks, your brain benefits from a fuller recovery window.",
+        body: "The longer default distinguishes a fuller reset from the break between focus blocks.",
       },
       blocksDefault: {
         triggerLabel: "Why 2 focus blocks before Long Break?",
         heading: "Why 2 Blocks?",
-        body: "Attention naturally works in waves. Two strong efforts followed by recovery keeps output sustainable.",
+        body: "The default session repeats focus and recall twice before taking a longer break.",
       },
     },
   };

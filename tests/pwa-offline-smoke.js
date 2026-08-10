@@ -457,7 +457,7 @@ async function assertSettingsPersistence(client, appUrl) {
       document.getElementById("restore-recommended-timing").click();
       const stored = JSON.parse(localStorage.getItem("better_pomodoro_session_v2"));
       return document.getElementById("focus").value === "45" &&
-        document.getElementById("protocol-status").textContent === "Recommended protocol" &&
+        document.getElementById("protocol-status").textContent === "Default protocol" &&
         document.getElementById("restore-recommended-timing").hidden &&
         document.getElementById("open-settings").getAttribute("data-dirty") === "true" &&
         stored.settings.focus === 37;
