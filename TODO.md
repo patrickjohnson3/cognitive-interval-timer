@@ -13,6 +13,22 @@
 - Preserve the name `Signal`; it describes the theme's semantic purpose better than generic names
   such as Vibrant or Colorful.
 
+## Continue Active Timer While Suspended
+
+- Keep an active timer progressing against persisted wall-clock deadlines while the PWA is hidden,
+  suspended, or the phone is locked; do not depend on JavaScript timers continuing to run in the
+  background.
+- Advance through elapsed phase boundaries when the app resumes so the visible phase and remaining
+  time reflect how much real time passed while the phone was locked or in a pocket.
+- Preserve paused state: locking or backgrounding the phone must not implicitly start a timer that
+  the user had paused.
+- Define deterministic behavior when enough suspended time elapses to cross multiple phases,
+  including whether completed Focus phases receive credit and whether zero-duration user actions
+  are required at any boundary.
+- Test the behavior on an installed Android PWA with the screen locked long enough to cross at least
+  one complete phase boundary.
+- Defer notification permissions until the lifecycle behavior is proven useful.
+
 ## Adaptive Prep Duration
 
 - Test reducing Prep to 60–90 seconds for subsequent focus blocks so an internalized routine does
@@ -23,15 +39,6 @@
   target, and begin.
 - Validate 60 versus 90 seconds through observed use before changing the default or adding
   automatic first-block behavior.
-
-## Phase-Aware Suspended Time
-
-- Continue freezing Prep, Focus, and Recall while the app is hidden or suspended.
-- Let Short Break and Long Break continue against a persisted wall-clock deadline so users can
-  step away from the screen.
-- If a break expires while suspended, return to Focus in a paused state when the app resumes.
-- Never auto-start or credit a focus block while the app is hidden.
-- Defer notification permissions until the lifecycle behavior is proven useful.
 
 ## Restore Display Modes At Startup
 
