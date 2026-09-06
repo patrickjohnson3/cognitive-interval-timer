@@ -310,6 +310,29 @@ async function assertInteractiveAccessibility(client) {
   );
   if (!minimalActionWorked) throw new Error("Minimal timer action did not start the timer");
 
+  const phaseBeforeNext = await evaluateValue(
+    client,
+    'document.documentElement.getAttribute("data-phase")'
+  );
+  await pressKey(client, "Tab", "Tab", 9);
+  const minimalNextReached = await evaluateValue(
+    client,
+    'document.activeElement?.id === "next-minimal-phase"'
+  );
+  if (!minimalNextReached) throw new Error("Minimal Next Phase is not keyboard reachable");
+  await pressKey(client, "Enter", "Enter", 13, "\r");
+  const minimalNextWorked = await evaluateValue(
+    client,
+    `(() => {
+      const after = document.documentElement.getAttribute("data-phase");
+      const wrap = document.getElementById("minimal-exit-wrap");
+      const panel = document.getElementById("minimal-exit-panel");
+      return after !== ${JSON.stringify(phaseBeforeNext)} &&
+        wrap.getAttribute("data-open") === "false" && panel.hidden;
+    })()`
+  );
+  if (!minimalNextWorked) throw new Error("Minimal Next Phase action did not advance the timer");
+
   await evaluateValue(
     client,
     `(() => {
@@ -1000,20 +1023,33 @@ async function assertResponsiveUI(client) {
     );
   }
 
-  const minimalLandscapeOkay = await evaluateValue(
+  const minimalLandscapeChecks = await evaluateValue(
     client,
     `(() => {
       document.documentElement.setAttribute("data-minimal-mode", "true");
       const hint = document.getElementById("hint").getBoundingClientRect();
       const reveal = document.getElementById("minimal-exit-reveal").getBoundingClientRect();
-      const validTarget = reveal.width >= 44 && reveal.height >= 44;
-      const separated = hint.bottom + 4 <= reveal.top;
       document.documentElement.removeAttribute("data-minimal-mode");
-      return separated && validTarget;
+      return {
+        phase: document.documentElement.getAttribute("data-phase"),
+        status: document.documentElement.getAttribute("data-timer-status"),
+        hint: document.getElementById("hint").textContent,
+        hintBottom: hint.bottom,
+        revealTop: reveal.top,
+        revealWidth: reveal.width,
+        revealHeight: reveal.height
+      };
     })()`
   );
+  const minimalLandscapeOkay =
+    minimalLandscapeChecks.hintBottom + 4 <= minimalLandscapeChecks.revealTop &&
+    minimalLandscapeChecks.revealWidth >= 44 &&
+    minimalLandscapeChecks.revealHeight >= 44;
   if (!minimalLandscapeOkay) {
-    throw new Error("Minimal controls overlap the phase guidance in short landscape");
+    throw new Error(
+      "Minimal controls overlap the phase guidance in short landscape: " +
+        JSON.stringify(minimalLandscapeChecks)
+    );
   }
 
   const themeState = await evaluateValue(

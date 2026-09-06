@@ -25,6 +25,7 @@ function createDom() {
       exitMinimalModeReveal: eventTargetNode({ id: "minimal-exit-reveal" }),
       exitMinimalModePanel: eventTargetNode({ id: "minimal-exit-panel", tagName: "DIV" }),
       minimalPrimaryAction: eventTargetNode({ id: "minimal-primary-action" }),
+      nextMinimalPhase: eventTargetNode({ id: "next-minimal-phase" }),
       restartMinimalBlock: eventTargetNode({ id: "restart-minimal-block" }),
       exitMinimalMode: eventTargetNode({ id: "exit-minimal-mode" }),
     },
@@ -648,6 +649,31 @@ test("restarting from minimal panel resets without toggling timer", function () 
   assert(
     ctx.dom.controls.exitMinimalModeWrap.getAttribute("data-open") === "false",
     "expected restart to close minimal panel"
+  );
+});
+
+test("advancing from minimal panel skips without toggling timer", function () {
+  const ctx = bindWithBrowserStubs();
+  ctx.documentElement.setAttribute("data-minimal-mode", "true");
+  ctx.dom.controls.exitMinimalModeWrap.setAttribute("data-open", "true");
+  ctx.dom.controls.nextMinimalPhase.listeners.click({
+    stopPropagation: function stopPropagation() {
+      ctx.calls.push("stop-propagation");
+    },
+  });
+
+  assert.equal(
+    ctx.calls.filter(function isSkip(call) {
+      return call === "skip";
+    }).length,
+    1,
+    "expected minimal panel Next Phase to skip exactly once"
+  );
+  assert(ctx.calls.includes("stop-propagation"), "expected Next Phase click not to bubble");
+  assert(!ctx.calls.includes("shortcut:toggle"), "Next Phase should not toggle timer");
+  assert(
+    ctx.dom.controls.exitMinimalModeWrap.getAttribute("data-open") === "false",
+    "expected Next Phase to close minimal panel"
   );
 });
 

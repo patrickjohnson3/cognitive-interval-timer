@@ -119,6 +119,7 @@
         exitMinimalModeReveal: byId("minimal-exit-reveal"),
         exitMinimalModePanel: byId("minimal-exit-panel"),
         minimalPrimaryAction: byId("minimal-primary-action"),
+        nextMinimalPhase: byId("next-minimal-phase"),
         restartMinimalBlock: byId("restart-minimal-block"),
         exitMinimalMode: byId("exit-minimal-mode"),
       },

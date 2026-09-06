@@ -96,6 +96,15 @@
           handlers.onPrimaryAction();
         }
       );
+      dom.controls.nextMinimalPhase.addEventListener(
+        "click",
+        function onNextMinimalPhaseClick(event) {
+          if (event && event.stopPropagation) event.stopPropagation();
+          setMinimalPanelOpen(false);
+          focusMinimalModeReveal();
+          handlers.onSkip();
+        }
+      );
       dom.controls.restartMinimalBlock.addEventListener(
         "click",
         function onRestartMinimalBlockClick(event) {
