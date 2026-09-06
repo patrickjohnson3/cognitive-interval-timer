@@ -76,6 +76,12 @@ function createDom() {
         type: "checkbox",
         checked: true,
       }),
+      continue_while_suspended: eventTargetNode({
+        id: "continue_while_suspended",
+        tagName: "INPUT",
+        type: "checkbox",
+        checked: true,
+      }),
       fullscreen_enabled: eventTargetNode({
         id: "fullscreen_enabled",
         tagName: "INPUT",
@@ -419,6 +425,14 @@ test("wake lock checkbox triggers wake lock handler and dirty settings handler",
 
   assert(ctx.calls.includes("wake-lock:true"), "expected wake lock toggle handler");
   assert(ctx.calls.includes("settings"), "expected settings dirty handler");
+});
+
+test("suspended countdown checkbox triggers the settings handler", function () {
+  const ctx = bindWithBrowserStubs();
+  ctx.dom.fields.continue_while_suspended.checked = false;
+  ctx.dom.fields.continue_while_suspended.listeners.change();
+
+  assert(ctx.calls.includes("settings"));
 });
 
 test("Escape closes an open minimal panel before exiting minimal mode", function () {

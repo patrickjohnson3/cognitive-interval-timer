@@ -372,6 +372,22 @@
                   ><input id="auto_start" type="checkbox" />
                   <span id="label-auto-start">Auto-Start Next Phase</span></label
                 >
+                <div class="setting-option">
+                  <label
+                    ><input
+                      id="continue_while_suspended"
+                      type="checkbox"
+                      aria-describedby="help-continue-while-suspended"
+                    />
+                    <span id="label-continue-while-suspended"
+                      >Continue Timer While Screen Is Locked</span
+                    ></label
+                  >
+                  <p id="help-continue-while-suspended" class="setting-help">
+                    Also counts down while the app is in the background. If the phase ends, it
+                    pauses at zero without counting the Focus block as completed.
+                  </p>
+                </div>
               </div>
             </details>
           </section>

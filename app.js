@@ -135,6 +135,7 @@
         soundEnabled: byId("label-sound-enabled"),
         quietModeEnabled: byId("label-quiet-mode-enabled"),
         singleKeyShortcutsEnabled: byId("label-single-key-shortcuts-enabled"),
+        continueWhileSuspended: byId("label-continue-while-suspended"),
         fullscreenEnabled: byId("label-fullscreen-enabled"),
         minimalModeEnabled: byId("label-minimal-mode-enabled"),
         wakeLockEnabled: byId("label-wake-lock-enabled"),

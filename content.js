@@ -51,6 +51,7 @@
     soundOnPhaseChange: "Play Sound On Phase Change",
     quietMode: "Quiet Mode",
     singleKeyShortcuts: "Enable Single-Key Shortcuts",
+    continueWhileSuspended: "Continue Timer While Screen Is Locked",
     fullscreenMode: "Fullscreen",
     minimalMode: "Minimal Mode",
     keepScreenAwake: "Keep Screen Awake",
@@ -88,6 +89,9 @@
         running: "Pause timer",
         paused: "Resume timer",
       },
+      expiredPrimaryActionIcon: "■",
+      expiredPrimaryActionLabel: "Phase Ended",
+      expiredPrimaryActionAriaLabel: "Phase ended; choose Next Phase or Restart Block",
     },
     announcements: {
       phaseStartedSuffix: "Started",
@@ -101,6 +105,8 @@
       timerPaused: "Timer paused.",
       timerResumed: "Timer resumed.",
       blockRestarted: "Block restarted.",
+      suspendedPhaseElapsedSuffix:
+        "ended while the screen was locked or the app was in the background. Choose Next Phase or Restart Block.",
     },
     pwa: {
       installCopy: "Install for offline use.",

@@ -17,6 +17,7 @@
         }
         return Date.now();
       };
+    const wallNow = config.wallNow || Date.now;
     const maxTickGapMs = config.maxTickGapMs || 5000;
     let intervalId = null;
     let suspended = false;
@@ -39,12 +40,14 @@
       }
 
       state.timer.status = Core.STATUS.RUNNING;
+      state.timer.suspendedAtMs = null;
       state.timer.lastTickMs = now();
       hooks.onStateChange();
     }
 
     function pause() {
       state.timer.status = Core.STATUS.PAUSED;
+      state.timer.suspendedAtMs = null;
       state.timer.lastTickMs = null;
       hooks.onStateChange();
     }
@@ -63,6 +66,7 @@
       state.timer.focusBlockNumber = 0;
       state.timer.phase = phase;
       state.timer.remainingSec = Core.phaseDurationSec(phase, state.settings);
+      state.timer.suspendedAtMs = null;
       hooks.onStateChange();
     }
 
@@ -74,6 +78,7 @@
         creditFocus: false,
       });
       state.timer.lastTickMs = state.timer.status === Core.STATUS.RUNNING ? now() : null;
+      state.timer.suspendedAtMs = null;
 
       hooks.onPhaseChange({
         from: from,
@@ -151,15 +156,54 @@
       hooks.onStateChange();
     }
 
-    function setSuspended(nextSuspended) {
+    function setSuspended(nextSuspended, options) {
+      const suspensionOptions = Object.assign(
+        { trackElapsed: false, countElapsed: false },
+        options || {}
+      );
       suspended = Boolean(nextSuspended);
       if (suspended) {
         state.timer.lastTickMs = null;
-        return;
+        if (
+          suspensionOptions.trackElapsed &&
+          state.timer.status === Core.STATUS.RUNNING &&
+          state.timer.suspendedAtMs == null
+        ) {
+          state.timer.suspendedAtMs = wallNow();
+          return { changed: true, expired: false };
+        }
+        return { changed: false, expired: false };
       }
+
+      const suspendedAtMs = state.timer.suspendedAtMs;
+      const canCountElapsed =
+        suspensionOptions.countElapsed &&
+        state.timer.status === Core.STATUS.RUNNING &&
+        typeof suspendedAtMs === "number" &&
+        Number.isFinite(suspendedAtMs) &&
+        suspendedAtMs >= 0;
+      let changed = state.timer.suspendedAtMs != null;
+      let expired = false;
+
+      if (canCountElapsed) {
+        const elapsedSec = Math.max(0, (wallNow() - suspendedAtMs) / 1000);
+        if (elapsedSec >= state.timer.remainingSec) {
+          state.timer.remainingSec = 0;
+          state.timer.status = Core.STATUS.PAUSED;
+          expired = true;
+        } else if (elapsedSec > 0) {
+          state.timer.remainingSec -= elapsedSec;
+          changed = true;
+        }
+      }
+
+      state.timer.suspendedAtMs = null;
       if (state.timer.status === Core.STATUS.RUNNING) {
         state.timer.lastTickMs = now();
+      } else {
+        state.timer.lastTickMs = null;
       }
+      return { changed: changed, expired: expired };
     }
 
     return {

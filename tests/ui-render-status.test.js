@@ -52,6 +52,7 @@ function createDeps() {
       soundEnabled: textNode(),
       quietModeEnabled: textNode(),
       singleKeyShortcutsEnabled: textNode(),
+      continueWhileSuspended: textNode(),
       fullscreenEnabled: textNode(),
       minimalModeEnabled: textNode(),
       wakeLockEnabled: textNode(),
@@ -80,6 +81,7 @@ function createDeps() {
       sound_enabled: { checked: false },
       quiet_mode_enabled: { checked: false },
       single_key_shortcuts_enabled: { checked: true },
+      continue_while_suspended: { checked: true },
       fullscreen_enabled: { checked: false },
       minimal_mode_enabled: { checked: false },
       wake_lock_enabled: { checked: false },
@@ -151,6 +153,9 @@ function createDeps() {
           running: "Pause timer",
           paused: "Resume timer",
         },
+        expiredPrimaryActionIcon: "■",
+        expiredPrimaryActionLabel: "Phase Ended",
+        expiredPrimaryActionAriaLabel: "Phase ended; choose Next Phase or Restart Block",
       },
     },
   };
@@ -283,6 +288,7 @@ test("static UI copy is hydrated by the renderer", function () {
   deps.Content.UI_COPY.blocksBeforeLongBreak = "Blocks";
   deps.Content.UI_COPY.startWithPrep = "Prep enabled";
   deps.Content.UI_COPY.autoStartNext = "Auto-start";
+  deps.Content.UI_COPY.continueWhileSuspended = "Continue while suspended";
   deps.Content.UI_COPY.soundOnPhaseChange = "Sound";
   deps.Content.UI_COPY.quietMode = "Quiet";
   deps.Content.UI_COPY.fullscreenMode = "Fullscreen";
@@ -405,6 +411,25 @@ test("primary button shows Resume after timer is paused", function () {
   assert(
     deps.dom.controls.start.attributes["aria-label"] === "Resume timer",
     "expected Resume aria label"
+  );
+});
+
+test("expired suspended phase disables the primary action", function () {
+  const deps = createDeps();
+  const render = UIRender.create(deps);
+  const state = baseState();
+  state.timer.status = "paused";
+  state.timer.remainingSec = 0;
+  state.timer.focusBlockNumber = 1;
+
+  render.render(state);
+
+  assert.equal(deps.dom.controls.start.label.textContent, "Phase Ended");
+  assert.equal(deps.dom.controls.start.disabled, true);
+  assert.equal(deps.dom.controls.minimalPrimaryAction.disabled, true);
+  assert.equal(
+    deps.dom.controls.start.attributes["aria-label"],
+    "Phase ended; choose Next Phase or Restart Block"
   );
 });
 

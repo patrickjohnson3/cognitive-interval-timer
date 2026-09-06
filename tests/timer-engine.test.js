@@ -19,6 +19,7 @@ function createTimerContext() {
       phase: Core.PHASE.FOCUS,
       focusBlockNumber: 1,
       remainingSec: 30,
+      suspendedAtMs: null,
       lastTickMs: currentTimeMs,
     },
   };
@@ -26,6 +27,9 @@ function createTimerContext() {
     state,
     Core,
     now: function now() {
+      return currentTimeMs;
+    },
+    wallNow: function wallNow() {
       return currentTimeMs;
     },
     hooks: {
@@ -122,6 +126,84 @@ test("suspension discards hidden elapsed time without completing work", function
   } finally {
     global.setInterval = originalSetInterval;
   }
+});
+
+test("suspension deducts elapsed wall time from only the active phase", function () {
+  const ctx = createTimerContext();
+
+  ctx.timer.setSuspended(true, { trackElapsed: true });
+  assert.equal(ctx.state.timer.suspendedAtMs, 1000);
+  ctx.advanceClock(10000);
+  const result = ctx.timer.setSuspended(false, { countElapsed: true });
+
+  assert.equal(ctx.state.timer.phase, Core.PHASE.FOCUS);
+  assert.equal(ctx.state.timer.status, Core.STATUS.RUNNING);
+  assert.equal(ctx.state.timer.remainingSec, 20);
+  assert.equal(ctx.state.timer.suspendedAtMs, null);
+  assert.equal(ctx.state.stats.focusBlocksToday, 0);
+  assert.deepEqual(result, { changed: true, expired: false });
+});
+
+test("running timers without a suspension anchor do not catch up", function () {
+  const ctx = createTimerContext();
+  ctx.advanceClock(10000);
+
+  const result = ctx.timer.setSuspended(false, { countElapsed: true });
+
+  assert.equal(ctx.state.timer.remainingSec, 30);
+  assert.equal(ctx.state.timer.status, Core.STATUS.RUNNING);
+  assert.deepEqual(result, { changed: false, expired: false });
+});
+
+test("suspension expiration pauses at zero without advancing or crediting focus", function () {
+  const ctx = createTimerContext();
+  ctx.state.timer.remainingSec = 5;
+
+  ctx.timer.setSuspended(true, { trackElapsed: true });
+  ctx.advanceClock(10000);
+  const result = ctx.timer.setSuspended(false, { countElapsed: true });
+
+  assert.equal(ctx.state.timer.phase, Core.PHASE.FOCUS);
+  assert.equal(ctx.state.timer.status, Core.STATUS.PAUSED);
+  assert.equal(ctx.state.timer.remainingSec, 0);
+  assert.equal(ctx.state.stats.focusBlocksToday, 0);
+  assert.equal(ctx.state.stats.focusBlocksSinceLong, 0);
+  assert.equal(ctx.phaseChanges.length, 0);
+  assert.deepEqual(result, { changed: true, expired: true });
+});
+
+test("paused timers ignore suspended wall time", function () {
+  const ctx = createTimerContext();
+  ctx.state.timer.status = Core.STATUS.PAUSED;
+
+  ctx.timer.setSuspended(true, { trackElapsed: true });
+  ctx.advanceClock(10000);
+  const result = ctx.timer.setSuspended(false, { countElapsed: true });
+
+  assert.equal(ctx.state.timer.status, Core.STATUS.PAUSED);
+  assert.equal(ctx.state.timer.remainingSec, 30);
+  assert.equal(ctx.state.timer.suspendedAtMs, null);
+  assert.deepEqual(result, { changed: false, expired: false });
+});
+
+test("restored suspension anchors reconcile after process recreation", function () {
+  const ctx = createTimerContext();
+  ctx.state.timer = Core.normalizeTimerState(
+    {
+      status: Core.STATUS.RUNNING,
+      phase: Core.PHASE.FOCUS,
+      focusBlockNumber: 1,
+      remainingSec: 30,
+      suspendedAtMs: 1000,
+    },
+    ctx.state.settings
+  );
+  ctx.advanceClock(10000);
+
+  ctx.timer.setSuspended(false, { countElapsed: true });
+
+  assert.equal(ctx.state.timer.remainingSec, 20);
+  assert.equal(ctx.state.timer.status, Core.STATUS.RUNNING);
 });
 
 test("ordinary ticks render only when the displayed second changes", function () {

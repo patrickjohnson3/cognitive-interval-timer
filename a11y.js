@@ -56,6 +56,13 @@
       if (type === "block_restarted") {
         return announcements.blockRestarted || "Block restarted.";
       }
+      if (type === "phase_elapsed_while_suspended") {
+        return (
+          data.label +
+          " " +
+          (announcements.suspendedPhaseElapsedSuffix || "ended while the app was suspended.")
+        );
+      }
       return "";
     }
 

@@ -28,6 +28,7 @@ https://patrickjohnson3.github.io/cognitive-interval-timer/
 - Dedicated configuration view for infrequently changed settings
 - Unsaved settings indicator
 - Keyboard shortcuts for timer control
+- Optional countdown while the screen is locked or the app is in the background
 - Fullscreen mode
 - Best-effort keep-screen-awake mode on browsers with Screen Wake Lock support
 - Minimal mode with centered phase, timer, and phase tagline
@@ -106,7 +107,7 @@ eval "$(fnm env --shell bash)"
 
 In minimal mode, left-clicking or tapping the screen starts, pauses, and resumes the timer.
 
-The countdown freezes while the page is hidden or suspended. Returning to the app resumes from the stored remaining time rather than crediting unattended focus blocks.
+By default, a running phase accounts for time spent with the screen locked or the app in the background. If that time exhausts the phase, the timer returns paused at `00:00` without advancing or counting a Focus block as completed. Disable **Continue Timer While Screen Is Locked** under Automation to freeze the countdown instead.
 
 ### Keyboard shortcuts
 
@@ -127,6 +128,7 @@ General:
 - Theme (`Light` / `Dark` / `Signal`)
 - Start with prep phase
 - Auto-start next phase
+- Continue timer while screen is locked (enabled by default)
 - Play sound on phase change
 - Fullscreen
 - Keep screen awake

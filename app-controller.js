@@ -56,6 +56,7 @@
         phase: Core.PHASE.FOCUS,
         focusBlockNumber: 0,
         remainingSec: 0,
+        suspendedAtMs: null,
         lastTickMs: null,
       },
       ui: {
@@ -88,6 +89,7 @@
       deps.TimerEngine.create({
         state: appState,
         Core: Core,
+        wallNow: now,
         hooks: {
           onPhaseChange,
           onStateChange,
@@ -243,6 +245,7 @@
         phase: timerState.phase,
         focusBlockNumber: timerState.focusBlockNumber,
         remainingSec: timerState.remainingSec,
+        suspendedAtMs: timerState.suspendedAtMs,
       };
     }
 
@@ -282,7 +285,8 @@
         previous.timer.status === Core.STATUS.RUNNING &&
         next.timer.status === Core.STATUS.RUNNING &&
         previous.timer.phase === next.timer.phase &&
-        previous.timer.focusBlockNumber === next.timer.focusBlockNumber
+        previous.timer.focusBlockNumber === next.timer.focusBlockNumber &&
+        previous.timer.suspendedAtMs === next.timer.suspendedAtMs
       );
     }
 
@@ -324,6 +328,8 @@
 
     function start() {
       return ensureSessionAccess(function startTimer() {
+        if (appState.timer.status === Core.STATUS.PAUSED && appState.timer.remainingSec <= 0)
+          return;
         const wasPaused = appState.timer.status === Core.STATUS.PAUSED;
         tapFeedback();
         timer.start();
@@ -391,6 +397,7 @@
     }
 
     function onPrimaryAction() {
+      if (appState.timer.status === Core.STATUS.PAUSED && appState.timer.remainingSec <= 0) return;
       if (appState.timer.status === Core.STATUS.RUNNING) {
         pause();
         return;
@@ -619,27 +626,47 @@
     function bindTimerVisibility() {
       if (!doc || typeof doc.addEventListener !== "function" || !timer.setSuspended) return;
       function syncTimerVisibility() {
-        const activeSessionWithoutLock =
-          appState.timer.status !== Core.STATUS.IDLE && !sessionLock.hasLock();
+        syncTimerSuspension();
         if (doc.visibilityState === "hidden") {
           persistSessionIfChanged({ force: true });
         }
-        timer.setSuspended(doc.visibilityState === "hidden" || activeSessionWithoutLock);
       }
       doc.addEventListener("visibilitychange", syncTimerVisibility);
       if (win && typeof win.addEventListener === "function") {
         win.addEventListener("pagehide", function persistBeforePageExit() {
+          syncTimerSuspension({ forceHidden: true });
           persistSessionIfChanged({ force: true });
         });
+        win.addEventListener("pageshow", syncTimerVisibility);
       }
       syncTimerVisibility();
     }
 
-    function syncTimerSuspension() {
-      const hidden = doc && doc.visibilityState === "hidden";
+    function syncTimerSuspension(options) {
+      const hidden = Boolean(
+        (options && options.forceHidden) || (doc && doc.visibilityState === "hidden")
+      );
       const activeSessionWithoutLock =
         appState.timer.status !== Core.STATUS.IDLE && !sessionLock.hasLock();
-      timer.setSuspended(hidden || activeSessionWithoutLock);
+      const shouldSuspend = hidden || activeSessionWithoutLock;
+      const result = timer.setSuspended(shouldSuspend, {
+        trackElapsed: hidden && appState.settings.continue_while_suspended,
+        countElapsed: !shouldSuspend && appState.settings.continue_while_suspended,
+      });
+
+      if (!shouldSuspend && result && result.changed) {
+        if (result.expired) announceSuspendedPhaseElapsed();
+        onStateChange();
+      }
+      return result;
+    }
+
+    function announceSuspendedPhaseElapsed() {
+      const message = a11y.formatAnnouncement("phase_elapsed_while_suspended", {
+        label: phaseLabel(appState.timer.phase),
+      });
+      announce.announce(message);
+      announce.showVisualStatus(message);
     }
 
     function saveSettings(rawSettings) {

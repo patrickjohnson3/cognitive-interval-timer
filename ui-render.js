@@ -27,6 +27,7 @@
       dom.copy.soundEnabled.textContent = uiCopy.soundOnPhaseChange;
       dom.copy.quietModeEnabled.textContent = uiCopy.quietMode;
       dom.copy.singleKeyShortcutsEnabled.textContent = uiCopy.singleKeyShortcuts;
+      dom.copy.continueWhileSuspended.textContent = uiCopy.continueWhileSuspended;
       dom.copy.fullscreenEnabled.textContent = uiCopy.fullscreenMode;
       dom.copy.minimalModeEnabled.textContent = uiCopy.minimalMode;
       dom.copy.wakeLockEnabled.textContent = uiCopy.keepScreenAwake;
@@ -79,6 +80,7 @@
     function buildView(state) {
       const statusKey = state.timer.status;
       const sessionStarted = statusKey !== Core.STATUS.IDLE;
+      const phaseExpired = statusKey === Core.STATUS.PAUSED && state.timer.remainingSec <= 0;
       const phaseCopy = phaseConfig[state.timer.phase];
       const phaseLabel = phaseCopy.displayName;
       const recommendedTiming =
@@ -134,9 +136,16 @@
                 ? labels.unsavedChanges
                 : labels.allSettingsSaved,
         sessionStatusText: state.ui.sessionConflict ? labels.sessionInUse : "",
-        primaryButtonIcon: labels.primaryActionIcons[statusKey],
-        primaryButtonText: labels.primaryActionLabels[statusKey],
-        primaryButtonAriaLabel: labels.primaryActionAriaLabels[statusKey],
+        primaryButtonIcon: phaseExpired
+          ? labels.expiredPrimaryActionIcon
+          : labels.primaryActionIcons[statusKey],
+        primaryButtonText: phaseExpired
+          ? labels.expiredPrimaryActionLabel
+          : labels.primaryActionLabels[statusKey],
+        primaryButtonAriaLabel: phaseExpired
+          ? labels.expiredPrimaryActionAriaLabel
+          : labels.primaryActionAriaLabels[statusKey],
+        primaryButtonDisabled: phaseExpired,
         titleText: sessionStarted
           ? Core.formatTime(state.timer.remainingSec) +
             labels.documentTitleSeparator +
@@ -190,6 +199,7 @@
       icon.textContent = vm.primaryButtonIcon;
       label.textContent = vm.primaryButtonText;
       button.setAttribute("aria-label", vm.primaryButtonAriaLabel);
+      button.disabled = vm.primaryButtonDisabled;
     }
 
     return {

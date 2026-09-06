@@ -502,6 +502,14 @@ button.primary:hover {
   box-shadow: none;
 }
 
+button:disabled,
+button:disabled:hover {
+  cursor: not-allowed;
+  opacity: 0.58;
+  transform: none;
+  box-shadow: none;
+}
+
 :root[data-theme="signal"] .hint,
 :root[data-theme="signal"] .long-hint {
   border-color: var(--color-border);

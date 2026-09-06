@@ -38,6 +38,7 @@
     sound_enabled: true,
     quiet_mode_enabled: false,
     single_key_shortcuts_enabled: true,
+    continue_while_suspended: true,
     fullscreen_enabled: false,
     minimal_mode_enabled: false,
     wake_lock_enabled: false,
@@ -110,6 +111,10 @@
         typeof merged.single_key_shortcuts_enabled === "boolean"
           ? merged.single_key_shortcuts_enabled
           : DEFAULT_SETTINGS.single_key_shortcuts_enabled,
+      continue_while_suspended:
+        typeof merged.continue_while_suspended === "boolean"
+          ? merged.continue_while_suspended
+          : DEFAULT_SETTINGS.continue_while_suspended,
       fullscreen_enabled:
         typeof merged.fullscreen_enabled === "boolean"
           ? merged.fullscreen_enabled
@@ -177,6 +182,7 @@
     const status = Object.values(STATUS).includes(input.status) ? input.status : STATUS.IDLE;
     const defaultRemaining = phaseDurationSec(phase, settings);
     const remaining = Number(input.remainingSec);
+    const suspendedAtMs = input.suspendedAtMs;
 
     return {
       status,
@@ -186,6 +192,13 @@
         Number.isFinite(remaining) && remaining >= 0
           ? Math.min(remaining, defaultRemaining)
           : defaultRemaining,
+      suspendedAtMs:
+        status === STATUS.RUNNING &&
+        typeof suspendedAtMs === "number" &&
+        Number.isFinite(suspendedAtMs) &&
+        suspendedAtMs >= 0
+          ? suspendedAtMs
+          : null,
       lastTickMs: null,
     };
   }

@@ -144,6 +144,9 @@
       bindCheckbox(dom.fields.single_key_shortcuts_enabled, function onShortcutSettingInput() {
         handlers.onSettingsInput(readSettingsForm());
       });
+      bindCheckbox(dom.fields.continue_while_suspended, function onSuspendedTimerInput() {
+        handlers.onSettingsInput(readSettingsForm());
+      });
       bindCheckbox(dom.fields.fullscreen_enabled, function onFullscreenInput(field) {
         handlers.onSettingsInput(readSettingsForm());
         handlers.onFullscreenToggle(field.checked);

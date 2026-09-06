@@ -228,7 +228,15 @@ test("normalizeSettings preserves the single-key shortcut preference", function 
   assert.equal(settings.single_key_shortcuts_enabled, false);
 });
 
-test("normalizeTimerState restores a persisted timer without elapsed wall time", function () {
+test("countdown while suspended defaults on and can be disabled", function () {
+  assert.equal(Core.normalizeSettings(null).continue_while_suspended, true);
+  assert.equal(
+    Core.normalizeSettings({ continue_while_suspended: false }).continue_while_suspended,
+    false
+  );
+});
+
+test("normalizeTimerState restores a persisted timer and suspension anchor", function () {
   const settings = Core.normalizeSettings(null);
   const timer = Core.normalizeTimerState(
     {
@@ -236,6 +244,7 @@ test("normalizeTimerState restores a persisted timer without elapsed wall time",
       phase: Core.PHASE.RECALL,
       focusBlockNumber: 3,
       remainingSec: 77,
+      suspendedAtMs: 123456,
     },
     settings
   );
@@ -244,7 +253,41 @@ test("normalizeTimerState restores a persisted timer without elapsed wall time",
   assert(timer.phase === Core.PHASE.RECALL, "expected phase to restore");
   assert(timer.focusBlockNumber === 3, "expected active block to restore");
   assert(timer.remainingSec === 77, "expected remaining time to restore unchanged");
+  assert.equal(timer.suspendedAtMs, 123456);
   assert(timer.lastTickMs === null, "expected a fresh wall-clock anchor");
+});
+
+test("normalizeTimerState rejects invalid or inapplicable suspension anchors", function () {
+  const settings = Core.normalizeSettings(null);
+
+  assert.equal(
+    Core.normalizeTimerState(
+      { status: Core.STATUS.RUNNING, phase: Core.PHASE.FOCUS, suspendedAtMs: null },
+      settings
+    ).suspendedAtMs,
+    null
+  );
+  assert.equal(
+    Core.normalizeTimerState(
+      { status: Core.STATUS.RUNNING, phase: Core.PHASE.FOCUS, suspendedAtMs: "invalid" },
+      settings
+    ).suspendedAtMs,
+    null
+  );
+  assert.equal(
+    Core.normalizeTimerState(
+      { status: Core.STATUS.RUNNING, phase: Core.PHASE.FOCUS, suspendedAtMs: false },
+      settings
+    ).suspendedAtMs,
+    null
+  );
+  assert.equal(
+    Core.normalizeTimerState(
+      { status: Core.STATUS.PAUSED, phase: Core.PHASE.FOCUS, suspendedAtMs: 123456 },
+      settings
+    ).suspendedAtMs,
+    null
+  );
 });
 
 test("normalizeTimerState bounds corrupted remaining time to the phase duration", function () {

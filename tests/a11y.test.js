@@ -94,6 +94,10 @@ test("timer actions have concise status announcements", function () {
   assert.equal(a11y.formatAnnouncement("timer_paused"), "Timer paused.");
   assert.equal(a11y.formatAnnouncement("timer_resumed"), "Timer resumed.");
   assert.equal(a11y.formatAnnouncement("block_restarted"), "Block restarted.");
+  assert.equal(
+    a11y.formatAnnouncement("phase_elapsed_while_suspended", { label: "Focus" }),
+    "Focus ended while the screen was locked or the app was in the background. Choose Next Phase or Restart Block."
+  );
 });
 
 test("tooltip triggers meet the 44 CSS-pixel touch target minimum", function () {

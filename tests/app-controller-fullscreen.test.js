@@ -23,6 +23,7 @@ function createDom() {
       autoStart: eventTargetNode(),
       soundEnabled: eventTargetNode(),
       quietModeEnabled: eventTargetNode(),
+      continueWhileSuspended: eventTargetNode(),
       fullscreenEnabled: eventTargetNode(),
       minimalModeEnabled: eventTargetNode(),
       wakeLockEnabled: eventTargetNode(),
@@ -46,6 +47,7 @@ function createDom() {
       sound_enabled: eventTargetNode(),
       quiet_mode_enabled: eventTargetNode(),
       single_key_shortcuts_enabled: eventTargetNode({ checked: true }),
+      continue_while_suspended: eventTargetNode({ checked: true }),
       fullscreen_enabled: eventTargetNode(),
       minimal_mode_enabled: eventTargetNode(),
       wake_lock_enabled: eventTargetNode(),
@@ -71,6 +73,8 @@ function setup(options) {
   let bindCount = 0;
   const wakeLockCalls = [];
   const timerCalls = [];
+  const suspensionCalls = [];
+  let timerIsSuspended = false;
   const hapticCalls = [];
   const audioCalls = [];
   const transitionCalls = [];
@@ -125,6 +129,7 @@ function setup(options) {
         sound_enabled: dom.fields.sound_enabled.checked,
         quiet_mode_enabled: dom.fields.quiet_mode_enabled.checked,
         single_key_shortcuts_enabled: dom.fields.single_key_shortcuts_enabled.checked,
+        continue_while_suspended: dom.fields.continue_while_suspended.checked,
         fullscreen_enabled: dom.fields.fullscreen_enabled.checked,
         minimal_mode_enabled: dom.fields.minimal_mode_enabled.checked,
         wake_lock_enabled: dom.fields.wake_lock_enabled.checked,
@@ -197,8 +202,13 @@ function setup(options) {
       resetToPhase: function resetToPhase(phase) {
         timerCalls.push("resetToPhase:" + phase);
       },
-      setSuspended: function setSuspended(suspended) {
+      setSuspended: function setSuspended(suspended, options) {
         timerCalls.push("suspended:" + suspended);
+        suspensionCalls.push({ suspended: Boolean(suspended), options: options });
+        const resumed = timerIsSuspended && !suspended;
+        timerIsSuspended = Boolean(suspended);
+        if (resumed && config.suspendedTimerResult) return config.suspendedTimerResult;
+        return { changed: false, expired: false };
       },
     },
     storage: {
@@ -276,6 +286,7 @@ function setup(options) {
     fullscreenRequests,
     stored,
     timerCalls,
+    suspensionCalls,
     wakeLockCalls,
     hapticCalls,
     audioCalls,
@@ -435,7 +446,7 @@ test("a client refreshes persisted state after acquiring the session lock", asyn
   assert(ctx.announcementCalls.includes("timer_resumed"));
 });
 
-test("document visibility freezes and resynchronizes the timer clock", function () {
+test("document visibility tracks and reconciles suspended wall time", function () {
   const ctx = setup();
   global.document.visibilityState = "hidden";
   ctx.documentListeners.visibilitychange();
@@ -444,6 +455,45 @@ test("document visibility freezes and resynchronizes the timer clock", function 
 
   assert(ctx.timerCalls.includes("suspended:true"), "expected hidden timer suspension");
   assert(ctx.timerCalls.includes("suspended:false"), "expected visible timer resynchronization");
+  assert.equal(ctx.suspensionCalls.at(-2).options.trackElapsed, true);
+  assert.equal(ctx.suspensionCalls.at(-1).options.countElapsed, true);
+});
+
+test("disabled suspended countdown preserves freeze behavior", function () {
+  const ctx = setup({
+    storedSettings: Core.normalizeSettings({ continue_while_suspended: false }),
+  });
+  global.document.visibilityState = "hidden";
+  ctx.documentListeners.visibilitychange();
+  global.document.visibilityState = "visible";
+  ctx.documentListeners.visibilitychange();
+
+  assert.equal(ctx.suspensionCalls.at(-2).options.trackElapsed, false);
+  assert.equal(ctx.suspensionCalls.at(-1).options.countElapsed, false);
+});
+
+test("disabled suspended countdown preference persists", function () {
+  const ctx = setup();
+
+  ctx.app.controller.saveSettings(
+    Object.assign({}, ctx.app.state.settings, { continue_while_suspended: false })
+  );
+
+  assert.equal(ctx.stored[Core.STORAGE_KEYS.session].settings.continue_while_suspended, false);
+});
+
+test("suspended phase expiration is announced without a phase transition", function () {
+  const ctx = setup({ suspendedTimerResult: { changed: true, expired: true } });
+  ctx.app.state.timer.status = Core.STATUS.RUNNING;
+  ctx.app.state.timer.phase = Core.PHASE.FOCUS;
+  global.document.visibilityState = "hidden";
+  ctx.documentListeners.visibilitychange();
+  global.document.visibilityState = "visible";
+  ctx.documentListeners.visibilitychange();
+
+  assert(ctx.announcementCalls.includes("phase_elapsed_while_suspended"));
+  assert(ctx.visualStatusCalls.includes("phase_elapsed_while_suspended"));
+  assert.equal(ctx.transitionCalls.length, 0);
 });
 
 test("timer session state survives application initialization", function () {
@@ -469,6 +519,7 @@ test("timer settings and statistics persist as one coherent session", function (
   ctx.app.state.stats.focusBlocksToday = 4;
   ctx.app.state.timer.phase = Core.PHASE.RECALL;
   ctx.app.state.timer.remainingSec = 25;
+  ctx.app.state.timer.suspendedAtMs = 123456;
 
   ctx.app.onStateChange();
 
@@ -478,6 +529,7 @@ test("timer settings and statistics persist as one coherent session", function (
   assert.equal(session.stats.focusBlocksToday, 4);
   assert.equal(session.timer.phase, Core.PHASE.RECALL);
   assert.equal(session.timer.remainingSec, 25);
+  assert.equal(session.timer.suspendedAtMs, 123456);
 });
 
 test("timer persistence does not add time to a fractional countdown", function () {
@@ -513,6 +565,23 @@ test("running countdown persistence is throttled without delaying state changes"
   ctx.app.state.timer.status = Core.STATUS.PAUSED;
   ctx.app.onStateChange();
   assert.equal(ctx.getSessionWriteCount(), initialWrites + 3, "pause state should persist now");
+});
+
+test("suspension anchors bypass running progress write throttling", function () {
+  const ctx = setup({
+    now: function now() {
+      return 1000;
+    },
+  });
+  ctx.app.state.timer.status = Core.STATUS.RUNNING;
+  ctx.app.onStateChange();
+  const runningWrites = ctx.getSessionWriteCount();
+
+  ctx.app.state.timer.suspendedAtMs = 1000;
+  ctx.app.onStateChange();
+
+  assert.equal(ctx.getSessionWriteCount(), runningWrites + 1);
+  assert.equal(ctx.stored[Core.STORAGE_KEYS.session].timer.suspendedAtMs, 1000);
 });
 
 test("page suspension forces pending running progress to storage", function () {
@@ -561,6 +630,16 @@ test("primary action resumes while timer is paused", function () {
   assert(ctx.timerCalls.includes("start"), "expected primary action to resume timer");
   assert(ctx.hapticCalls.includes("tap"), "expected resume haptic tap");
   assert(ctx.announcementCalls.includes("timer_resumed"));
+});
+
+test("primary action cannot resume an expired suspended phase", function () {
+  const ctx = setup();
+  ctx.app.state.timer.status = Core.STATUS.PAUSED;
+  ctx.app.state.timer.remainingSec = 0;
+  ctx.boundHandlers.onPrimaryAction();
+
+  assert(!ctx.timerCalls.includes("start"));
+  assert(!ctx.hapticCalls.includes("tap"));
 });
 
 test("restart announces the reset timer state", function () {
